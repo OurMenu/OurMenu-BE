@@ -3,12 +3,10 @@ name: Java CD with Gradle
 on:
   issue_comment:
     types: [ created, edited ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-    #if: github.event.issue.pull_request && contains(github.event.comment.body, '/아워메뉴) && contains(github.event.comment.body, '배포')
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/아워메뉴) && contains(github.event.comment.body, '배포')
     runs-on: ubuntu-latest
     permissions:
       write-all
