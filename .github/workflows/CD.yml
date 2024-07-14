@@ -59,7 +59,7 @@ jobs:
 
       - name: Build Push Docker images
         run: |
-          docker build -f ./infra/docker/Dockerfile -t ${{ secrets.DOCKER_REPO }} .
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }} .
           docker push ${{ secrets.DOCKER_REPO }}
 
   deploy:
