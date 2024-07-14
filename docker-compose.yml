@@ -24,9 +24,10 @@ services:
   application:
     container_name: docker-compose-test
     restart: on-failure
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: ji0513ji/ourmenu:latest
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
