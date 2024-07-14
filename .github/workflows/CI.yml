@@ -46,13 +46,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
-      - name: Wait for MySQL to be healthy
-        run: |
-          until docker inspect --format='{{json .State.Health.Status}}' mysql | grep "healthy"; do
-            echo "Waiting for MySQL to be healthy..."
-            sleep 5
-          done
-
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 
