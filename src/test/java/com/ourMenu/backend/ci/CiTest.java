@@ -1,7 +1,7 @@
 package com.ourMenu.backend.ci;
 
-import com.ourMenu.backend.domain.test.TestEntity;
-import com.ourMenu.backend.domain.test.TestRepository;
+import com.ourMenu.backend.domain.test.domain.TestEntity;
+import com.ourMenu.backend.domain.test.dao.TestRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

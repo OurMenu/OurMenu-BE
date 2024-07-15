@@ -1,4 +1,4 @@
-package com.ourMenu.backend.domain.test;
+package com.ourMenu.backend.domain.test.domain;
 
 
 import jakarta.persistence.Entity;
@@ -13,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
+@Builder
 public class TestEntity {
 
     @Id
