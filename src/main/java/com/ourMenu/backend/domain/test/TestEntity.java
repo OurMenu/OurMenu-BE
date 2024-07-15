@@ -1,4 +1,4 @@
-package com.ourMenu.backend.test;
+package com.ourMenu.backend.domain.test;
 
 
 import jakarta.persistence.Entity;

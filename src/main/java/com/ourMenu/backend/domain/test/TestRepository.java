@@ -1,4 +1,4 @@
-package com.ourMenu.backend.test;
+package com.ourMenu.backend.domain.test;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

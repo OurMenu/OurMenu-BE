@@ -1,9 +1,8 @@
 package com.ourMenu.backend.ci;
 
-import com.ourMenu.backend.test.TestEntity;
-import com.ourMenu.backend.test.TestRepository;
+import com.ourMenu.backend.domain.test.TestEntity;
+import com.ourMenu.backend.domain.test.TestRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
