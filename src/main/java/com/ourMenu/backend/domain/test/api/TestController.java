@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.test.api;
 
 import com.ourMenu.backend.domain.test.api.request.SaveEntityRequest;
+import com.ourMenu.backend.domain.test.api.request.SaveJdbcRequest;
 import com.ourMenu.backend.domain.test.api.response.FindEntityByIdResponse;
 import com.ourMenu.backend.domain.test.api.response.FindJdbcByIdResponse;
 import com.ourMenu.backend.domain.test.api.response.SaveEntityResponse;
@@ -10,6 +11,7 @@ import com.ourMenu.backend.domain.test.domain.TestEntity;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,8 +55,8 @@ public class TestController {
     }
 
     @PostMapping("/jdbc/save")
-    public void save(@RequestBody String name){
-        testService.saveJdbcEntity(name);
+    public void save(@RequestBody @Valid SaveJdbcRequest saveJdbcRequest){
+        testService.saveJdbcEntity(saveJdbcRequest.name());
     }
 
     @GetMapping("/jdbc/{SaveEntityId}")
