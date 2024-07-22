@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Configuration;
                 title = "ourmenu API 명세서",
                 description = "ourmenu 사용되는 API 명세서",
                 version = "v1"
-        ),
+        )/*,
         servers = {
                 @Server(
                         url = "https://bluesparrow.shop",
                         description = "HTTPS Server"
-                )
-        }
+                ),
+        }*/
 )
 
 @Configuration
