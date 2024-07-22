@@ -14,9 +14,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+  swagger:
+    #server-url: http://localhost:8080
+    #server-url: https://bluesparrow.shop
   logging:
     level:
       org.hibernate.SQL: debug
-  swagger:
-    server-url: http://localhost:8080
+
 
