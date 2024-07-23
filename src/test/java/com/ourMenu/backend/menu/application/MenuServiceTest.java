@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -54,7 +55,8 @@ class MenuServiceTest {
         // Given
         menuService.createMenu(menu1);
         menuService.createMenu(menu2);
-
+        em.flush();
+        em.clear();
 
         // When
         List<Menu> menus = menuService.getAllMenus();
@@ -70,6 +72,7 @@ class MenuServiceTest {
     void 메뉴단권조회() {
         // Given
         em.flush();
+        em.clear();
 
         // When
         Long savedId = menuService.createMenu(menu1).getId();
@@ -84,26 +87,76 @@ class MenuServiceTest {
     @Test
     void 단권조회_메뉴가없는경우() {
         // Given
-        Long nonExistentId = 999L; // 존재하지 않는 ID
+        Long notExistedId = 999L; // 존재하지 않는 ID
 
         // When & Then
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
-            menuService.getMenuById(nonExistentId);
+            menuService.getMenuById(notExistedId);
         });
 
 
     }
 
     @Test
-    void createMenu() {
+    void 메뉴추가() {
+        // Given
+        Menu newMenu = new Menu();
+        newMenu.setTitle("된장찌개");
+        newMenu.setPrice(9000);
+        newMenu.setImage("image_url");
+        newMenu.setStatus(MenuStatus.CREATED);
+        newMenu.setMemo("구수한 맛");
 
+        // When
+        Menu savedMenu = menuService.createMenu(newMenu);
+        em.flush();
+        em.clear();
+        Menu findMenu = menuService.getMenuById(savedMenu.getId());
+
+
+        // Then
+
+        assertEquals(findMenu.getTitle(), savedMenu.getTitle());
+        assertEquals(findMenu.getPrice(), savedMenu.getPrice());
+    }
+
+
+    @Test
+    void 메뉴업데이트() {
+        // Given
+        Long savedId = menuService.createMenu(menu1).getId();
+        Menu updatedMenu = new Menu();
+        updatedMenu.setId(savedId);
+        updatedMenu.setTitle("김치찌개");
+        updatedMenu.setPrice(12000);
+        updatedMenu.setImage("updated_image_url");
+        updatedMenu.setStatus(MenuStatus.UPDATED); // 예시로 상태 변경
+        updatedMenu.setMemo("라면사리 공짜");
+
+        // When
+        menuService.updateMenu(savedId, updatedMenu);
+        em.flush();
+        em.clear();
+        Menu foundMenu = menuService.getMenuById(savedId);
+
+        // Then
+        assertEquals(12000, foundMenu.getPrice());
     }
 
     @Test
-    void updateMenu() {
-    }
+    void 메뉴삭제() {
 
-    @Test
-    void deleteMenu() {
+        // Given
+        menuService.createMenu(menu1);
+        menuService.createMenu(menu2);
+        em.flush();
+        em.clear();
+        Long savedId = menuService.createMenu(menu1).getId();
+
+        // When
+        Menu deleteMenu = menuService.deleteMenu(savedId);
+
+        // Then
+        assertEquals(deleteMenu.getStatus(), MenuStatus.DELETED);
     }
 }

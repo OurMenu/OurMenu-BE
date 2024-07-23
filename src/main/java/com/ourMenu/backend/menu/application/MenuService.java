@@ -6,6 +6,7 @@ import com.ourMenu.backend.menu.domain.MenuStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,22 +17,26 @@ public class MenuService {
     private MenuRepository menuRepository;
 
     // 모두 조회
+    @Transactional
     public List<Menu> getAllMenus() {
         return menuRepository.findAll();
     }
 
-    // 단권 조회 * 예외처리 추가해야함
+    // 단권 조회 *
+    @Transactional
     public Menu getMenuById(Long id) {
         return menuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
     }
 
     // 메뉴 추가
+    @Transactional
     public Menu createMenu(Menu menu) {
         return menuRepository.save(menu);
     }
 
     // 메뉴 업데이트
+    @Transactional
     public Menu updateMenu(Long id, Menu menuDetails) {
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
@@ -48,7 +53,8 @@ public class MenuService {
         }
     }
 
-    // 메뉴 삭제 * 예외처리 추가해야함
+    // 메뉴 삭제 *
+    @Transactional
     public Menu deleteMenu(Long id) {
         Menu menu = menuRepository.findById(id).orElse(null);
         if (menu != null) {

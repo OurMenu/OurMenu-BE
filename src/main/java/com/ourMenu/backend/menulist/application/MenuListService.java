@@ -8,6 +8,7 @@ import com.ourMenu.backend.menulist.dao.MenuListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +23,13 @@ public class MenuListService {
     private final MenuRepository menuRepository;
 
     /** 새 메뉴판 생성 */
+    @Transactional
     public MenuList createMenuList(MenuList menuList) {
         return menuListRepository.save(menuList);
     }
 
     /** 메뉴판 메뉴 추가 */
+    @Transactional
     public MenuList addMenu(Long menuId, Long menuListId ) {
         MenuList menuList = menuListRepository.findById(menuListId)
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
@@ -39,16 +42,22 @@ public class MenuListService {
         return menuListRepository.save(menuList);
     }
 
+    // 모든 메뉴판 조회
+    @Transactional
     public List<MenuList> getAllMenuLists() {
         return menuListRepository.findAll();
     }
 
+    // 특정 메뉴판 조회
+    @Transactional
     public MenuList getMenuListById(Long id) {
-        return menuListRepository.findById(id).orElse(null);
+        return menuListRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
     }
 
 
-
+    // 메뉴판 업데이트
+    @Transactional
     public MenuList updateMenuList(Long id, MenuList menuListDetails) {
         MenuList menuList = menuListRepository.findById(id).orElse(null);
         if (menuList != null) {
@@ -63,6 +72,8 @@ public class MenuListService {
         }
     }
 
+    // 메뉴판 삭제
+    @Transactional
     public void deleteMenuList(Long id) {
         menuListRepository.deleteById(id);
     }
