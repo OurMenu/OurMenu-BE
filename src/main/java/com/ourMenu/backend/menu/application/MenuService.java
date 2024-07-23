@@ -56,7 +56,8 @@ public class MenuService {
     // 메뉴 삭제 *
     @Transactional
     public Menu deleteMenu(Long id) {
-        Menu menu = menuRepository.findById(id).orElse(null);
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
         if (menu != null) {
             menu.setStatus(MenuStatus.DELETED); // 상태를 'DELETED'로 변경
             return menuRepository.save(menu); //  상태를 저장

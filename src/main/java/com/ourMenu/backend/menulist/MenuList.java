@@ -43,4 +43,10 @@ public class MenuList {
         this.menuMenuLists.add(menuMenuList);
         menuMenuList.setMenuList(this);
     }
+
+    public void removeMenuMenuList(MenuMenuList menuMenuList) {
+        this.menuMenuLists.remove(menuMenuList);
+        menuMenuList.setMenuList(null);
+    }
+
 }
