@@ -22,7 +22,8 @@ public class MenuService {
 
     // 단권 조회 * 예외처리 추가해야함
     public Menu getMenuById(Long id) {
-        return menuRepository.findById(id).orElse(null);
+        return menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
     }
 
     // 메뉴 추가
@@ -32,7 +33,8 @@ public class MenuService {
 
     // 메뉴 업데이트
     public Menu updateMenu(Long id, Menu menuDetails) {
-        Menu menu = menuRepository.findById(id).orElse(null);
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
         if (menu != null) {
             menu.setTitle(menuDetails.getTitle());
             menu.setPrice(menuDetails.getPrice());

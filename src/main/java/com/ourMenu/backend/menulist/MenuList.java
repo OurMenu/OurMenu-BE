@@ -2,8 +2,8 @@ package com.ourMenu.backend.menulist;
 
 import com.ourMenu.backend.menu.domain.MenuMenuList;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.groups.Default;
+import lombok.*;
 
 import java.security.Timestamp;
 import java.util.ArrayList;
@@ -12,6 +12,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class MenuList {
 
     @Id
@@ -29,8 +32,11 @@ public class MenuList {
     @Lob
     private String image;
 
-    @OneToMany(mappedBy = "menuList")
+
+    @OneToMany(mappedBy = "menuList", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<MenuMenuList> menuMenuLists = new ArrayList<>();
+
 
     //** 연관관계 메서드 **//
     public void addMenuMenuList(MenuMenuList menuMenuList){
