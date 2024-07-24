@@ -22,7 +22,8 @@ public class Menu {
     private int price;
 
     @Lob
-    private String image;
+    @Column(name = "image")
+    private String ImgUrl;
 
     @Enumerated(EnumType.STRING)
     private MenuStatus status;

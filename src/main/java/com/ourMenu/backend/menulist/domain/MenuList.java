@@ -29,7 +29,8 @@ public class MenuList {
     private String title;
 
     @Lob
-    private String image;
+    @Column(name = "image")
+    private String ImgUrl;
 
 
     @OneToMany(mappedBy = "menuList", cascade = CascadeType.ALL)
