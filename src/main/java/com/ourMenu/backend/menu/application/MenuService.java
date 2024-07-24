@@ -43,7 +43,7 @@ public class MenuService {
         if (menu != null) {
             menu.setTitle(menuDetails.getTitle());
             menu.setPrice(menuDetails.getPrice());
-            menu.setImage(menuDetails.getImage());
+            menu.setImgUrl(menuDetails.getImgUrl());
             menu.setModifiedAt(menuDetails.getModifiedAt());
             menu.setStatus(menuDetails.getStatus());
             menu.setMemo(menuDetails.getMemo());

@@ -87,7 +87,7 @@ public class MenuListService {
             menuList.setTitle(menuListDetails.getTitle());
             menuList.setModifiedAt(menuListDetails.getModifiedAt());
             menuList.setStatus(menuListDetails.getStatus());
-            menuList.setImage(menuListDetails.getImage());
+            menuList.setImgUrl(menuListDetails.getImgUrl());
 
             return menuListRepository.save(menuList);
         } else {
