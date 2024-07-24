@@ -1,6 +1,6 @@
-package com.ourMenu.backend.menulist.domain;
+package com.ourMenu.backend.domain.menulist.domain;
 
-import com.ourMenu.backend.menu.domain.MenuMenuList;
+import com.ourMenu.backend.domain.menu.domain.MenuMenuList;
 import jakarta.persistence.*;
 import lombok.*;
 

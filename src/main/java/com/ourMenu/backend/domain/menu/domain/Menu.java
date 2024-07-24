@@ -1,4 +1,4 @@
-package com.ourMenu.backend.menu.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,13 +1,13 @@
 package com.ourMenu.backend.ci.menulist.application;
 
-import com.ourMenu.backend.menu.application.MenuService;
-import com.ourMenu.backend.menu.dao.MenuRepository;
-import com.ourMenu.backend.menu.domain.Menu;
-import com.ourMenu.backend.menu.domain.MenuStatus;
+import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 
-import com.ourMenu.backend.menulist.application.MenuListService;
-import com.ourMenu.backend.menulist.dao.MenuListRepository;
-import com.ourMenu.backend.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
+import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
+import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

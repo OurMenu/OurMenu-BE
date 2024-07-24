@@ -1,6 +1,6 @@
-package com.ourMenu.backend.menu.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
-import com.ourMenu.backend.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

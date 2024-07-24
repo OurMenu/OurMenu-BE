@@ -1,8 +1,8 @@
-package com.ourMenu.backend.menu.application;
+package com.ourMenu.backend.domain.menu.application;
 
-import com.ourMenu.backend.menu.dao.MenuRepository;
-import com.ourMenu.backend.menu.domain.Menu;
-import com.ourMenu.backend.menu.domain.MenuStatus;
+import com.ourMenu.backend.domain.menu.domain.MenuStatus;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
