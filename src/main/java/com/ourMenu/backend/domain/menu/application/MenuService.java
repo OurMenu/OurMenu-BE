@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,30 @@ public class MenuService {
         } else {
             return null;
         }
+    }
+
+    /*
+    Request를 통한 메뉴 업데이트
+     */
+    @Transactional
+    public Menu updateMenu(Long id, PatchMenuRequest patchMenuRequest) {
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+        if (patchMenuRequest.getTitle() != null) {
+            menu.setTitle(patchMenuRequest.getTitle());
+        }
+        if (patchMenuRequest.getImgUrl() != null) {
+            menu.setImgUrl(patchMenuRequest.getImgUrl());
+        }
+        if (patchMenuRequest.getPrice() != 0) { // 가격이 0이 아닌 경우에만 업데이트
+            menu.setPrice(patchMenuRequest.getPrice());
+        }
+        if (patchMenuRequest.getMemo() != null) {
+            menu.setMemo(patchMenuRequest.getMemo());
+        }
+
+        return menuRepository.save(menu);
     }
 
     // 메뉴 삭제 *
