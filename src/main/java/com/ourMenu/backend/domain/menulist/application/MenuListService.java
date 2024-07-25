@@ -6,6 +6,7 @@ import com.ourMenu.backend.domain.menu.domain.MenuMenuList;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.domain.MenuListStatus;
+import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +94,24 @@ public class MenuListService {
         } else {
             return null;
         }
+    }
+
+    /*
+    Request를 통한 메뉴판 업데이트
+     */
+    @Transactional
+    public MenuList updateMenuList(Long id, PatchMenuListRequest patchMenuListRequest) {
+        MenuList menuList = menuListRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("MenuList not found"));
+
+        if (patchMenuListRequest.getTitle() != null){
+            menuList.setTitle(patchMenuListRequest.getTitle());
+        }
+        if (patchMenuListRequest.getImgUrl() != null){
+            menuList.setImgUrl(patchMenuListRequest.getImgUrl());
+        }
+
+        return menuListRepository.save(menuList);
     }
 
     // 메뉴판 삭제
