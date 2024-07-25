@@ -1,9 +1,9 @@
 package com.ourMenu.backend.ci.menu.application;
 
-import com.ourMenu.backend.menu.application.MenuService;
-import com.ourMenu.backend.menu.dao.MenuRepository;
-import com.ourMenu.backend.menu.domain.Menu;
-import com.ourMenu.backend.menu.domain.MenuStatus;
+import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

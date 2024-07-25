@@ -1,18 +1,18 @@
-package com.ourMenu.backend.menulist.application;
+package com.ourMenu.backend.domain.menulist.application;
 
-import com.ourMenu.backend.menu.dao.MenuRepository;
-import com.ourMenu.backend.menu.domain.Menu;
-import com.ourMenu.backend.menu.domain.MenuMenuList;
-import com.ourMenu.backend.menulist.domain.MenuList;
-import com.ourMenu.backend.menulist.domain.MenuListStatus;
-import com.ourMenu.backend.menulist.dao.MenuListRepository;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuMenuList;
+import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
+import com.ourMenu.backend.domain.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.menulist.domain.MenuListStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.ourMenu.backend.menu.domain.MenuMenuList.createMenuMenuList;
+import static com.ourMenu.backend.domain.menu.domain.MenuMenuList.createMenuMenuList;
 
 @Service
 @RequiredArgsConstructor
