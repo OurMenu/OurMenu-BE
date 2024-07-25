@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.menulist.dto.response;
 
 import com.ourMenu.backend.domain.menu.domain.MenuMenuList;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menulist.domain.MenuListStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,6 @@ public class MenuListDto {
 
     private String imgUrl;
 
-    private List<MenuMenuList> menuMenuLists = new ArrayList<>();
+    private List<MenuDto> menus;
 
 }

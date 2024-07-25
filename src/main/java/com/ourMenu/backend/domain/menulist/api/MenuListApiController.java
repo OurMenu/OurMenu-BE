@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequest;
@@ -112,7 +113,18 @@ public class MenuListApiController {
                 .imgUrl(menuList.getImgUrl())
                 .createdAt(menuList.getCreatedAt())
                 .modifiedAt(menuList.getModifiedAt())
-                .menuMenuLists(menuList.getMenuMenuLists())
+                .menus(menuList.getMenuMenuLists().stream()
+                        .map(menuMenuList -> MenuDto.builder()
+                                .id(menuMenuList.getMenu().getId())
+                                .title(menuMenuList.getMenu().getTitle())
+                                .price(menuMenuList.getMenu().getPrice())
+                                .createdAt(menuMenuList.getMenu().getCreatedAt())
+                                .modifiedAt(menuMenuList.getMenu().getModifiedAt())
+                                .memo(menuMenuList.getMenu().getMemo())
+                                .imgUrl(menuMenuList.getMenu().getImgUrl())
+                                .status(menuMenuList.getMenu().getStatus())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
         return menuListDto;
     }

@@ -109,15 +109,16 @@ public class MenuApiController {
 
 
     private static MenuDto menuDto(Menu menu) {
-        MenuDto response = new MenuDto();
-        response.setId(menu.getId());
-        response.setTitle(menu.getTitle());
-        response.setPrice(menu.getPrice());
-        response.setImgUrl(menu.getImgUrl());
-        response.setMemo(menu.getMemo());
-        response.setStatus(menu.getStatus());
-        response.setCreatedAt(menu.getCreatedAt());
-        response.setModifiedAt(menu.getModifiedAt());
+        MenuDto response = MenuDto.builder()
+                        .id(menu.getId())
+                .title(menu.getTitle())
+                .price(menu.getPrice())
+                .imgUrl(menu.getImgUrl())
+                .createdAt(menu.getCreatedAt())
+                .modifiedAt(menu.getModifiedAt())
+                .memo(menu.getMemo())
+                .status(menu.getStatus())
+                .build();
         return response;
     }
 }
