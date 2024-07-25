@@ -24,6 +24,8 @@ spring:
     password: ${GMAIL_PASSWORD}
     properties:
       mail:
+        transport:
+          protocol: smtp
         smtp:
           auth: true
           timeout: 5000
