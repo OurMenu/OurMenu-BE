@@ -3,11 +3,10 @@ package com.ourMenu.backend.domain.menu.dto.response;
 import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import lombok.Data;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
-public class GetMenuResponse {
+public class MenuDto {
     private Long id;
     private String title;
     private int price;
