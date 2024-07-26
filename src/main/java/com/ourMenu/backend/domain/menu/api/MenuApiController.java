@@ -3,10 +3,9 @@ package com.ourMenu.backend.domain.menu.api;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
-import com.ourMenu.backend.domain.menu.dto.response.PatchMenuResponse;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
-import com.ourMenu.backend.domain.menu.dto.response.GetMenuResponse;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -44,36 +43,19 @@ public class MenuApiController {
     ID를 통한 메뉴 조회
      */
     @GetMapping("/{id}")
-    public ApiResponse<GetMenuResponse> getMenuById(@PathVariable Long id) {
+    public ApiResponse<MenuDto> getMenuById(@PathVariable Long id) {
         Menu menu = menuService.getMenuById(id);
 
-        GetMenuResponse response = new GetMenuResponse();
-        response.setId(menu.getId());
-        response.setTitle(menu.getTitle());
-        response.setPrice(menu.getPrice());
-        response.setImgUrl(menu.getImgUrl());
-        response.setStatus(menu.getStatus());
-        response.setCreatedAt(menu.getCreatedAt());
-        response.setModifiedAt(menu.getModifiedAt());
-        response.setMemo(menu.getMemo());
+        MenuDto response = menuDto(menu);
 
         return ApiUtils.success(response);
     }
 
     @GetMapping("")
-    public ApiResponse<List<GetMenuResponse>> getAllMenu() {
+    public ApiResponse<List<MenuDto>> getAllMenu() {
         List<Menu> menuList = menuService.getAllMenus();
-        List<GetMenuResponse> responseList = menuList.stream().map(menu -> {
-            GetMenuResponse response = new GetMenuResponse();
-            response.setId(menu.getId());
-            response.setTitle(menu.getTitle());
-            response.setPrice(menu.getPrice());
-            response.setImgUrl(menu.getImgUrl());
-            response.setMemo(menu.getMemo());
-            response.setStatus(menu.getStatus());
-            response.setCreatedAt(menu.getCreatedAt());
-            response.setModifiedAt(menu.getModifiedAt());
-            return response;
+        List<MenuDto> responseList = menuList.stream().map(menu -> {
+            return menuDto(menu);
         }).collect(Collectors.toList());
 
         return ApiUtils.success(responseList);
@@ -118,21 +100,25 @@ public class MenuApiController {
     메뉴 업데이트
      */
     @PatchMapping("/{id}")
-    public ApiResponse<PatchMenuResponse> updateMenu(@PathVariable Long id, @RequestBody PatchMenuRequest patchMenuRequest){
+    public ApiResponse<MenuDto> updateMenu(@PathVariable Long id, @RequestBody PatchMenuRequest patchMenuRequest){
         Menu updatedMenu = menuService.updateMenu(id, patchMenuRequest);
 
-        PatchMenuResponse response = new PatchMenuResponse();
-        response.setId(updatedMenu.getId());
-        response.setTitle(updatedMenu.getTitle());
-        response.setImgUrl(updatedMenu.getImgUrl());
-        response.setPrice(updatedMenu.getPrice());
-        response.setMemo(updatedMenu.getMemo());
-        response.setCreatedAt(updatedMenu.getCreatedAt());
-        response.setModifiedAt(updatedMenu.getModifiedAt());
-        response.setStatus(updatedMenu.getStatus());
-
-
+        MenuDto response = menuDto(updatedMenu);
         return ApiUtils.success(response);
     }
 
+
+    private static MenuDto menuDto(Menu menu) {
+        MenuDto response = MenuDto.builder()
+                        .id(menu.getId())
+                .title(menu.getTitle())
+                .price(menu.getPrice())
+                .imgUrl(menu.getImgUrl())
+                .createdAt(menu.getCreatedAt())
+                .modifiedAt(menu.getModifiedAt())
+                .memo(menu.getMemo())
+                .status(menu.getStatus())
+                .build();
+        return response;
+    }
 }
