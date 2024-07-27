@@ -34,9 +34,9 @@ public class DummyHomeController {
     @GetMapping("/home/recommended/tag")
     public ApiResponse<List<DummyTagResponse>> dummyGetTag(){
         List<DummyTagResponse> responseList = new ArrayList<>();
-        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://s3--urlpath"));
-        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://s3--urlpath"));
-        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://s3--urlpath"));
+        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%ED%99%94%EC%82%B0%EB%9D%BC%EB%A9%98.png"));
+        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%ED%99%94%EC%82%B0%EB%9D%BC%EB%A9%98.png"));
+        responseList.add(new DummyTagResponse("화산라멘", "화산라멘 멘야마쯔리 홍대점", "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%ED%99%94%EC%82%B0%EB%9D%BC%EB%A9%98.png"));
 
         return ApiUtils.success(responseList);
     }
