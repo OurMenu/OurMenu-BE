@@ -1,8 +1,11 @@
 package com.ourMenu.backend.domain.user.application;
 
+import com.ourMenu.backend.domain.user.dao.EmailRedisRepository;
+import com.ourMenu.backend.domain.user.domain.AuthEmailEntity;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,9 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
+
+    @Autowired
+    private EmailRedisRepository emailRepository;
 
     private final JavaMailSender javaMailSender;
     @Value("spring.mail.username")
@@ -30,7 +36,7 @@ public class EmailService {
         return code.toString();
     }
 
-    public MimeMessage createAuthEmail(String address) {
+    private MimeMessage createAuthEmail(String address) {
         MimeMessage message = javaMailSender.createMimeMessage();
         code = generateRandomCode();
 
@@ -49,9 +55,15 @@ public class EmailService {
         return message;
     }
 
+    private void saveCode(String address, String code) {
+        AuthEmailEntity emailEntity = new AuthEmailEntity(address, code);
+        emailRepository.save(emailEntity);
+    }
+
     public String sendMail(String address) {
         MimeMessage message = createAuthEmail(address);
         javaMailSender.send(message);
+        saveCode(address, code);
 
         return code;
     }
