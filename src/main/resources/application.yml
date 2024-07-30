@@ -31,3 +31,6 @@ spring:
           timeout: 5000
           starttls:
             enable: true
+  redis:
+    host: localhost
+    port: 6379
