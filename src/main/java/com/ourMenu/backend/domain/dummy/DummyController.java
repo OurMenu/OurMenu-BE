@@ -20,9 +20,9 @@ public class DummyController {
     @GetMapping("/menuFolder")
     public ApiResponse<List<DummyMenuFolderDto>> dummyGetMenu(){
         List<DummyMenuFolderDto> responseList = Arrays.asList(
-                new DummyMenuFolderDto("서울숲 맛집", 10, "https://dummyimage.com/600x400/000/fff&text=서울숲+맛집", 1),
-                new DummyMenuFolderDto("고기고기", 10, "https://dummyimage.com/600x400/000/fff&text=고기고기", 1),
-                new DummyMenuFolderDto("홍대거리", 10, "https://dummyimage.com/600x400/000/fff&text=홍대거리", 1)
+                new DummyMenuFolderDto("한강뷰 맛집", 10, "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%ED%95%9C%EA%B0%95%EB%B7%B0%EB%A7%9B%EC%A7%91.png", 1),
+                new DummyMenuFolderDto("고기고기", 10, "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%EA%B3%A0%EA%B8%B0%EA%B3%A0%EA%B8%B0.png", 1),
+                new DummyMenuFolderDto("서울숲공원", 10, "https://hobbytat.s3.ap-northeast-2.amazonaws.com/dump/%EC%84%9C%EC%9A%B8%EC%88%B2%EA%B3%B5%EC%9B%90.png", 1)
         );
         return ApiUtils.success(responseList);
     }
