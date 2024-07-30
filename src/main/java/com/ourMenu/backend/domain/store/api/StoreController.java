@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.store.api;
 
+import com.ourMenu.backend.domain.store.api.response.GetStoresSearch;
 import com.ourMenu.backend.domain.store.application.StoreService;
 import com.ourMenu.backend.domain.store.domain.Store;
 import com.ourMenu.backend.domain.store.dao.StoreRepository;
@@ -14,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("search")
+@RequestMapping("stores")
 @RequiredArgsConstructor
 public class StoreController {
 
     private final StoreService storeService;
 
-    @GetMapping
-    public ApiResponse<List<Store>>search(@RequestParam("string")String name){
+    @GetMapping("/search")
+    public ApiResponse<List<GetStoresSearch>>search(@RequestParam String name){
         List<Store> storeList = storeService.searchStore(name);
-        return ApiUtils.success(storeList);
+        return ApiUtils.success(storeList.stream().map(GetStoresSearch::toDto).toList());
     }
 }
