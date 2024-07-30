@@ -21,6 +21,10 @@ public class GlobalExceptionHandler {
     private ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         return handleException(e,ErrorCode.INTERNAL_SERVER_ERROR, e.getBindingResult().getFieldError().getDefaultMessage());
     }
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<?> handleBusinessException(CustomException e) {
+        return handleException(e, e.getErrorCode(), e.getMessage());
+    }
 
     private ResponseEntity<?> handleException(Exception e, ErrorCode errorCode, String message) {
         return ApiUtils.error(ErrorResponse.of(errorCode, message));

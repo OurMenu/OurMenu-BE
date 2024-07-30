@@ -8,7 +8,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"G500","서버 내부에서 에러가 발생하였습니다");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"G500","서버 내부에서 에러가 발생하였습니다"),
+
+    //search
+    SEARCH_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND,"S404","검색 결과가 없습니다")
+    ;
 
     private final HttpStatus status;
     private final String code;
