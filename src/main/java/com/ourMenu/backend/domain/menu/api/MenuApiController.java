@@ -23,25 +23,24 @@ public class MenuApiController {
 
     /*
     메뉴 생성
-     */
+
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest) {
-        Menu menu = new Menu();
-        menu.setTitle(postMenuRequest.getTitle());
-        menu.setPrice(postMenuRequest.getPrice());
-        menu.setImgUrl(postMenuRequest.getImgUrl());
-        menu.setMemo(postMenuRequest.getMemo());
-
-        Menu savedMenu = menuService.createMenu(menu);
-        PostMenuResponse postMenuResponse = new PostMenuResponse();
-        postMenuResponse.setId(savedMenu.getId());
+        Menu menu = Menu.builder()  // 빌더 패턴 사용
+                .title(postMenuRequest.getTitle())
+                .price(postMenuRequest.getPrice())
+                .imgUrl(postMenuRequest.getImgUrl())
+                .memo(postMenuRequest.getMemo())
+                .build();
 
         return ApiUtils.success(postMenuResponse);
     }
 
+     */
+
     /*
     ID를 통한 메뉴 조회
-     */
+
     @GetMapping("/{id}")
     public ApiResponse<MenuDto> getMenuById(@PathVariable Long id) {
         Menu menu = menuService.getMenuById(id);
@@ -50,6 +49,7 @@ public class MenuApiController {
 
         return ApiUtils.success(response);
     }
+
 
     @GetMapping("")
     public ApiResponse<List<MenuDto>> getAllMenu() {
@@ -63,7 +63,7 @@ public class MenuApiController {
 
     /*
     메뉴 삭제
-     */
+
     @DeleteMapping("/{id}")
     public ApiResponse<String> removeMenu(@PathVariable Long id){
         menuService.deleteMenu(id);
@@ -96,9 +96,9 @@ public class MenuApiController {
 //        return ApiUtils.success(response);
 //    }
 
-    /*
+
     메뉴 업데이트
-     */
+
     @PatchMapping("/{id}")
     public ApiResponse<MenuDto> updateMenu(@PathVariable Long id, @RequestBody PatchMenuRequest patchMenuRequest){
         Menu updatedMenu = menuService.updateMenu(id, patchMenuRequest);
@@ -106,6 +106,7 @@ public class MenuApiController {
         MenuDto response = menuDto(updatedMenu);
         return ApiUtils.success(response);
     }
+
 
 
     private static MenuDto menuDto(Menu menu) {
@@ -121,4 +122,6 @@ public class MenuApiController {
                 .build();
         return response;
     }
+
+     */
 }
