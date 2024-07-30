@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -66,6 +67,11 @@ public class EmailService {
         saveCode(address, code);
 
         return code;
+    }
+
+    public boolean confirmCode(String address, String code) {
+        Optional<AuthEmailEntity> emailEntity = emailRepository.findById(address);
+        return emailEntity.map(authEmailEntity -> authEmailEntity.getCode().equals(code)).orElse(false);
     }
 
 }
