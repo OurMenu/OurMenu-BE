@@ -39,12 +39,13 @@ public class AccountController {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
+        // TODO: Add logic to ensure email exists
         String code = emailService.sendMail(request.getEmail());
         log.info("success sending! email: {} / code: {}", request.getEmail(), code);
         return ApiUtils.success(new AuthEmailResponse(code));
     }
 
-    @PostMapping("/confirmEmail")
+    @PostMapping("/confirmCode")
     public ApiResponse<Object> confirmCode(@Valid @RequestBody ConfirmCodeRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(getErrorMessages(bindingResult));
