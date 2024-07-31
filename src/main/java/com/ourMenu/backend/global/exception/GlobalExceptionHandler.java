@@ -1,6 +1,7 @@
 package com.ourMenu.backend.global.exception;
 
 import com.ourMenu.backend.global.util.ApiUtils;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
     private ResponseEntity<?> handleException(RuntimeException e) {
         String message = e.getMessage() != null ? e.getMessage() : ErrorCode.INTERNAL_SERVER_ERROR.getMessage();
         return handleException(e, ErrorCode.INTERNAL_SERVER_ERROR, message);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    private ResponseEntity<?> handleJwtException(JwtException e) {
+        return handleException(e, ErrorCode.JWT_TOKEN_ERROR, ErrorCode.JWT_TOKEN_ERROR.getMessage());
     }
 
     private ResponseEntity<?> handleException(Exception e, ErrorCode errorCode, String message) {
