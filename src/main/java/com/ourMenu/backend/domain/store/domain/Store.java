@@ -19,4 +19,6 @@ public class Store {
     private List<String> images;
     private List<Menu> menu;
     private String time;
+    private String mapx;
+    private String mapy;
 }
