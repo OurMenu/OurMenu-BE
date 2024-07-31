@@ -16,5 +16,4 @@ public class PostMenuRequest {
     private int price;
     private String ImgUrl;
     private String memo;
-
 }

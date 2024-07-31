@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/menuList")
 public class MenuListApiController {
 
-    private final MenuListService menuListService;
+
 
     /*
     메뉴판 등록
-     */
+
     @PostMapping("")
     public ApiResponse<PostMenuListResponse> saveMenuList(@RequestBody PostMenuListRequest postMenuListRequest) {
         MenuList menuList = MenuList.builder()
@@ -40,9 +40,9 @@ public class MenuListApiController {
         return ApiUtils.success(response);
     }
 
-    /*
+
     메뉴판 전체 조회
-     */
+
     @GetMapping("")
     public ApiResponse<List<MenuListDto>> findAllMenuList(){
         List<MenuList> menuLists = menuListService.getAllMenuLists();
@@ -53,9 +53,9 @@ public class MenuListApiController {
         return ApiUtils.success(responseList);
     }
 
-    /*
+
     메뉴판 단건 조회
-     */
+
     @GetMapping("/{id}")
     public ApiResponse<MenuListDto> findMenuListById(@PathVariable Long id){
         MenuList menuList = menuListService.getMenuListById(id);
@@ -63,9 +63,9 @@ public class MenuListApiController {
         return ApiUtils.success(response);
     }
 
-    /*
+
     메뉴판 수정(제목, 사진)
-     */
+
     @PatchMapping("/{id}")
     public ApiResponse<MenuListDto> updateMenuList(@PathVariable Long id, @RequestBody PatchMenuListRequest patchMenuListRequest){
         MenuList menuList = menuListService.updateMenuList(id, patchMenuListRequest);
@@ -73,18 +73,18 @@ public class MenuListApiController {
         return ApiUtils.success(response);
     }
 
-    /*
+
     메뉴판 삭제
-     */
+
     @DeleteMapping("/{id}")
     public ApiResponse<String> removeMenuList(@PathVariable Long id){
         menuListService.deleteMenuList(id);
         return ApiUtils.success("OK");
     }
 
-    /*
+
     메뉴판 메뉴 추가
-     */
+
     @PatchMapping("")
     public ApiResponse<MenuListDto> addMenuInMenuList(@RequestParam Long menuId, @RequestParam Long menuListId){
         MenuList menuList = menuListService.addMenu(menuId, menuListId);
@@ -92,9 +92,9 @@ public class MenuListApiController {
         return ApiUtils.success(response);
     }
 
-    /*
+
     메뉴판 메뉴 삭제
-     */
+
     @DeleteMapping("")
     public ApiResponse<String> removeMenuInMenuList(@RequestParam Long menuId, @RequestParam Long menuListId){
         menuListService.deleteMenu(menuId, menuListId);
@@ -102,9 +102,9 @@ public class MenuListApiController {
     }
 
 
-    /*
+
     Get 메서드 Response 생성 메서드
-     */
+
     private static MenuListDto getMenuListDto(MenuList menuList) {
         MenuListDto menuListDto = MenuListDto.builder()
                 .id(menuList.getId())
@@ -128,4 +128,11 @@ public class MenuListApiController {
                 .build();
         return menuListDto;
     }
+
+     */
 }
+
+
+
+
+

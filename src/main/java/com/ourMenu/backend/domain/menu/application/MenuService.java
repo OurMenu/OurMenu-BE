@@ -37,6 +37,7 @@ public class MenuService {
     }
 
     // 메뉴 업데이트
+    /*
     @Transactional
     public Menu updateMenu(Long id, Menu menuDetails) {
         Menu menu = menuRepository.findById(id)
@@ -54,9 +55,7 @@ public class MenuService {
         }
     }
 
-    /*
-    Request를 통한 메뉴 업데이트
-     */
+
     @Transactional
     public Menu updateMenu(Long id, PatchMenuRequest patchMenuRequest) {
         Menu menu = menuRepository.findById(id)
@@ -90,5 +89,5 @@ public class MenuService {
             return null;
         }
     }
-
+    */
 }
