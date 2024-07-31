@@ -31,6 +31,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 	//validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//mongodb
+	implementation ('org.springframework.boot:spring-boot-starter-data-mongodb')
 }
 
 tasks.named('test') {
