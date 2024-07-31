@@ -20,6 +20,8 @@ public class GetStoresSearch {
     private List<String> images;
     private List<GetMenuSearch> menus;
     private String time;
+    private String mapx;
+    private String mapy;
 
     public static GetStoresSearch toDto(Store store){
         List<GetMenuSearch> menuList;
@@ -38,6 +40,8 @@ public class GetStoresSearch {
                 .images(store.getImages())
                 .menus(menuList)
                 .time(store.getTime())
+                .mapx(store.getMapx())
+                .mapy(store.getMapy())
                 .build();
     }
 }
