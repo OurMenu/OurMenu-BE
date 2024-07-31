@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${secret.jwt-secret-key}")
+    @Value("${JWT_SECRET_KEY}")
     private String JWT_SECRET_KEY;
 
     @Bean
