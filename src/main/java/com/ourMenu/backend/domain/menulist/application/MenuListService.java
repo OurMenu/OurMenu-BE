@@ -21,6 +21,13 @@ public class MenuListService {
         return menuListRepository.save(menuList);
     }
 
+    // 메뉴판 조회 //
+    @Transactional
+    public MenuList getMenuListByName(String title) {
+        return menuListRepository.findByTitle(title)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
+    }
+
     /** 메뉴판 메뉴 추가 */
     /*
 

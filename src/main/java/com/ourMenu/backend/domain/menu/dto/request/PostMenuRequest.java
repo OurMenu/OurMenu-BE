@@ -25,6 +25,4 @@ public class PostMenuRequest {
     // 태그 관련 정보
     private List<TagRequestDto> tagInfo;
 
-    // 이미지 관련 정보
-    private List<String> imageUrls;
 }

@@ -1,11 +1,14 @@
 package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.global.common.ApiResponse;
@@ -28,14 +31,14 @@ public class MenuApiController {
 
     private final MenuService menuService;
 
-    private final MenuListRepository menuListRepository;
+    private final MenuListService menuListService;
 
 
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest) {
-        MenuList findMenuList = menuListRepository.findByTitle(postMenuRequest.getMenuListTitle())
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
+
+        MenuList findMenuList = menuListService.getMenuListByName(postMenuRequest.getMenuListTitle());
 
         // 메뉴 생성
         Menu menu = Menu.builder()  // 빌더 패턴 사용
@@ -84,18 +87,6 @@ public class MenuApiController {
                 .collect(Collectors.toList());
 
 
-
-        List<MenuImage> menuImages = postMenuRequest.getImageUrls().stream()
-                .map(url -> MenuImage.builder()
-                        .url(url)
-                        .menu(menu)
-                        .build()) // MenuImage 생성
-                .collect(Collectors.toList());
-
-        for (MenuImage menuImage : menuImages) {
-            menuImage.confirmMenu(menu);
-        }
-
         Menu saveMenu = menuService.createMenu(menu);
 
         PostMenuResponse postMenuResponse = new PostMenuResponse(saveMenu.getId());
@@ -103,6 +94,29 @@ public class MenuApiController {
     }
 
 
+    // 메뉴 생성
+    @PostMapping("/photo")
+    public ApiResponse<String> saveMenuImage(@RequestBody PostPhotoRequest photoRequest){
+        Long menuId = photoRequest.getMenuId();
+
+        // 메뉴 조회
+        Menu findMenu = menuService.getMenuById(menuId);
+
+        List<String> imageUrls = photoRequest.getImageUrls();
+
+        List<MenuImage> menuImages = photoRequest.getImageUrls().stream()
+                .map(url -> MenuImage.builder()
+                        .url(url)
+                        .menu(findMenu)
+                        .build()) // MenuImage 생성
+                .collect(Collectors.toList());
+
+        for (MenuImage menuImage : menuImages) {
+            menuImage.confirmMenu(findMenu);
+        }
+
+        return ApiUtils.success("OK");
+    }
 
     /*
     ID를 통한 메뉴 조회
