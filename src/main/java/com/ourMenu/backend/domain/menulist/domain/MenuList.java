@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class MenuList {
 
     @Id
@@ -34,7 +34,7 @@ public class MenuList {
     private LocalDateTime modifiedAt;
     private String title;
 
-    private String icon;
+    private String iconType;
     private Long priority;
 
     @Lob

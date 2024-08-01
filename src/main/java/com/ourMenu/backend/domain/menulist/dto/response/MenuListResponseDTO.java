@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PostMenuListResponse {
+public class MenuListResponseDTO {
     private Long id;
+    private String title;
+    private String imgUrl;
+    private String iconType;
 }
