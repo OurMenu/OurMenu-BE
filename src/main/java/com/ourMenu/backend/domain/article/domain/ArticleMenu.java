@@ -15,7 +15,7 @@ public class ArticleMenu {
     @Column(name = "article_menu_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
 

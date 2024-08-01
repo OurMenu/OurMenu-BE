@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,6 +24,9 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "article")
+    private List<ArticleMenu> articleMenuList = new ArrayList<>();
+
     private String title;
     private String content;
 
@@ -36,7 +41,7 @@ public class Article {
     private Long views = 0L;
 
     // 연관관계 메서드 //
-    public void confirmUser(User user){
+    public void confirmUser(User user) {
         this.user = user;
         user.addArticles(this);
     }
