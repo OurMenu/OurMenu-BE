@@ -30,9 +30,22 @@ public class JwtProvider {
                     .setSigningKey(secretKey).build()
                     .parseClaimsJws(token);
         } catch(JwtException e) {
-            throw new JwtException("invalid token error");
+            throw new JwtException("");
         }
         return 1L;
+    }
+
+    public boolean isValidToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
 }

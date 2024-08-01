@@ -34,7 +34,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(JwtException.class)
     private ResponseEntity<?> handleJwtException(JwtException e) {
-        return handleException(e, ErrorCode.JWT_TOKEN_ERROR, ErrorCode.JWT_TOKEN_ERROR.getMessage());
+        String message = e.getMessage() != null ? e.getMessage() : ErrorCode.JWT_TOKEN_ERROR.getMessage();
+        return handleException(e, ErrorCode.JWT_TOKEN_ERROR, message);
     }
 
     private ResponseEntity<?> handleException(Exception e, ErrorCode errorCode, String message) {
