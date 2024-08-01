@@ -3,6 +3,7 @@ package com.ourMenu.backend.article;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.article.domain.ArticleMenu;
+import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.global.common.Status;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -79,12 +80,14 @@ public class ArticleServiceTest {
         //given
 
         //when
-
-        //then
-        org.junit.jupiter.api.Assertions.assertThrows(NoSuchElementException.class, () -> {
+        RuntimeException exception = org.junit.jupiter.api.Assertions.assertThrows(NoSuchArticleException.class, () -> {
             Article softDeleteArticle = articleService.softDelete(1L);
             Assertions.assertThat(softDeleteArticle.getStatus()).isEqualTo(Status.DELETED);
         });
+        //then
+        String expectedMessage = "해당하는 게시물이 없습니다";
+        String actualMessage = exception.getMessage();
+        Assertions.assertThat(expectedMessage).isEqualTo(actualMessage);
 
     }
 }

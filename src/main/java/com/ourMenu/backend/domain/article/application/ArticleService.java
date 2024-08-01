@@ -3,11 +3,13 @@ package com.ourMenu.backend.domain.article.application;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -32,7 +34,8 @@ public class ArticleService {
 
     @Transactional
     public Article softDelete(Long id){
-        Article article = articleRepository.findById(id).get();
+        Article article = articleRepository.findById(id)
+                .orElseThrow(()->new NoSuchArticleException("해당하는 게시물이 없습니다"));
         article.setStatus(Status.DELETED);
         return article;
     }
