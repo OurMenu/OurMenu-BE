@@ -3,9 +3,12 @@ package com.ourMenu.backend.domain.article.application;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +28,12 @@ public class ArticleService {
         Article saveArticle = articleRepository.save(article);
         articleMenuRepository.saveAll(article.getArticleMenuList());
         return saveArticle;
+    }
+
+    @Transactional
+    public Article softDelete(Long id){
+        Article article = articleRepository.findById(id).get();
+        article.setStatus(Status.DELETED);
+        return article;
     }
 }

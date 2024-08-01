@@ -50,4 +50,8 @@ public class Article {
     public void addArticleMenu(ArticleMenu articleMenu) {
         this.addArticleMenu(articleMenu);
     }
+
+    public void setStatus(Status status){
+        this.status=status;
+    }
 }
