@@ -7,11 +7,11 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "email", timeToLive = 300)
-public class AuthEmailEntity {
+@RedisHash(value = "refreshToken", timeToLive = 60 * 60 * 24 * 30)
+public class RefreshTokenEntity {
 
     @Id
-    private String email;
-    private String code;
+    private String refreshToken;
+    private long userId;
 
 }

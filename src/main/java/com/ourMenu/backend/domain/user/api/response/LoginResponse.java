@@ -6,5 +6,6 @@ public record LoginResponse(
         String grantType,
         String accessToken,
         String refreshToken,
-        Instant expiredAt
+        Instant accessTokenExpiredAt,
+        Instant refreshTokenExpiredAt
 ) { }
