@@ -3,7 +3,9 @@ package com.ourMenu.backend.domain.article.application;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
+import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
 import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,22 +34,45 @@ public class ArticleService {
         return saveArticle;
     }
 
+    /**
+     * softdelete 논리적 삭제
+     *
+     * @param id 게시글 id
+     * @return 논리적으로 삭제된 article (물리적으로 변경된 article)
+     */
     @Transactional
-    public Article softDelete(Long id){
+    public Article softDelete(Long id) {
         Article article = findOne(id);
         article.setStatus(Status.DELETED);
         return article;
     }
 
+    /**
+     * softdelete 물리적 삭제
+     *
+     * @param id 게시글 id
+     */
     @Transactional
-    public void hardDelete(Long id){
+    public void hardDelete(Long id) {
         Article article = findOne(id);
         articleRepository.delete(article);
+        articleMenuRepository.deleteAll(article.getArticleMenuList());
+    }
+
+    /**
+     * 게시글 메뉴조회 (test를 위해 필요)
+     * @param id 게시글 id
+     * @return 게시글
+     */
+    @Transactional(readOnly = true)
+    public Article findOne(Long id) {
+        return articleRepository.findById(id)
+                .orElseThrow(NoSuchArticleException::new);
     }
 
     @Transactional(readOnly = true)
-    public Article findOne(Long id){
-        return articleRepository.findById(id)
-                .orElseThrow(()->new NoSuchArticleException("해당하는 게시물이 없습니다"));
+    public ArticleMenu findArticleMenu(Long id) {
+        return articleMenuRepository.findById(id)
+                .orElseThrow(NoSuchArticleMenuException::new);
     }
 }
