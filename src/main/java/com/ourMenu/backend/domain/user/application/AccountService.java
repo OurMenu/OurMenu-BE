@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.user.application;
 
 import com.ourMenu.backend.domain.user.api.request.LoginRequest;
+import com.ourMenu.backend.domain.user.api.request.ReissueTokenRequest;
 import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
 import com.ourMenu.backend.domain.user.api.response.LoginResponse;
 import com.ourMenu.backend.domain.user.dao.RefreshTokenRedisRepository;
@@ -75,6 +76,11 @@ public class AccountService {
         }
 
         return makeLoginResponse((long)result.get("user_id"));
+    }
+
+    public LoginResponse reissueToken(ReissueTokenRequest request) {
+        long id = jwtProvider.getUserId(request.getRefreshToken());
+        return makeLoginResponse(id);
     }
 
 }

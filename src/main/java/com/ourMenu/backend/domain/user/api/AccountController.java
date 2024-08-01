@@ -1,9 +1,6 @@
 package com.ourMenu.backend.domain.user.api;
 
-import com.ourMenu.backend.domain.user.api.request.AuthEmailRequest;
-import com.ourMenu.backend.domain.user.api.request.ConfirmCodeRequest;
-import com.ourMenu.backend.domain.user.api.request.LoginRequest;
-import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
+import com.ourMenu.backend.domain.user.api.request.*;
 import com.ourMenu.backend.domain.user.api.response.AuthEmailResponse;
 import com.ourMenu.backend.domain.user.api.response.LoginResponse;
 import com.ourMenu.backend.domain.user.application.AccountService;
@@ -84,6 +81,11 @@ public class AccountController {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
         return ApiUtils.success(accountService.login(request));
+    }
+
+    @PostMapping("/reissueToken")
+    public ApiResponse<LoginResponse> reissueToken(@Valid @RequestBody ReissueTokenRequest request, BindingResult bindingResult) {
+        return ApiUtils.success(accountService.reissueToken(request));
     }
 
 }
