@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /*
     @ExceptionHandler(RuntimeException.class)
     private ResponseEntity<?> handleException(Exception e) {
         return handleException(e, ErrorCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
     }
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     private ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         return handleException(e,ErrorCode.INTERNAL_SERVER_ERROR, e.getBindingResult().getFieldError().getDefaultMessage());

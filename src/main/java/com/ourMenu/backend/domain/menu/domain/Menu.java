@@ -1,14 +1,12 @@
 package com.ourMenu.backend.domain.menu.domain;
 
-import com.ourMenu.backend.domain.menuimage.domain.MenuImage;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.menutag.domain.MenuTag;
-import com.ourMenu.backend.domain.place.domain.Place;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,17 +37,19 @@ public class Menu {
     private String memo;
     private String icon;
 
-    @OneToMany(mappedBy = "menu")
-    private List<MenuImage> images;
+    @Builder.Default
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "menu")
-    private List<MenuTag> tags;
+    @Builder.Default
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private List<MenuTag> tags = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "menulist_id")
     private MenuList menuList;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "place_id")
     private Place place;
 
@@ -65,7 +65,8 @@ public class Menu {
     }
 
     public void addMenuImage(MenuImage menuImage) {
-        images.add(menuImage);
+        //System.out.println("menuImage = " + menuImage);
+         images.add(menuImage);
     }
 
     public void addMenuTag(MenuTag menuTag) {

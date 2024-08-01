@@ -1,12 +1,14 @@
-package com.ourMenu.backend.domain.menuimage.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
 @Getter
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class MenuImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

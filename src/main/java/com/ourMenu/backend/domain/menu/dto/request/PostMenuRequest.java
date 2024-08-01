@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.security.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +15,16 @@ public class PostMenuRequest {
 
     private String title;
     private int price;
-    private String ImgUrl;
     private String memo;
+    private String icon;
+    private String menuListTitle;
+
+    // 식당 관련 정보
+    private StoreRequestDTO storeInfo;
+
+    // 태그 관련 정보
+    private List<TagRequestDto> tagInfo;
+
+    // 이미지 관련 정보
+    private List<String> imageUrls;
 }

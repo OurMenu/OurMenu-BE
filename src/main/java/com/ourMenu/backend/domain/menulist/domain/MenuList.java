@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,9 +41,9 @@ public class MenuList {
     @Column(name = "image")
     private String imgUrl;
 
-
+    @Builder.Default
     @OneToMany(mappedBy = "menuList")
-    private List<Menu> menus;
+    private List<Menu> menus = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

@@ -1,9 +1,9 @@
-package com.ourMenu.backend.domain.tag.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
-import com.ourMenu.backend.domain.menutag.domain.MenuTag;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,8 +20,9 @@ public class Tag {
 
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tag")
-    private List<MenuTag> menuTags;
+    private List<MenuTag> menuTags = new ArrayList<>();
 
     private Boolean isCustom = true;
 

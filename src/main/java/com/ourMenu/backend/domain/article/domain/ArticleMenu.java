@@ -1,4 +1,4 @@
-package com.ourMenu.backend.domain.articlemenu.domain;
+package com.ourMenu.backend.domain.article.domain;
 
 import com.ourMenu.backend.domain.article.domain.Article;
 import jakarta.persistence.*;
