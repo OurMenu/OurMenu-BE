@@ -46,4 +46,10 @@ public class ArticleService {
                 .orElseThrow(()->new NoSuchArticleException("해당하는 게시물이 없습니다"));
         articleRepository.delete(article);
     }
+
+    @Transactional(readOnly = true)
+    public Article findOne(Long id){
+        return articleRepository.findById(id)
+                .orElseThrow(()->new NoSuchArticleException("해당하는 게시물이 없습니다"));
+    }
 }
