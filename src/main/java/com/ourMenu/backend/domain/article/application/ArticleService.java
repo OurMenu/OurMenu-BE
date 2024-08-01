@@ -60,9 +60,10 @@ public class ArticleService {
     }
 
     /**
-     * 게시글 메뉴조회 (test를 위해 필요)
-     * @param id 게시글 id
-     * @return 게시글
+     * 게시글 조회
+     * @param id
+     * @return
+     * @throws NoSuchArticleException id 값을 가진 article이 존재하지 않는 경우
      */
     @Transactional(readOnly = true)
     public Article findOne(Long id) {
@@ -70,6 +71,11 @@ public class ArticleService {
                 .orElseThrow(NoSuchArticleException::new);
     }
 
+    /**
+     * 게시글 메뉴조회 (test를 위해 필요)
+     * @param id 게시글 id
+     * @return 게시글
+     */
     @Transactional(readOnly = true)
     public ArticleMenu findArticleMenu(Long id) {
         return articleMenuRepository.findById(id)

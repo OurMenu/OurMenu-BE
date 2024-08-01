@@ -78,7 +78,7 @@ public class ArticleServiceTest {
     @DisplayName("soft 삭제시 요청한 id의 게시글이 없다면 exception이 발생한다.")
     @Test
     @Transactional
-    public void test3(){
+    public void test3() {
         //given
 
         //when
@@ -144,6 +144,25 @@ public class ArticleServiceTest {
         String expectedMessage = "해당하는 게시물메뉴가 없습니다";
         String actualMessage = exception.getMessage();
         Assertions.assertThat(expectedMessage).isEqualTo(actualMessage);
+
+    }
+
+    @DisplayName("게시글을 조회할때 쿼리 수를 최대한 줄인다")
+    @Test
+    @Transactional
+    public void test6() {
+        //given
+        List<ArticleMenu> articleMenuList = List.of(articleMenu1, articleMenu2);
+        Article article = Article.builder()
+                .title("게시글 제목")
+                .content("게시글 내용")
+                .articleMenuList(articleMenuList)
+                .build();
+        Article saveArticle = articleService.save(article);
+        //when
+        Article findArticle = articleService.findOne(saveArticle.getId());
+        //then
+        Assertions.assertThat(findArticle).isEqualTo(saveArticle);
 
     }
 }

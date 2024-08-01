@@ -25,7 +25,7 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "article")
     private List<ArticleMenu> articleMenuList = new ArrayList<>();
 
     private String title;
@@ -51,7 +51,7 @@ public class Article {
         this.addArticleMenu(articleMenu);
     }
 
-    public void setStatus(Status status){
-        this.status=status;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
