@@ -39,4 +39,11 @@ public class ArticleService {
         article.setStatus(Status.DELETED);
         return article;
     }
+
+    @Transactional
+    public void hardDelete(Long id){
+        Article article = articleRepository.findById(id)
+                .orElseThrow(()->new NoSuchArticleException("해당하는 게시물이 없습니다"));
+        articleRepository.delete(article);
+    }
 }
