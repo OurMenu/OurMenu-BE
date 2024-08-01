@@ -90,6 +90,8 @@ public class MenuListService {
 
         MenuList removeMenuList = removeMenuListBuilder.build();
 
+        menuListRepository.save(removeMenuList);
+
         return "OK";
     }
 
