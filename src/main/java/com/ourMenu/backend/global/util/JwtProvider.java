@@ -29,7 +29,7 @@ public class JwtProvider {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey).build()
                     .parseClaimsJws(token);
-        } catch(JwtException e) {
+        } catch(JwtException | IllegalArgumentException e) {
             throw new JwtException("");
         }
         return 1L;

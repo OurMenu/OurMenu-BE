@@ -78,6 +78,10 @@ public class AccountService {
         return makeLoginResponse((long)result.get("user_id"));
     }
 
+    public void logout(Long userId) {
+        refreshTokenRepository.deleteById(userId);
+    }
+
     public LoginResponse reissueToken(ReissueTokenRequest request) {
         long id = jwtProvider.getUserId(request.getRefreshToken());
         return makeLoginResponse(id);

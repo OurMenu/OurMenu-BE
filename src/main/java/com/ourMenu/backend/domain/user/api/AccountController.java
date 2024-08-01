@@ -8,6 +8,7 @@ import com.ourMenu.backend.domain.user.application.EmailService;
 import com.ourMenu.backend.domain.user.exception.AuthEmailException;
 import com.ourMenu.backend.domain.user.exception.EmailDuplicationException;
 import com.ourMenu.backend.domain.user.exception.UserException;
+import com.ourMenu.backend.global.argument_resolver.PreAuthorize;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
@@ -81,6 +82,13 @@ public class AccountController {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
         return ApiUtils.success(accountService.login(request));
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Object> logout(@PreAuthorize Long userId) {
+        accountService.logout(userId);
+        log.info("logout {}", userId);
+        return ApiUtils.success(null);
     }
 
     @PostMapping("/reissueToken")
