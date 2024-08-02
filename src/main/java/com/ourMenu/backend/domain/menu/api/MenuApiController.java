@@ -11,6 +11,8 @@ import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
+import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -34,90 +36,31 @@ public class MenuApiController {
     private final MenuListService menuListService;
 
 
+    /*
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest) {
-
-        MenuList findMenuList = menuListService.getMenuListByName(postMenuRequest.getMenuListTitle());
-
-        // 메뉴 생성
-        Menu menu = Menu.builder()  // 빌더 패턴 사용
-                .title(postMenuRequest.getTitle())
-                .price(postMenuRequest.getPrice())
-                .memo(postMenuRequest.getMemo())
-                .createdAt(LocalDateTime.now()) // 생성일시 설정
-                .modifiedAt(LocalDateTime.now()) // 수정일시 설정
-                .build();
-
-        // 식당 생성 -> 위도, 경도 정보는 어떻게 처리하는지
-        Place place = Place.builder()
-                .title(postMenuRequest.getStoreInfo().getStoreName())
-                .address(postMenuRequest.getStoreInfo().getStoreAddress())
-                .info(postMenuRequest.getStoreInfo().getStoreInfo())
-                .createdAt(LocalDateTime.now()) // 생성일시 설정
-                .modifiedAt(LocalDateTime.now()) // 수정일시 설정
-                .build();
-
-        // 연관관계 설정
-        menu.confirmMenuList(findMenuList);
-        menu.confirmPlace(place);
-
-
-        /* 메뉴 태그 생성 */
-        List<MenuTag> menuTags = postMenuRequest.getTagInfo().stream()
-                .map(tagInfo -> {
-                    // Tag 생성
-                    Tag tag = Tag.builder()
-                            .name(tagInfo.getTagTitle())
-                            .isCustom(tagInfo.getIsCustom())
-                            .build();
-
-                    // MenuTag 생성
-                    MenuTag menuTag = MenuTag.builder()
-                            .tag(tag)
-                            .menu(menu)
-                            .build();
-
-                    // 연관관계 설정
-                    menuTag.confirmTag(tag);
-                    menuTag.confirmMenu(menu);
-
-                    return menuTag; // MenuTag 객체를 반환
-                })
-                .collect(Collectors.toList());
-
-
-        Menu saveMenu = menuService.createMenu(menu);
-
-        PostMenuResponse postMenuResponse = new PostMenuResponse(saveMenu.getId());
+        PostMenuResponse postMenuResponse = menuService.createMenu(postMenuRequest);
         return ApiUtils.success(postMenuResponse);
-    }
+    } */
 
-
-    // 메뉴 생성
+    // 이미지 추가
     @PostMapping("/photo")
-    public ApiResponse<String> saveMenuImage(@RequestBody PostPhotoRequest photoRequest){
-        Long menuId = photoRequest.getMenuId();
-
-        // 메뉴 조회
-        Menu findMenu = menuService.getMenuById(menuId);
-
-        List<String> imageUrls = photoRequest.getImageUrls();
-
-        List<MenuImage> menuImages = photoRequest.getImageUrls().stream()
-                .map(url -> MenuImage.builder()
-                        .url(url)
-                        .menu(findMenu)
-                        .build()) // MenuImage 생성
-                .collect(Collectors.toList());
-
-        for (MenuImage menuImage : menuImages) {
-            menuImage.confirmMenu(findMenu);
-        }
-
+    public ApiResponse<String> saveMenuImage(@RequestBody PostPhotoRequest photoRequest) {
+        menuService.saveMenuImage(photoRequest.getMenuId(), photoRequest.getImageUrls());
         return ApiUtils.success("OK");
     }
 
+    @PatchMapping("")
+    public ApiResponse<String> updateMenuList(@PathVariable Long menuId, @RequestBody PostMenuRequest request) {
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> removeMenu (@PathVariable Long id){
+        String response = menuService.removeMenu(id);       //STATUS를 DELETED로 변환
+        return ApiUtils.success(response);  //OK 반환
+    }
     /*
     ID를 통한 메뉴 조회
 

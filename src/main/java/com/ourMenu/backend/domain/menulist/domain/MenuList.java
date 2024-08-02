@@ -65,4 +65,8 @@ public class MenuList {
         this.user = user;
         user.addMenuList(this);
     }
+
+    public void removeMenu(Menu menu) {
+        menus.remove(menu);
+    }
 }
