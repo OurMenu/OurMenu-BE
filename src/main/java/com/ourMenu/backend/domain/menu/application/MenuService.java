@@ -3,18 +3,21 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.global.common.Status;
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -122,6 +125,11 @@ public class MenuService {
         menuRepository.delete(menu);
 
         return "OK";
+    }
+
+    @Transactional
+    public List<Menu> findMenuByPlace(Long placeId){
+        return menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
     }
 
     // 메뉴 업데이트

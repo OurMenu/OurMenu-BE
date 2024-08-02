@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
 
 
 @Service
@@ -40,21 +44,20 @@ public class MenuListService {
     // 메뉴판 조회 //
     @Transactional
     public MenuList getMenuListByName(String title) {
-        return menuListRepository.findByTitle(title)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
+        return menuListRepository.findMenuListByTitle(title, Arrays.asList(CREATED, UPDATED));
     }
 
     //메뉴판 전체 조회
     @Transactional
     public List<MenuList> getAllMenuList(){
-        return menuListRepository.findAll();
+        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED));
     }
 
     //메뉴판 업데이트
     @Transactional
     public MenuList updateMenuList(Long id, MenuListRequestDTO request) {
         MenuList menuList = menuListRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MenuList not found"));
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
@@ -79,13 +82,15 @@ public class MenuListService {
     @Transactional
     public String removeMenuList(Long id){
         MenuList menuList = menuListRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MenuList not found"));
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
 
         MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
 
         removeMenuListBuilder.status(Status.DELETED);
 
         MenuList removeMenuList = removeMenuListBuilder.build();
+
+        menuListRepository.save(removeMenuList);
 
         return "OK";
     }

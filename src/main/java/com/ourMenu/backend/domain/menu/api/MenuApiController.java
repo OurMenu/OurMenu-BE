@@ -1,15 +1,14 @@
 package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
-import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
+import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
+import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuFolderDTO;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
+import com.ourMenu.backend.domain.menu.dto.response.TagDTO;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
-import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/menu")
@@ -61,6 +59,32 @@ public class MenuApiController {
         String response = menuService.removeMenu(id);       //STATUS를 DELETED로 변환
         return ApiUtils.success(response);  //OK 반환
     }
+    @GetMapping("/{placeId}")
+    public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId) {
+        List<Menu> menuList = menuService.findMenuByPlace(placeId);
+        List<PlaceMenuDTO> response = menuList.stream().map(menu ->
+                PlaceMenuDTO.builder()
+                        .menuId(menu.getId())
+                        .menuTitle(menu.getTitle())
+                        .price(menu.getPrice())
+                        .icon(menu.getIcon())
+                        .tags(menu.getTags().stream().map(tag ->
+                                TagDTO.builder()
+                                        .tagTitle(tag.getTag().getName())
+                                        .isCustom(tag.getTag().getIsCustom())
+                                        .build())
+                                .collect(Collectors.toList())
+                        )
+                        .images(menu.getImages())
+                        .menuFolder(PlaceMenuFolderDTO.builder()
+                                .menuFolderTitle(menu.getMenuList().getTitle())
+                                .icon(menu.getMenuList().getIconType())
+                                .build())
+                        .build())
+                .collect(Collectors.toList());
+        return ApiUtils.success(response);
+    }
+
     /*
     ID를 통한 메뉴 조회
 
