@@ -40,16 +40,17 @@ jobs:
           distribution: 'temurin'
       # Setup Redis
       - name: Setup Redis
-        uses: getong/redis-action@v1
+        uses: shogo82148/actions-setup-redis@v1.30.1
         with:
-          redis version: '5.0.7' # Optional, default value is "latest". The version of the redis
-          host port: 6379 # Optional, default value is 6379. The port of host
-          container port: 6379 # Optional, default value is 6379. The port of container
-          redis password: '123456778' # Optional, default is empty
+          redis-version: 6.2.0
+          redis-port: 6379
+          auto-start: true
+          redis-password: 12345678
       # Redis Health Check
       - name: Redis Health Check
         run: redis-cli -h 127.0.0.1 -p 6379 -a 12345678 ping
-
+        env:
+          REDISCLI_AUTH: ${{ secrets.REDIS_PASSWORD }}
       # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Grant execute permission for gradlew
@@ -65,7 +66,7 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: testdb
           JWT_SECRET_KEY: asdfasdfkjalsdfjkalsdjfkljaskdlfjjaklsdjfklajdskfjaklsdjfklasdjkflajsdklfajklsdfjkalsdjfklajsdklfajkl
           SPRING_DATA_MONGODB_URL: ${{ secrets.MONGODB_URL }}
-          SPRINT_REDIS_HOST: 127.0.0.1
+          SPRINT_REDIS_HOST: localhost
           REDIS_PASSWORD: 12345678
           #JWT_SECRET_KEY: ${secrets.JWT_SECRET_KEY}
         run: ./gradlew build --stacktrace
