@@ -23,25 +23,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     private ResponseEntity<?> handleValidationException(ValidationException e) {
-        String message = e.getMessage() != null ? e.getMessage() : ErrorCode.VALIDATION_ERROR.getMessage();
+        String message = !e.getMessage().isBlank() ? e.getMessage() : ErrorCode.VALIDATION_ERROR.getMessage();
         return handleException(e, ErrorCode.VALIDATION_ERROR, message);
     }
 
     @ExceptionHandler(RuntimeException.class)
     private ResponseEntity<?> handleException(RuntimeException e) {
-        String message = e.getMessage() != null ? e.getMessage() : ErrorCode.INTERNAL_SERVER_ERROR.getMessage();
+        String message = !e.getMessage().isBlank() ? e.getMessage() : ErrorCode.INTERNAL_SERVER_ERROR.getMessage();
         return handleException(e, ErrorCode.INTERNAL_SERVER_ERROR, message);
     }
 
     @ExceptionHandler(JwtException.class)
     private ResponseEntity<?> handleJwtException(JwtException e) {
-        String message = e.getMessage() != null ? e.getMessage() : ErrorCode.JWT_TOKEN_ERROR.getMessage();
+        String message = !e.getMessage().isBlank() ? e.getMessage() : ErrorCode.JWT_TOKEN_ERROR.getMessage();
         return handleException(e, ErrorCode.JWT_TOKEN_ERROR, message);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     private ResponseEntity<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
-        return handleException(e,ErrorCode.MISSING_PARAMETER,ErrorCode.MISSING_PARAMETER.getMessage());
+        return handleException(e,ErrorCode.VALIDATION_ERROR,ErrorCode.VALIDATION_ERROR.getMessage());
     }
   
     @ExceptionHandler(CustomException.class)
