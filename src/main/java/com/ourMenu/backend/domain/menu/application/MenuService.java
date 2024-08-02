@@ -4,11 +4,13 @@ import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -34,6 +36,11 @@ public class MenuService {
     @Transactional
     public Menu createMenu(Menu menu) {
         return menuRepository.save(menu);
+    }
+
+    @Transactional
+    public List<Menu> findMenuByPlace(Long placeId){
+        return menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
     }
 
     // 메뉴 업데이트
