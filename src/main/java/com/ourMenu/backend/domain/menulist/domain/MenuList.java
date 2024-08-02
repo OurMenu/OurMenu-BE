@@ -7,13 +7,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class MenuList {
 
     @Id
@@ -33,16 +34,16 @@ public class MenuList {
     private LocalDateTime modifiedAt;
     private String title;
 
-    private String icon;
+    private String iconType;
     private Long priority;
 
     @Lob
     @Column(name = "image")
     private String imgUrl;
 
-
+    @Builder.Default
     @OneToMany(mappedBy = "menuList")
-    private List<Menu> menus;
+    private List<Menu> menus = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

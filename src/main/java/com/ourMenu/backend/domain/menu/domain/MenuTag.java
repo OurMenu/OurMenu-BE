@@ -1,7 +1,7 @@
-package com.ourMenu.backend.domain.menutag.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.tag.domain.Tag;
+import com.ourMenu.backend.domain.menu.domain.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +20,7 @@ public class MenuTag {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 

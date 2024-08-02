@@ -2,7 +2,7 @@ package com.ourMenu.backend.domain.user.domain;
 
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.place.domain.Place;
+import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
