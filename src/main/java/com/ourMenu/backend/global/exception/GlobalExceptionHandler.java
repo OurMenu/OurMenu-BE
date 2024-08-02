@@ -5,8 +5,6 @@ import io.jsonwebtoken.JwtException;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,12 +41,12 @@ public class GlobalExceptionHandler {
     private ResponseEntity<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
         return handleException(e,ErrorCode.VALIDATION_ERROR,ErrorCode.VALIDATION_ERROR.getMessage());
     }
-  
+
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<?> handleBusinessException(CustomException e) {
         return handleException(e, e.getErrorCode(), e.getMessage());
     }
-  
+
     private ResponseEntity<?> handleException(Exception e, ErrorCode errorCode, String message) {
         log.error("{}: {}", errorCode, e.getMessage());
         return ApiUtils.error(ErrorResponse.of(errorCode, message));
