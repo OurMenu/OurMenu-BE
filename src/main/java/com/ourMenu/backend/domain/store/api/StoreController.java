@@ -19,15 +19,14 @@ import java.util.List;
 import static com.ourMenu.backend.global.exception.ErrorCode.SEARCH_RESULT_NOT_FOUND;
 
 @RestController
-@RequestMapping("stores")
 @RequiredArgsConstructor
 public class StoreController {
 
     private final StoreService storeService;
 
-    @GetMapping("/search")
-    public ApiResponse<List<GetStoresSearch>>search(@RequestParam String name){
-        List<Store> storeList = storeService.searchStore(name);
+    @GetMapping("/place/info")
+    public ApiResponse<List<GetStoresSearch>>search(@RequestParam String title){
+        List<Store> storeList = storeService.searchStore(title);
         if(storeList.size()==0){
            throw new SearchResultNotFoundException();
 
