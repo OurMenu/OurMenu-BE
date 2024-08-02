@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.user.api;
 
 import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
+import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
@@ -10,10 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.ourMenu.backend.global.util.BindingResultUtils.getErrorMessages;
 
@@ -40,6 +38,11 @@ public class UserController {
         }
         userService.changeNickname(userId, request);
         return ApiUtils.success(null);
+    }
+
+    @GetMapping("")
+    public ApiResponse<UserInfoResponse> getUserInfo(@UserId Long userId) {
+        return ApiUtils.success(userService.getUserInfo(userId));
     }
 
 }

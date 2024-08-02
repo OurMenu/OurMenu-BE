@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.user.application;
 
 import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
+import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.dao.UserDao;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
@@ -42,6 +43,16 @@ public class UserService {
 
     public void changeNickname(Long userId, ChangeNicknameRequest request) {
         userDao.updateNickname(userId, request.getNickname());
+    }
+
+    public UserInfoResponse getUserInfo(Long userId) {
+        Map<String, Object> user = userDao.getUserById(userId);
+
+        String email = (String) user.get("email");
+        String nickname = (String) user.get("nickname");
+        String imgUrl = (String) user.get("img_url");
+
+        return new UserInfoResponse(userId, email, nickname, imgUrl);
     }
 
 }
