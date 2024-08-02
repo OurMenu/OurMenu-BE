@@ -11,6 +11,7 @@ import com.ourMenu.backend.domain.user.exception.EmailDuplicationException;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.util.JwtProvider;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +86,13 @@ public class AccountService {
 
     public LoginResponse reissueToken(ReissueTokenRequest request) {
         long id = jwtProvider.getUserId(request.getRefreshToken());
+
+        Optional<RefreshTokenEntity> tokenEntity = refreshTokenRepository.findById(id);
+        if(tokenEntity.isEmpty())
+            throw new JwtException("");
+        if(!tokenEntity.get().getRefreshToken().equals(request.getRefreshToken()))
+            throw new JwtException("");
+
         return makeLoginResponse(id);
     }
 
