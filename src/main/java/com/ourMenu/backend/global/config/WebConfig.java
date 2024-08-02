@@ -31,7 +31,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/dummy/**");
+                        "/dummy/**",
+                        "/place/info");
     }
 
     @Override
