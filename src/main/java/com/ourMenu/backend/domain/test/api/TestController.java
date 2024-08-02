@@ -25,7 +25,7 @@ public class TestController {
     private final TestService testService;
 
     @PostMapping("/jpa/save")
-    @Operation(summary = "테스트회원 저장", description = "swagger 테스트를 위한 저장 API")
+    @Operation(summary = "테스트회원 저장(jpa)", description = "swagger 테스트를 위한 저장 API")
     public ApiResponse<SaveEntityResponse> saveTestEntity(@RequestBody SaveEntityRequest saveEntityRequest) throws IOException {
         TestEntity testEntity=TestEntity
                 .builder()
@@ -43,7 +43,7 @@ public class TestController {
     }
 
     @GetMapping("/jpa/{SaveEntityId}")
-    @Operation(summary = "테스트회원 조회", description = "swagger 테스트를 위한 조회 API")
+    @Operation(summary = "테스트회원 조회(jpa)", description = "swagger 테스트를 위한 조회 API")
     public ApiResponse<FindEntityByIdResponse> findById(@PathVariable("SaveEntityId")Long saveEntityId){
         TestEntity findTestEntity = testService.findTestEntity(saveEntityId);
         FindEntityByIdResponse findEntityByIdResponse = FindEntityByIdResponse
@@ -55,11 +55,13 @@ public class TestController {
     }
 
     @PostMapping("/jdbc/save")
+    @Operation(summary = "테스트회원 저장(jdbc)", description = "swagger 테스트를 위한 저장 API")
     public void save(@RequestBody @Valid SaveJdbcRequest saveJdbcRequest){
         testService.saveJdbcEntity(saveJdbcRequest.name());
     }
 
     @GetMapping("/jdbc/{SaveEntityId}")
+    @Operation(summary = "테스트회원 조회(jdbc)", description = "swagger 테스트를 위한 조회 API")
     public ApiResponse<FindJdbcByIdResponse> findJdbcEntityById(@PathVariable("SaveEntityId")Long saveEntityId){
         JdbcEntity jdbcEntity = testService.findJdbcEntity(saveEntityId);
         FindJdbcByIdResponse findJdbcByIdResponse = FindJdbcByIdResponse

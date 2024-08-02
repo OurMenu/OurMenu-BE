@@ -14,6 +14,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+  swagger:
+    #server-url: http://localhost:8080
+    #server-url: https://bluesparrow.shop
+  data:
+    mongodb:
+      url: ${MONGO_URL}
+      #uri: ${MONGO_URL}
   logging:
     level:
       org.hibernate.SQL: debug
