@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import java.util.List;
 
 @Configuration
@@ -21,8 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtAuthInterceptor)
                 .order(1)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/api/test/**")
-                .excludePathPatterns("/account/** , /account/logout")
+                .excludePathPatterns("/api/test/**", "/account/**", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
                 .addPathPatterns("/account/logout");
     }
 
