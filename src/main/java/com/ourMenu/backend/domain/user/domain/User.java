@@ -6,6 +6,7 @@ import com.ourMenu.backend.domain.place.domain.Place;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
 import java.util.List;
