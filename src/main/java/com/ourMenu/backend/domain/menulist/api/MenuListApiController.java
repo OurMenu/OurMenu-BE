@@ -22,13 +22,13 @@ public class MenuListApiController {
 
     //메뉴판 등록
     @PostMapping("")
-    public ApiResponse<MenuListResponseDTO> createMenuList(@RequestBody MenuListRequestDTO request){
+    public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request){
         MenuList menuList = menuListService.createMenuList(request);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
-                .title(request.getTitle())
-                .imgUrl(request.getImg())
-                .iconType(request.getIconType())
+                .title(menuList.getTitle())
+                .imgUrl(menuList.getImgUrl())
+                .iconType(menuList.getIconType())
                 .build();
 
         return ApiUtils.success(response);

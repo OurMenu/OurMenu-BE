@@ -8,14 +8,21 @@ import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequest;
 import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
 
@@ -26,6 +33,10 @@ public class MenuListService {
 
     private final MenuListRepository menuListRepository;
     private final MenuRepository menuRepository;
+    private final S3Client s3Client;
+
+    @Value("${spring.aws.s3.bucket-name}")
+    private String bucketName;
 
     /** 새 메뉴판 생성 */
 //    @Transactional
@@ -34,12 +45,43 @@ public class MenuListService {
 //    }
 
     //메뉴판 생성
-    @Transactional
-    public MenuList createMenuList(MenuListRequestDTO request){
-        MenuList menuList = MenuList.builder().title(request.getTitle()).imgUrl(request.getImg()).iconType(request.getIconType()).build();
-        return menuListRepository.save(menuList);
-    }
+//    @Transactional
+//    public MenuList createMenuList(MenuListRequestDTO request){
+//        MenuList menuList = MenuList.builder().title(request.getTitle()).imgUrl(request.getImg()).iconType(request.getIconType()).build();
+//        return menuListRepository.save(menuList);
+//    }
 
+    @Transactional
+    public MenuList createMenuList(MenuListRequestDTO request) {
+        MultipartFile file = request.getImg();
+        String fileUrl = "";
+
+        try {
+            if (file != null && !file.isEmpty()) {
+                String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+
+                s3Client.putObject(PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(fileName)
+                                .build(),
+                        RequestBody.fromBytes(file.getBytes()));
+
+                fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+
+            }
+        }catch (Exception e) {
+            e.getMessage();
+        }
+
+        MenuList menuList = MenuList.builder()
+                .title(request.getTitle())
+                .imgUrl(fileUrl)
+                .iconType(request.getIconType())
+                .build();
+
+        return menuListRepository.save(menuList);
+
+    }
 
     // 메뉴판 조회 //
     @Transactional
@@ -66,7 +108,26 @@ public class MenuListService {
             updateMenuListBuilder.title(request.getTitle());
         }
         if (request.getImg() != null){
-            updateMenuListBuilder.imgUrl(request.getImg());
+            MultipartFile file = request.getImg();
+            String fileUrl = "";
+
+            try {
+                if (file != null && !file.isEmpty()) {
+                    String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+                    s3Client.putObject(PutObjectRequest.builder()
+                                    .bucket(bucketName)
+                                    .key(fileName)
+                                    .build(),
+                            Paths.get(file.getOriginalFilename()));
+
+                    fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+                }
+            }catch (S3Exception e){
+                throw new RuntimeException("Failed to upload file to S3", e);
+            }catch (IOException e){
+                throw new RuntimeException("Failed to upload file to S3", e);       //예외 처리 필요
+            }
+            updateMenuListBuilder.imgUrl(fileUrl);
         }
 
         if (request.getIconType() != null){
