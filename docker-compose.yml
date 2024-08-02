@@ -34,7 +34,8 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SWAGGER_SERVER_URL: https://bluesparrow.shop
+      SPRING_DATA_MONGODB_URL: ${MONGODB_URL}
+      SPRING_SWAGGER_SERVER_URL: https://bluesparrow.shop
     depends_on:
       - database
     networks:
