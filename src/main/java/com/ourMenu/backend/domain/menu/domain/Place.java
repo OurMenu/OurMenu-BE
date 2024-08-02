@@ -1,4 +1,4 @@
-package com.ourMenu.backend.domain.place.domain;
+package com.ourMenu.backend.domain.menu.domain;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.user.domain.User;
@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,8 +40,9 @@ public class Place {
     private String address;
     private String info;
 
+    @Builder.Default
     @OneToMany(mappedBy = "place")
-    private List<Menu> menus;
+    private List<Menu> menus = new ArrayList<>();
 
     public void addMenu(Menu menu){
         menus.add(menu);

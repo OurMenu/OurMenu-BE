@@ -22,23 +22,8 @@ public class UserDao {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    @PostConstruct
-    public void createUserTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                "user_id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "nickname VARCHAR(255) NOT NULL, " +
-                "email VARCHAR(255) NOT NULL UNIQUE, " +
-                "password VARCHAR(255) NOT NULL, " +
-                "img_url VARCHAR(255), " +
-                "status VARCHAR(50) DEFAULT 'CREATED', " +
-                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                "modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
-                ")";
-        jdbcTemplate.getJdbcOperations().execute(sql);
-    }
-
     public long createUser(SignUpRequest userInfo) {
-        String sql = "INSERT INTO users (nickname, email, password) " +
+        String sql = "INSERT INTO user (nickname, email, password) " +
                 "VALUES (:nickname, :email, :password)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -53,22 +38,38 @@ public class UserDao {
     }
 
     public Map<String, Object> getUserById(Long userId) {
-        String sql = "SELECT * FROM users WHERE user_id = :userId";
+        String sql = "SELECT * FROM user WHERE user_id = :userId";
         SqlParameterSource param = new MapSqlParameterSource("userId", userId);
         return jdbcTemplate.queryForMap(sql, param);
     }
 
     public Map<String, Object> getUserByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = :email";
+        String sql = "SELECT * FROM user WHERE email = :email";
         SqlParameterSource param = new MapSqlParameterSource("email", email);
         return jdbcTemplate.queryForMap(sql, param);
     }
 
     public boolean isEmailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = :email";
+        String sql = "SELECT COUNT(*) FROM user WHERE email = :email";
         SqlParameterSource param = new MapSqlParameterSource("email", email);
         int count = jdbcTemplate.queryForObject(sql, param, Integer.class);
         return count > 0;
+    }
+
+    public int updatePassword(Long userId, String newPassword) {
+        String sql = "UPDATE user SET password = :newPassword WHERE user_id = :userId";
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("newPassword", newPassword);
+        return jdbcTemplate.update(sql, param);
+    }
+
+    public int updateNickname(Long userId, String newNickname) {
+        String sql = "UPDATE user SET nickname = :newNickname WHERE user_id = :userId";
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("newNickname", newNickname);
+        return jdbcTemplate.update(sql, param);
     }
 
 }

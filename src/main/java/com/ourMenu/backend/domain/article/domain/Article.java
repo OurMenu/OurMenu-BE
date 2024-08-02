@@ -1,6 +1,5 @@
 package com.ourMenu.backend.domain.article.domain;
 
-import com.ourMenu.backend.domain.articlemenu.domain.ArticleMenu;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
