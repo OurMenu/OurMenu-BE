@@ -68,6 +68,8 @@ jobs:
           SPRING_DATA_MONGODB_URL: ${{ secrets.MONGODB_URL }}
           SPRINT_REDIS_HOST: localhost
           REDIS_PASSWORD: 12345678
+          GMAIL_ADDRESS: qwer@naver.com
+          GMAIL_PASSWORD: 12423423
           #JWT_SECRET_KEY: ${secrets.JWT_SECRET_KEY}
         run: ./gradlew build --stacktrace
 
