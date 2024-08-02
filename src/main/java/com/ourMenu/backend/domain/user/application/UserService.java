@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.user.application;
 
+import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
 import com.ourMenu.backend.domain.user.dao.UserDao;
 import com.ourMenu.backend.domain.user.exception.UserException;
@@ -37,6 +38,10 @@ public class UserService {
 
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         userDao.updatePassword(userId, encodedNewPassword);
+    }
+
+    public void changeNickname(Long userId, ChangeNicknameRequest request) {
+        userDao.updateNickname(userId, request.getNickname());
     }
 
 }

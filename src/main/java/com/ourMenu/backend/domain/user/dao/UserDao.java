@@ -64,4 +64,12 @@ public class UserDao {
         return jdbcTemplate.update(sql, param);
     }
 
+    public int updateNickname(Long userId, String newNickname) {
+        String sql = "UPDATE user SET nickname = :newNickname WHERE user_id = :userId";
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("newNickname", newNickname);
+        return jdbcTemplate.update(sql, param);
+    }
+
 }

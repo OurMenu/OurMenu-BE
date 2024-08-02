@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.user.api;
 
+import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.global.argument_resolver.UserId;
@@ -29,6 +30,15 @@ public class UserController {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
         userService.changePassword(userId, request);
+        return ApiUtils.success(null);
+    }
+
+    @PatchMapping("/nickname")
+    public ApiResponse<Object> changeNickname(@UserId Long userId, @Valid @RequestBody ChangeNicknameRequest request, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new ValidationException(getErrorMessages(bindingResult));
+        }
+        userService.changeNickname(userId, request);
         return ApiUtils.success(null);
     }
 
