@@ -20,7 +20,7 @@ public class MenuTag {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
@@ -33,5 +33,13 @@ public class MenuTag {
     public void confirmMenu(Menu menu){
         this.menu = menu;
         menu.addMenuTag(this);
+    }
+
+    // 삭제되기 전 Tag와의 관계삭제
+    @PreRemove
+    public void removeTag() {
+        if (tag != null) {
+            tag.removeMenuTag(this);
+        }
     }
 }
