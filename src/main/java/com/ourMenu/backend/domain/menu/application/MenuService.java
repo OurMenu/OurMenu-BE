@@ -9,6 +9,8 @@ import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,7 @@ public class MenuService {
     private final MenuListService menuListService;
     private final PlaceService placeService;
     private final TagService tagService;
+    private final UserService userService;
 
     // 모두 조회
     @Transactional
@@ -36,33 +40,47 @@ public class MenuService {
         return menuRepository.findAll();
     }
 
-    /*
+
     @Transactional
     // 메뉴 등록 * (이미지 제외)
-    public PostMenuResponse createMenu(PostMenuRequest postMenuRequest) {
+    public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
+
+        // 유저 정보 가져오기
+        User finduser = userService.getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("해당하는 유저가 없습니다."));
+
+        // 메뉴판 정보 가져오기
         MenuList findMenuList = menuListService.getMenuListByName(postMenuRequest.getMenuListTitle());
 
-        Place place = placeService.createPlace(postMenuRequest.getStoreInfo());
+        // 장소 가져오기(식당이 없는 경우 새로 생성)
+        Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
 
+        // 메뉴 생성
         Menu menu = Menu.builder()
                 .title(postMenuRequest.getTitle())
                 .price(postMenuRequest.getPrice())
+                .user(finduser)
                 .memo(postMenuRequest.getMemo())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
+        // 식당, 메뉴판 연관관계 설정
         menu.confirmMenuList(findMenuList);
         menu.confirmPlace(place);
 
+        // MenuTag 생성 및 연관관계 설정
         List<MenuTag> menuTags = postMenuRequest.getTagInfo().stream()
                 .map(tagInfo -> {
-                    Tag tag = tagService.createTag(tagInfo);
+                    Tag tag = tagService.findByName(tagInfo.getTagTitle())
+                            .orElseGet(() -> tagService.createTag(tagInfo)); // 태그가 존재하지 않으면 생성
+
+                    // 중간 테이블 생성
                     MenuTag menuTag = MenuTag.builder()
                             .tag(tag)
                             .menu(menu)
                             .build();
-
+                    // 연관관계 설정
                     menuTag.confirmTag(tag);
                     menuTag.confirmMenu(menu);
 
@@ -76,7 +94,7 @@ public class MenuService {
 
         return new PostMenuResponse(savedMenu.getId());
     }
-*/
+
     // 메뉴 추가
     public Menu getMenuById(Long menuId) {
         return menuRepository.findById(menuId)
@@ -104,7 +122,6 @@ public class MenuService {
     @Transactional
     public void updateMenu(Long menuId, PostMenuRequest postMenuRequest) {
         // 메뉴 조회
-
     }
 
     @Transactional

@@ -47,8 +47,6 @@ public class Menu {
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<MenuTag> tags = new ArrayList<>();
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menulist_id")
     private MenuList menuList;
@@ -57,10 +55,10 @@ public class Menu {
     @JoinColumn(name = "place_id")
     private Place place;
 
-//    // 단방향?! 양방향?!
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    // 단방향?! 양방향?! -> 단방향으로 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 //    @PrePersist
 //    public void prePersist() {
@@ -92,9 +90,7 @@ public class Menu {
         menuList.addMenu(this);
     }
 
-    public void confirmUser(User user){
 
-    }
 
     public void confirmPlace(Place place){
         this.place = place;

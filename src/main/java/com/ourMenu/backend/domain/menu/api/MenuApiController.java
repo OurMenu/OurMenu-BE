@@ -12,6 +12,7 @@ import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +35,13 @@ public class MenuApiController {
     private final MenuListService menuListService;
 
 
-    /*
+
     // 메뉴 생성
     @PostMapping("")
-    public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest) {
-        PostMenuResponse postMenuResponse = menuService.createMenu(postMenuRequest);
+    public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest, @UserId Long id) {
+        PostMenuResponse postMenuResponse = menuService.createMenu(postMenuRequest, id);
         return ApiUtils.success(postMenuResponse);
-    } */
+    }
 
     // 이미지 추가
     @PostMapping("/photo")
