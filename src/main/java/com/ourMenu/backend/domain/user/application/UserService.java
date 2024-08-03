@@ -4,6 +4,8 @@ import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.dao.UserDao;
+import com.ourMenu.backend.domain.user.dao.UserRepository;
+import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
@@ -13,8 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<?> userException(UserException e) {
@@ -53,6 +58,11 @@ public class UserService {
         String imgUrl = (String) user.get("img_url");
 
         return new UserInfoResponse(userId, email, nickname, imgUrl);
+    }
+
+    @Transactional
+    public Optional<User> getUserById(Long userId){
+        return userRepository.findById(userId);
     }
 
 }
