@@ -38,7 +38,7 @@ public class MenuTag {
     // 삭제되기 전 Tag와의 관계삭제
     @PreRemove
     public void removeTag() {
-        if (tag != null) {
+        if (this.getTag() != null) {
             tag.removeMenuTag(this);
         }
     }
