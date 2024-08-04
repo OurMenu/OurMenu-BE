@@ -120,7 +120,7 @@ public class MenuService {
     public void createMenuImage(PostPhotoRequest request) {
         List<MultipartFile> imgs = request.getImgs();
         long menuId = request.getMenuId();
-        log.info("현재 전달받은 번호는 " + menuId);
+
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
 
