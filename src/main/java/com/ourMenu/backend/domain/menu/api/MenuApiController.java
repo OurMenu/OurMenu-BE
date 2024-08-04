@@ -34,8 +34,6 @@ public class MenuApiController {
 
     private final MenuListService menuListService;
 
-
-
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest, @UserId Long id) {
@@ -56,10 +54,12 @@ public class MenuApiController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenu (@PathVariable Long id){
-        String response = menuService.removeMenu(id);       //STATUS를 DELETED로 변환
+    public ApiResponse<String> removeMenu (@PathVariable Long id, @UserId Long userId){
+        String response = menuService.removeMenu(id, userId);       // Hard Delete
         return ApiUtils.success(response);  //OK 반환
     }
+
+
     @GetMapping("/{placeId}")
     public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId) {
         List<Menu> menuList = menuService.findMenuByPlace(placeId);
