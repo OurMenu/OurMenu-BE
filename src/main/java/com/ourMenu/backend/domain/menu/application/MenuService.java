@@ -2,22 +2,15 @@ package com.ourMenu.backend.domain.menu.application;
 
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
-import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
-import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
-import com.ourMenu.backend.global.common.Status;
-import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,43 +151,31 @@ public class MenuService {
         }
     }
 
-
-
-//    public void saveMenuImage(Long menuId, List<String> imageUrls) {
-//            Menu findMenu = getMenuById(menuId);
-//
-//            List<MenuImage> menuImages = imageUrls.stream()
-//                    .map(url -> MenuImage.builder()
-//                            .url(url)
-//                            .menu(findMenu)
-//                            .build())
-//                    .collect(Collectors.toList());
-//
-//            for (MenuImage menuImage : menuImages) {
-//                menuImage.confirmMenu(findMenu);
-//            }
-//    }
-
-
     @Transactional
     public void updateMenu(Long menuId, PostMenuRequest postMenuRequest) {
         // 메뉴 조회
     }
 
     @Transactional
-    public String removeMenu(Long id){
+    public String removeMenu(Long id, Long userId){
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+
+        User user = menu.getUser();
+        user.getId(); // 프록시 초기화
 
         Place place = menu.getPlace();
         String placeName = place.getTitle(); // 프록시 초기화
 
         MenuList menuList = menu.getMenuList();
-        String title = menuList.getTitle();
+        String title = menuList.getTitle(); // 프록시 초기화
 
+
+        // 삭제 시 연관관계 제거
         menu.removeMenuList(menuList);
         menu.removePlace(place);
-
+        menu.removeUser(user);
+        menu.getTags().forEach(menuTag -> menuTag.removeTag());
 
         menuRepository.delete(menu);
 

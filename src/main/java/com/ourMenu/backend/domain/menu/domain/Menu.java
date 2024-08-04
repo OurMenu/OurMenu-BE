@@ -104,6 +104,12 @@ public class Menu {
         }
     }
 
+    public void removeUser(User user){
+        if (this.user == user) {
+            this.user = null; //
+        }
+    }
+
     public void removePlace(Place place) {
         if (this.place == place) {
             this.place = null;
