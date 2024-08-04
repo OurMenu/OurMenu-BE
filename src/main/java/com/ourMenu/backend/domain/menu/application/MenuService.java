@@ -3,29 +3,38 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MenuService {
 
     private final MenuRepository menuRepository;
@@ -33,6 +42,11 @@ public class MenuService {
     private final PlaceService placeService;
     private final TagService tagService;
     private final UserService userService;
+
+    private final S3Client s3Client;
+
+    @Value("${spring.aws.s3.bucket-name}")
+    private String bucketName;
 
     // 모두 조회
     @Transactional
@@ -103,20 +117,63 @@ public class MenuService {
 
     // 메뉴 이미지 등록
     @Transactional
-    public void saveMenuImage(Long menuId, List<String> imageUrls) {
-            Menu findMenu = getMenuById(menuId);
+    public void createMenuImage(PostPhotoRequest request) {
+        List<MultipartFile> imgs = request.getImgs();
+        long menuId = request.getMenuId();
+        log.info("현재 전달받은 번호는 " + menuId);
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
 
-            List<MenuImage> menuImages = imageUrls.stream()
-                    .map(url -> MenuImage.builder()
-                            .url(url)
-                            .menu(findMenu)
-                            .build())
-                    .collect(Collectors.toList());
+        List<String> fileUrls = new ArrayList<>();
 
-            for (MenuImage menuImage : menuImages) {
-                menuImage.confirmMenu(findMenu);
+        for (MultipartFile img : imgs) {
+            String fileUrl = "";
+            try {
+                if (img != null && !img.isEmpty()) {
+                    String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(img.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+
+                    s3Client.putObject(PutObjectRequest.builder()
+                                    .bucket(bucketName)
+                                    .key(fileName)
+                                    .build(),
+                            RequestBody.fromBytes(img.getBytes()));
+
+                    fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+                    fileUrls.add(fileUrl); // 변환된 URL 추가해줌
+                }
+            } catch (Exception e) {
+                e.getMessage();
             }
+        }
+
+        List<MenuImage> menuImages = fileUrls.stream()
+                .map(url -> MenuImage.builder()
+                        .url(url)
+                        .menu(menu)
+                        .build())
+                .collect(Collectors.toList());
+
+        for (MenuImage menuImage : menuImages) {
+            menuImage.confirmMenu(menu);
+        }
     }
+
+
+
+//    public void saveMenuImage(Long menuId, List<String> imageUrls) {
+//            Menu findMenu = getMenuById(menuId);
+//
+//            List<MenuImage> menuImages = imageUrls.stream()
+//                    .map(url -> MenuImage.builder()
+//                            .url(url)
+//                            .menu(findMenu)
+//                            .build())
+//                    .collect(Collectors.toList());
+//
+//            for (MenuImage menuImage : menuImages) {
+//                menuImage.confirmMenu(findMenu);
+//            }
+//    }
 
 
     @Transactional

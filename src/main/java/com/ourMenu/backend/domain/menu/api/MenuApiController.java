@@ -45,8 +45,8 @@ public class MenuApiController {
 
     // 이미지 추가
     @PostMapping("/photo")
-    public ApiResponse<String> saveMenuImage(@RequestBody PostPhotoRequest photoRequest) {
-        menuService.saveMenuImage(photoRequest.getMenuId(), photoRequest.getImageUrls());
+    public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
+        menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
     }
 
