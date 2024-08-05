@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.*;
+import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
@@ -48,14 +49,16 @@ public class MenuApiController {
         return ApiUtils.success("OK");
     }
 
-    @PatchMapping("")
-    public ApiResponse<String> updateMenuList(@PathVariable Long menuId, @RequestBody PostMenuRequest request) {
-        return null;
-    }
-
+    // 삭제
     @DeleteMapping("/{id}")
     public ApiResponse<String> removeMenu (@PathVariable Long id, @UserId Long userId){
         String response = menuService.removeMenu(id, userId);       // Hard Delete
+        return ApiUtils.success(response);  //OK 반환
+    }
+
+    @PatchMapping("/{id}")
+    public ApiResponse<String> updateMenu (@PathVariable Long id, @UserId Long userId, PatchMenuRequest patchMenuRequest){
+        String response = menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
         return ApiUtils.success(response);  //OK 반환
     }
 
