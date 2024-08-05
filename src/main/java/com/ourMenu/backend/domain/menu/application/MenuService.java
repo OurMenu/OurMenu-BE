@@ -4,6 +4,7 @@ import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
@@ -296,7 +297,19 @@ public class MenuService {
 
     @Transactional
     public List<Menu> findMenuByPlace(Long placeId){
-        return menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
+        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+                .orElseThrow(() -> new MenuNotFoundException());
+
+        if(menuList.isEmpty()){
+            throw new MenuNotFoundException();
+        }
+
+        return menuList;
+    }
+
+    @Transactional
+    public Menu findMenuInfo(Long menuId, Long userId) {
+        return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
 
