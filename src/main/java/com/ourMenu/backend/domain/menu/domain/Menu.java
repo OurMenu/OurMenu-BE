@@ -118,5 +118,20 @@ public class Menu {
     }
 
 
+   // 필드 값 변경 함수
+   public void changePrice(int price){
+       this.price = price;
+   }
 
+    public void changeTitle(String title){
+        this.title = title;
+    }
+
+    public void changeMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public void changeIcon(String icon) {
+        this.icon = icon;
+    }
 }
