@@ -32,7 +32,9 @@ public class StoreController {
     }
 
     @GetMapping("/place/{id}")
-    public ApiResponse<GetStoresSearch> findById(@RequestParam("id") String id, @Parameter(hidden = true) @UserId Long userId) {
+    public ApiResponse<GetStoresSearch> findById(@RequestParam("id") String id,
+                                                 @Parameter(hidden = true)
+                                                 @UserId Long userId) {
         Store findStore = storeService.findOneByUser(id, userId);
         return ApiUtils.success(GetStoresSearch.toDto(findStore));
     }
