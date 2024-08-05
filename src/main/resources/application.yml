@@ -13,10 +13,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 100
         format_sql: true
   swagger:
-    #server-url: http://localhost:8080
-    #server-url: https://bluesparrow.shop
+  #server-url: http://localhost:8080
+  #server-url: https://bluesparrow.shop
   data:
     mongodb:
       url: ${MONGO_URL}

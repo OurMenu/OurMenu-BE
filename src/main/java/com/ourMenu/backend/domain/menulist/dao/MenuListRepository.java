@@ -15,6 +15,8 @@ public interface MenuListRepository extends JpaRepository<MenuList, Long> {
     @Query("SELECT m FROM MenuList m WHERE m.status IN :status")
     List<MenuList> findAllMenuList(@Param("status")List<MenuListStatus> status);
 
-    @Query("SELECT m FROM MenuList m WHERE m.title = :title AND m.status IN (:status)")
-    MenuList findMenuListByTitle(@Param("title") String title, @Param("status")List<MenuListStatus> status);
+    @Query("SELECT m FROM MenuList m WHERE m.title = :title AND m.status IN (:status) AND m.user.id = :userId")
+    MenuList findMenuListByTitleAndUserId(@Param("title") String title,
+                                          @Param("status") List<MenuListStatus> status,
+                                          @Param("userId") Long userId);
 }

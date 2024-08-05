@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Setter
 public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,4 +56,12 @@ public class Place {
     }
 
 
+    public void removeMenu(Menu menu) {
+        menus.remove(menu);
+    }
+
+    // 필드 값 변경
+    public void changeInfo(String storeInfo){
+        this.info = storeInfo;
+    }
 }

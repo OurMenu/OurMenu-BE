@@ -85,8 +85,8 @@ public class MenuListService {
 
     // 메뉴판 조회 //
     @Transactional
-    public MenuList getMenuListByName(String title) {
-        return menuListRepository.findMenuListByTitle(title, Arrays.asList(CREATED, UPDATED));
+    public MenuList getMenuListByNameAndUserId(String title, Long userId) {
+        return menuListRepository.findMenuListByTitleAndUserId(title, Arrays.asList(CREATED, UPDATED), userId);
     }
 
     //메뉴판 전체 조회
