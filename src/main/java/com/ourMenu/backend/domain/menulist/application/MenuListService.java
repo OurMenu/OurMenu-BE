@@ -95,19 +95,19 @@ public class MenuListService {
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
 
-        return menuListRepository.findMenuListByTitle(title, userId, Arrays.asList(CREATED, UPDATED));
+        return menuListRepository.findMenuListByTitle(title, userId, Arrays.asList(CREATED, UPDATED)).orElseThrow(() -> new RuntimeException("해당 메뉴판이 존재하지 않습니다."));
     }
 
     //메뉴판 전체 조회
     @Transactional
     public List<MenuList> getAllMenuList(Long userId){
-        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED), userId);
+        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED), userId).orElseThrow(() -> new RuntimeException("해당 유저의 메뉴판이 존재하지 않습니다."));
     }
 
     //메뉴판 업데이트
     @Transactional
     public MenuList updateMenuList(Long menulistId, MenuListRequestDTO request, Long userId) {
-        MenuList menuList = menuListRepository.findMenuListsById(menulistId, userId);
+        MenuList menuList = menuListRepository.findMenuListsById(menulistId, userId, Arrays.asList(CREATED, UPDATED)).orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 존재하지 않습니다."));
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
@@ -150,7 +150,7 @@ public class MenuListService {
     //메뉴판 삭제
     @Transactional
     public String removeMenuList(Long menuListId, Long userId){
-        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId);
+        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED)).orElseThrow(() -> new RuntimeException("해당 메뉴판이 존재하지 않습니다."));
 
         MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
 

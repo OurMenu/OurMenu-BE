@@ -57,7 +57,7 @@ public class MenuService {
                 .orElseThrow(() -> new RuntimeException("해당하는 유저가 없습니다."));
 
         // 메뉴판 정보 가져오기
-        MenuList findMenuList = menuListService.getMenuListByNameAndUserId(postMenuRequest.getMenuListTitle(), userId);
+        MenuList findMenuList = menuListService.getMenuListByName(postMenuRequest.getMenuListTitle(), userId);
 
         // 장소 가져오기(식당이 없는 경우 새로 생성)
         Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
@@ -176,7 +176,7 @@ public class MenuService {
 
         // 메뉴판 변경
         if(!patchMenuRequest.getMenuListTitle().equals(menu.getMenuList().getTitle())){
-            MenuList menulist = menuListService.getMenuListByNameAndUserId(patchMenuRequest.getTitle(), userId);
+            MenuList menulist = menuListService.getMenuListByName(patchMenuRequest.getTitle(), userId);
             menu.removeMenuList(menu.getMenuList());
             menu.confirmMenuList(menulist);
         }
