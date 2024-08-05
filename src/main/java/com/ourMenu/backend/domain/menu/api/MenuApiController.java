@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.*;
+import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
@@ -58,8 +59,14 @@ public class MenuApiController {
 
     @PatchMapping("/{id}")
     public ApiResponse<String> updateMenu (@PathVariable Long id, @UserId Long userId, PatchMenuRequest patchMenuRequest){
-        String response = menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
-        return ApiUtils.success(response);  //OK 반환
+        menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
+        return ApiUtils.success("OK");  //OK 반환
+    }
+
+    @PatchMapping("/{id}/photo")
+    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, PatchMenuImage patchMenuImage){
+        menuService.updateMenuImage(patchMenuImage, id, userId);
+        return ApiUtils.success("OK");
     }
 
 

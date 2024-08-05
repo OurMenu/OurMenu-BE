@@ -2,15 +2,13 @@ package com.ourMenu.backend.domain.menu.application;
 
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
-import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
-import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
-import com.ourMenu.backend.domain.menu.dto.request.TagRequestDto;
+import com.ourMenu.backend.domain.menu.dto.request.*;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +35,7 @@ public class MenuService {
     private final PlaceService placeService;
     private final TagService tagService;
     private final UserService userService;
-
+    private final EntityManager em;
     private final S3Client s3Client;
 
     @Value("${spring.aws.s3.bucket-name}")
@@ -154,8 +152,9 @@ public class MenuService {
     }
 
     @Transactional
-    public String updateMenu(Long menuId, Long userId, PatchMenuRequest patchMenuRequest) {
-        Menu menu = menuRepository.findAllWithUserAndMenuListAndPlace(menuId);
+    public void updateMenu(Long menuId, Long userId, PatchMenuRequest patchMenuRequest) {
+        Menu menu = menuRepository.findAllWithUserAndMenuListAndPlace(menuId)
+                .orElseThrow(() -> new RuntimeException("해당하는 매뉴가 없습니다."));
 
         String MenuListTitle = patchMenuRequest.getMenuListTitle();
 
@@ -211,9 +210,64 @@ public class MenuService {
                     .collect(Collectors.toList());
         }
 
-        return "OK";
         // 메뉴 조회
     }
+
+    @Transactional
+    public String updateMenuImage(PatchMenuImage patchMenuImage, long id, long userId) {
+        log.info("현재 id 값은 : " + id);
+        Menu menu = menuRepository.findMenuAndImages(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 매뉴가 없습니다."));
+
+        List<MultipartFile> imgs = patchMenuImage.getImgs();
+
+        List<String> fileUrls = new ArrayList<>();
+        if(imgs != null) {
+            removeImages(menu);
+            log.info("메뉴 이미지 삭제 ");
+            for (MultipartFile img : imgs) {
+                String fileUrl = "";
+                try {
+                    if (img != null && !img.isEmpty()) {
+                        String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(img.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+
+                        s3Client.putObject(PutObjectRequest.builder()
+                                        .bucket(bucketName)
+                                        .key(fileName)
+                                        .build(),
+                                RequestBody.fromBytes(img.getBytes()));
+
+                        fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+                        fileUrls.add(fileUrl); // 변환된 URL 추가해줌
+                    }
+                } catch (Exception e) {
+                    e.getMessage();
+                }
+            }
+
+            List<MenuImage> menuImages = fileUrls.stream()
+                    .map(url -> MenuImage.builder()
+                            .url(url)
+                            .menu(menu)
+                            .build())
+                    .collect(Collectors.toList());
+
+            for (MenuImage menuImage : menuImages) {
+                menuImage.confirmMenu(menu);
+            }
+
+        }
+
+        return "OK";
+    }
+
+    @Transactional
+    public void removeImages(Menu menu){
+        menu.removeImage();
+        em.flush();
+    }
+
+
 
     @Transactional
     public String removeMenu(Long id, Long userId){
@@ -244,6 +298,8 @@ public class MenuService {
     public List<Menu> findMenuByPlace(Long placeId){
         return menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
     }
+
+
 
     /*
 
