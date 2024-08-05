@@ -1,17 +1,22 @@
 package com.ourMenu.backend.domain.onboarding.domain;
 
+import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.List;
+
+@Getter
 public enum Question {
 
-    FEELING(1,"오늘 기분은 어떠신가요?",Answer.DUMMY),
-    WEATHER(2,"오늘 날씨는 어떤가요?",Answer.DUMMY),
-    STRESS(3,"스트레스 받을 때는 어떤 음식을 드시나요?",Answer.DUMMY),
-    TRAVEL(4,"어디로 떠나고 싶은가요?",Answer.DUMMY),
-    SEASON(5,"어느 계절을 더 좋아하세요?",Answer.DUMMY);
+    FEELING(1, "오늘 기분은 어떠신가요?", Answer.FEELING),
+    WEATHER(2, "오늘 날씨는 어떤가요?", Answer.WEATHER),
+    STRESS(3, "스트레스 받을 때는 어떤 음식을 드시나요?", Answer.STRESS),
+    TRAVEL(4, "어디로 떠나고 싶은가요?", Answer.TRAVEL),
+    SEASON(5, "어느 계절을 더 좋아하세요?", Answer.SEASON);
 
-
-    private int id;
-    private String question;
-    private Answer answer;
+    private final int id;
+    private final String question;
+    private final Answer answer;
 
 
     Question(int id, String question, Answer answer) {
@@ -20,4 +25,7 @@ public enum Question {
         this.answer = answer;
     }
 
+    public static List<Question> getAllQuestions() {
+        return Arrays.stream(Question.values()).toList();
+    }
 }
