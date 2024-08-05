@@ -1,15 +1,21 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
+import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.GetMenuListResponse;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
+import com.ourMenu.backend.global.exception.ErrorCode;
+import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +28,21 @@ public class MenuListApiController {
 
     private final MenuListService menuListService;
     private final UserService userService;
+
+    @ExceptionHandler(MenuListException.class)
+    public ResponseEntity<?> menuListException(MenuListException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_LIST_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<?> userException(UserException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.USER_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(ImageLoadException.class)
+    public ResponseEntity<?> imageLoadException(ImageLoadException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.IMAGE_NOT_LOADED_ERROR, e.getMessage()));
+    }
 
     //메뉴판 등록
     @PostMapping("")
@@ -57,7 +78,7 @@ public class MenuListApiController {
 
     //메뉴판
     @PatchMapping("/{id}")
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @RequestBody MenuListRequestDTO request){
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
         MenuList menuList = menuListService.updateMenuList(id, request,  userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
