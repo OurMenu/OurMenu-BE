@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MenuListRepository extends JpaRepository<MenuList, Long> {
-//    Optional<MenuList> findByTitle(String title);
+    Optional<MenuList> findByTitle(String title);
 
     @Query("SELECT m FROM MenuList m WHERE m.status IN :status AND m.user.id = :userId")
     List<MenuList> findAllMenuList(@Param("status")List<MenuListStatus> status, @Param("userId") Long userId);
@@ -20,4 +20,5 @@ public interface MenuListRepository extends JpaRepository<MenuList, Long> {
 
     @Query("SELECT m FROM MenuList m WHERE m.id = :menulistId AND m.user.id =: userId")
     MenuList findMenuListsById(@Param("menulistId") Long menulistId, @Param("userId") Long userId);
+
 }

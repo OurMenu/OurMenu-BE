@@ -11,4 +11,6 @@ public class StoreRequestDTO {
     private String storeName;
     private String storeInfo;
     private String storeAddress;
+    private Double storeLatitude;  // 위도
+    private Double storeLongitude; // 경도
 }
