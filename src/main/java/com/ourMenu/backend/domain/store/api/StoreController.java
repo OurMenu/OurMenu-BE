@@ -33,4 +33,9 @@ public class StoreController {
         }
         return ApiUtils.success(storeList.stream().map(GetStoresSearch::toDto).toList());
     }
+    @GetMapping("/place/{id}")
+    public ApiResponse<GetStoresSearch>findById(@RequestParam("id")String id){
+        Store findStore = storeService.findById(id);
+        return ApiUtils.success(GetStoresSearch.toDto(findStore));
+    }
 }
