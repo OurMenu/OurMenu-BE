@@ -24,7 +24,7 @@ public class StoreService {
     private final UserStoreRepository userStoreRepository;
 
     /**
-     * 제목에 name을 포함 하는 음식점을 반환한다.(5개)
+     * 제목에 name을 포함 하는 음식점을 반환한다.(15개)
      *
      * @param name
      * @return 음식점 갯수
