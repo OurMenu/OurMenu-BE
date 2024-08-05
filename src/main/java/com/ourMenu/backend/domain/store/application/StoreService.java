@@ -67,6 +67,11 @@ public class StoreService {
         return userStoreOptional.get().updateModifiedAt();
     }
 
+    /**
+     * 검색 기록을 오름차순으로 검색한다.
+     * @param userId
+     * @return
+     */
     public List<UserStore> findHistory(Long userId) {
         return userStoreRepository.findByUserIdOrderByModifiedAtDesc(userId);
     }
