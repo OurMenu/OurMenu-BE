@@ -5,6 +5,8 @@ import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.GetMenuListResponse;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
+import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +21,12 @@ import java.util.stream.Collectors;
 public class MenuListApiController {
 
     private final MenuListService menuListService;
+    private final UserService userService;
 
     //메뉴판 등록
     @PostMapping("")
-    public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request){
-        MenuList menuList = menuListService.createMenuList(request);
+    public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
+        MenuList menuList = menuListService.createMenuList(request, userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
                 .title(menuList.getTitle())
@@ -38,8 +41,8 @@ public class MenuListApiController {
 
     //메뉴판 전체 조회
     @GetMapping("")
-    public ApiResponse<List<GetMenuListResponse>> findAllMenuList(){
-        List<MenuList> menuLists = menuListService.getAllMenuList();
+    public ApiResponse<List<GetMenuListResponse>> findAllMenuList(@UserId Long userId){
+        List<MenuList> menuLists = menuListService.getAllMenuList(userId);
         List<GetMenuListResponse> responses = menuLists.stream().map(menuList ->
                 GetMenuListResponse.builder()
                         .title(menuList.getTitle())
@@ -54,8 +57,8 @@ public class MenuListApiController {
 
     //메뉴판
     @PatchMapping("/{id}")
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @RequestBody MenuListRequestDTO request){
-        MenuList menuList = menuListService.updateMenuList(id, request);
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @RequestBody MenuListRequestDTO request){
+        MenuList menuList = menuListService.updateMenuList(id, request,  userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
                 .title(menuList.getTitle())
@@ -67,8 +70,8 @@ public class MenuListApiController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id){
-        String response = menuListService.removeMenuList(id);       //STATUS를 DELETED로 변환
+    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
+        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
         return ApiUtils.success(response);  //OK 반환
     }
 
