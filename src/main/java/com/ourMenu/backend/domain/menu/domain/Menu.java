@@ -117,6 +117,12 @@ public class Menu {
         }
     }
 
+    public void removeImage(){
+        if (images != null) {
+            images.clear();
+        }
+    }
+
 
    // 필드 값 변경 함수
    public void changePrice(int price){
