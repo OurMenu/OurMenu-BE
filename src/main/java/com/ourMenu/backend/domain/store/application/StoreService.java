@@ -66,4 +66,8 @@ public class StoreService {
         }
         return userStoreOptional.get().updateModifiedAt();
     }
+
+    public List<UserStore> findHistory(Long userId) {
+        return userStoreRepository.findByUserIdOrderByModifiedAtDesc(userId);
+    }
 }
