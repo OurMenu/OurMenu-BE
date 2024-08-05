@@ -4,6 +4,7 @@ import com.ourMenu.backend.domain.store.dao.StoreRepository;
 import com.ourMenu.backend.domain.store.dao.UserStoreRepository;
 import com.ourMenu.backend.domain.store.domain.Store;
 import com.ourMenu.backend.domain.store.domain.UserStore;
+import com.ourMenu.backend.domain.store.exception.SearchResultNotFoundException;
 import com.ourMenu.backend.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,7 @@ public class StoreService {
     public Store findOneByUser(String id, Long userId) {
         Optional<Store> optionalStore = storeRepository.findById(id);
         if (optionalStore.isEmpty())
-            throw new RuntimeException("찾을 수 없는 가게 입니다.");
+            throw new SearchResultNotFoundException();
         updateUserStore(optionalStore.get(),userId);
         return optionalStore.get();
     }
