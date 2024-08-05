@@ -1,15 +1,13 @@
 package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
-import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuDTO;
-import com.ourMenu.backend.domain.menu.dto.response.PlaceMenuFolderDTO;
-import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
-import com.ourMenu.backend.domain.menu.dto.response.TagDTO;
+import com.ourMenu.backend.domain.menu.dto.response.*;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,6 +34,7 @@ public class MenuApiController {
     private final MenuService menuService;
 
     private final MenuListService menuListService;
+    private final MenuRepository menuRepository;
 
     // 메뉴 생성
     @PostMapping("")
@@ -48,6 +48,16 @@ public class MenuApiController {
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
+    }
+
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String title,
+                                              @RequestParam(required = false) String tag,
+                                              @RequestParam(required = false) Integer menuFolderId) {
+        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId);
+        List<MenuDto> menuDtos = MenuDto.toDto(menus);
+
+        return ApiUtils.success(menuDtos);
     }
 
     // 삭제
@@ -68,6 +78,16 @@ public class MenuApiController {
         menuService.updateMenuImage(patchMenuImage, id, userId);
         return ApiUtils.success("OK");
     }
+
+//    @GetMapping("/menus/{menuId}")
+//    public String getMenu(@PathVariable Long menuId) {
+//        Menu findMenu = menuRepository.findMenuWithPlaceAndImages(menuId)
+//                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+//
+//
+//
+//        return "Ok";
+//    }
 
 
     @GetMapping("/{placeId}")
