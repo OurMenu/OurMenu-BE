@@ -17,9 +17,16 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     Optional<Menu> findByIdAndUserId(Long menuId, Long userId);
 
     @Query("SELECT m FROM Menu m " +
+            "JOIN FETCH m.images mi where m.id = :menuId")
+    Optional<Menu> findMenuAndImages(@Param("menuId") Long menuId);
+
+    @Query("SELECT m FROM Menu m " +
             "JOIN FETCH m.user u " +
             "JOIN FETCH m.menuList ml " +
-            "JOIN FETCH m.place p")
-    Menu findAllWithUserAndMenuListAndPlace(Long menuId);
+            "JOIN FETCH m.place p " +
+            "WHERE m.id = :menuId")
+    Optional<Menu> findAllWithUserAndMenuListAndPlace(@Param("menuId") Long menuId);
+
+
 
 }
