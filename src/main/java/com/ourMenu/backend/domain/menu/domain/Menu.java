@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.menu.domain;
 
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
+import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
+
 public class Menu {
 
     @Id
@@ -38,20 +40,25 @@ public class Menu {
     private String icon;
 
     @Builder.Default
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<MenuImage> images = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<MenuTag> tags = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menulist_id")
     private MenuList menuList;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
+
+    // 단방향?! 양방향?! -> 단방향으로 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 //    @PrePersist
 //    public void prePersist() {
@@ -83,10 +90,33 @@ public class Menu {
         menuList.addMenu(this);
     }
 
+
+
     public void confirmPlace(Place place){
         this.place = place;
         place.addMenu(this);
     }
+
+    public void removeMenuList(MenuList menuList) {
+        if (this.menuList == menuList) {
+            this.menuList = null; //
+            menuList.removeMenu(this);
+        }
+    }
+
+    public void removeUser(User user){
+        if (this.user == user) {
+            this.user = null; //
+        }
+    }
+
+    public void removePlace(Place place) {
+        if (this.place == place) {
+            this.place = null;
+            place.removeMenu(this);
+        }
+    }
+
 
 
 }

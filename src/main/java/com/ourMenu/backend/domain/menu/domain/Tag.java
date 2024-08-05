@@ -27,7 +27,11 @@ public class Tag {
     private Boolean isCustom = true;
 
 
+    // 중간 테이블 추가
     public void addMenuTag(MenuTag menuTag) {
         menuTags.add(menuTag);
     }
+
+    // 중간 테이블 삭제
+    public void removeMenuTag(MenuTag menuTag) {menuTags.remove(menuTag);}
 }

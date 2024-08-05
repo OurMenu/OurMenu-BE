@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -10,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostPhotoRequest {
-    private List<String> imageUrls;
-    private Long menuId;
+    private List<MultipartFile> imgs;
+    private long menuId;
 }
