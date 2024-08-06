@@ -22,7 +22,7 @@ public class StoreService {
      * @return 음식점 갯수
      */
     public List<Store> searchStore(String name){
-        Pageable pageable= PageRequest.of(0,5);
+        Pageable pageable= PageRequest.of(0,15);
         //return storeRepository.findByNameContaining(name);
         Page<Store> page=storeRepository.findByNameContaining(name,pageable);
         return page.getContent();
