@@ -9,7 +9,6 @@ import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
-import com.ourMenu.backend.global.common.Status;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -174,11 +171,21 @@ public class MenuListService {
         MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
-        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+//        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+//
+//        removeMenuListBuilder.status(Status.DELETED);
+//
+//        MenuList removeMenuList = removeMenuListBuilder.build();
+//
 
-        removeMenuListBuilder.status(Status.DELETED);
+        Long currentPriority = menuList.getPriority();
+        menuList.softDelete();
+        menuListRepository.save(menuList);
 
-        MenuList removeMenuList = removeMenuListBuilder.build();
+        menuListRepository.decreasePriorityGreaterThan(currentPriority);
+
+        return "OK";
+    }
 
     @Transactional
     public String setPriority(Long id, Long newPriority, Long userId) {
