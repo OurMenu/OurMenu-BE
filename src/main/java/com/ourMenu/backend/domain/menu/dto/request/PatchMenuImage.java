@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.menu.dto.request;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostPhotoRequest {
+public class PatchMenuImage {
     private List<MultipartFile> imgs;
-    private long menuId;
 }

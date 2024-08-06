@@ -19,9 +19,17 @@ public enum ErrorCode {
     // user
     EMAIL_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "G5001", "유효하지 않은 이메일입니다"),
     INVALID_PASSWORD_ERROR(HttpStatus.UNAUTHORIZED, "G5002", "올바르지 않은 비밀번호입니다"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "G5003", "유저가 존재하지 않습니다."),
 
     //search
-    SEARCH_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND,"S404","검색 결과가 없습니다");
+    SEARCH_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND,"S404","검색 결과가 없습니다"),
+
+    //menu, menuList
+    MENU_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "M401", "메뉴판이 존재하지 않습니다."),
+    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "M402", "메뉴가 존재하지 않습니다"),
+
+    //S3 image
+    IMAGE_NOT_LOADED_ERROR(HttpStatus.BAD_REQUEST, "I400", "사진 로딩에 실패하였습니다");
 
     private final HttpStatus status;
     private final String code;
