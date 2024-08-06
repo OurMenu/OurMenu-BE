@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  redis:
+    image: redis
+    ports:
+      - "8082:6379"
+    networks:
+      - test_network
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
   database:
     container_name: mysql_db
     image: mysql/mysql-server:5.7
@@ -8,10 +17,10 @@ services:
     environment:
       MYSQL_DATABASE: users_db
       MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       TZ: 'Asia/Seoul'
     ports:
-      - "8081:3306"
+      - "3307:3306"
     #volumes:
     #  - ./mysql/conf.d:/etc/mysql/conf.d # MySQL 설정 파일 위치
     command:
@@ -31,13 +40,28 @@ services:
     ports:
       - "8080:8080"
     environment:
+      #docker compose convert
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DATA_MONGODB_URL: ${MONGODB_URL}
       SPRING_SWAGGER_SERVER_URL: https://bluesparrow.shop
+      #auth
+      SPRING_MAIL_USERNAME: ${GMAIL_ADDRESS}
+      SPRING_MAIL_PASSWORD: ${GMAIL_PASSWORD}
+      SPRING_REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      #S3
+      BUCKET_NAME: ${BUCKET_NAME}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      AWS_REGION: ${AWS_REGION}
+
+
     depends_on:
       - database
+      - redis
     networks:
       - test_network
 

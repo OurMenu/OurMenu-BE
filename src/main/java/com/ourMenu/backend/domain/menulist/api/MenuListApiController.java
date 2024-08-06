@@ -1,13 +1,21 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
+import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.GetMenuListResponse;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
+import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.domain.user.exception.UserException;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
+import com.ourMenu.backend.global.exception.ErrorCode;
+import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +27,27 @@ import java.util.stream.Collectors;
 public class MenuListApiController {
 
     private final MenuListService menuListService;
+    private final UserService userService;
+
+    @ExceptionHandler(MenuListException.class)
+    public ResponseEntity<?> menuListException(MenuListException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_LIST_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<?> userException(UserException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.USER_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(ImageLoadException.class)
+    public ResponseEntity<?> imageLoadException(ImageLoadException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.IMAGE_NOT_LOADED_ERROR, e.getMessage()));
+    }
 
     //메뉴판 등록
     @PostMapping("")
-    public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request){
-        MenuList menuList = menuListService.createMenuList(request);
+    public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
+        MenuList menuList = menuListService.createMenuList(request, userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
                 .title(menuList.getTitle())
@@ -38,8 +62,8 @@ public class MenuListApiController {
 
     //메뉴판 전체 조회
     @GetMapping("")
-    public ApiResponse<List<GetMenuListResponse>> findAllMenuList(){
-        List<MenuList> menuLists = menuListService.getAllMenuList();
+    public ApiResponse<List<GetMenuListResponse>> findAllMenuList(@UserId Long userId){
+        List<MenuList> menuLists = menuListService.getAllMenuList(userId);
         List<GetMenuListResponse> responses = menuLists.stream().map(menuList ->
                 GetMenuListResponse.builder()
                         .title(menuList.getTitle())
@@ -54,8 +78,8 @@ public class MenuListApiController {
 
     //메뉴판
     @PatchMapping("/{id}")
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @RequestBody MenuListRequestDTO request){
-        MenuList menuList = menuListService.updateMenuList(id, request);
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
+        MenuList menuList = menuListService.updateMenuList(id, request,  userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .id(menuList.getId())
                 .title(menuList.getTitle())
@@ -67,8 +91,8 @@ public class MenuListApiController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id){
-        String response = menuListService.removeMenuList(id);       //STATUS를 DELETED로 변환
+    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
+        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
         return ApiUtils.success(response);  //OK 반환
     }
 

@@ -1,11 +1,26 @@
 package com.ourMenu.backend.domain.menu.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PatchMenuRequest {
+
     private String title;
     private int price;
-    private String ImgUrl;
     private String memo;
+    private String icon;
+    private String menuListTitle;
+
+    // 식당 관련 정보
+    private StoreRequestDTO storeInfo;
+
+    // 태그 관련 정보
+    private List<TagRequestDto> tagInfo;
+
 }

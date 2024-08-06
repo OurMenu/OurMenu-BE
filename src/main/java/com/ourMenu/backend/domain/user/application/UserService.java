@@ -4,6 +4,8 @@ import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.dao.UserDao;
+import com.ourMenu.backend.domain.user.dao.UserRepository;
+import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -27,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,6 +39,7 @@ public class UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     private final S3Client s3Client;
     @Value("${spring.aws.s3.bucket-name}")
@@ -106,6 +111,11 @@ public class UserService {
         }
 
         userDao.updateProfileImg(userId, fileName);
+    }
+
+    @Transactional
+    public Optional<User> getUserById(Long userId){
+        return userRepository.findById(userId);
     }
 
 }
