@@ -59,4 +59,9 @@ public class Place {
     public void removeMenu(Menu menu) {
         menus.remove(menu);
     }
+
+    // 필드 값 변경
+    public void changeInfo(String storeInfo){
+        this.info = storeInfo;
+    }
 }
