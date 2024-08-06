@@ -10,18 +10,35 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+
+    private final S3Client s3Client;
+    @Value("${spring.aws.s3.bucket-name}")
+    private String bucketName;
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<?> userException(UserException e) {
@@ -50,9 +67,45 @@ public class UserService {
 
         String email = (String) user.get("email");
         String nickname = (String) user.get("nickname");
-        String imgUrl = (String) user.get("img_url");
 
-        return new UserInfoResponse(userId, email, nickname, imgUrl);
+        String key = (String) user.get("img_url");
+        String fileUrl = "";
+        if(key != null && !key.isBlank()) {
+            fileUrl = s3Client.utilities()
+                    .getUrl(builder -> builder.bucket(bucketName).key(key))
+                    .toExternalForm();
+        }
+
+        return new UserInfoResponse(userId, email, nickname, fileUrl);
+    }
+
+    public void uploadProfileImg(Long userId, MultipartFile file) {
+        Map<String, Object> user = userDao.getUserById(userId);
+        String originKey = (String) user.get("img_url");
+
+        log.info("{} / {}", file.getOriginalFilename(), file.getContentType());
+        String fileName = "";
+
+        try {
+            if(originKey != null && !originKey.isBlank()) {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                                .bucket(bucketName).key(originKey).build());
+            }
+
+            if(file != null && !file.isEmpty()) {
+                fileName = "userProfile" + userId + "_" + UUID.randomUUID() + URLEncoder.encode(Objects.requireNonNull(file.getOriginalFilename()), StandardCharsets.UTF_8);
+
+                s3Client.putObject(PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(fileName)
+                                .build(),
+                        RequestBody.fromBytes(file.getBytes()));
+            }
+        } catch (NullPointerException | IOException e) {
+            throw new RuntimeException();
+        }
+
+        userDao.updateProfileImg(userId, fileName);
     }
 
 }
