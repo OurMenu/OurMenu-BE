@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +63,14 @@ public class PlaceService {
 
     public Place save(Place place) {
         return placeRepository.save(place); // Place 객체를 저장하고 반환
+    }
+
+    /**
+     * GET /place를 위한 메서드
+     * @param userId
+     * @return
+     */
+    public List<Place> findPlacesByUserId(Long userId){
+        return placeRepository.findAllByUserId(userId);
     }
 }

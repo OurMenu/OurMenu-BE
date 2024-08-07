@@ -29,12 +29,25 @@ public enum Question {
         return Arrays.stream(Question.values()).toList();
     }
 
-    public static List<String> getAnswerFoodByIdAndAnswerType(int id,AnswerType answerType) {
+    public static String getImgUrlByIdAndAnswerType(int id, AnswerType answerType) {
+        Question question = getQuestionByIdAndAnswerType(id, answerType);
+        if(answerType.equals(AnswerType.YES))
+            return question.getAnswer().getYesAnswerImg();
+        return question.getAnswer().getNoAnswerImg();
+
+    }
+
+    public static Question getQuestionByIdAndAnswerType(int id, AnswerType answerType) {
         for (Question question : values()) {
             if (question.getId() == id) {
-                return question.getAnswer().getAnswerFood(answerType);
+                return question;
             }
         }
         throw new RuntimeException("questionId에 해당하는 값이 없습니다");
+    }
+
+    public static List<String> getAnswerFoodByIdAndAnswerType(int id, AnswerType answerType) {
+        return getQuestionByIdAndAnswerType(id, answerType).getAnswer().getAnswerFood(answerType);
+
     }
 }
