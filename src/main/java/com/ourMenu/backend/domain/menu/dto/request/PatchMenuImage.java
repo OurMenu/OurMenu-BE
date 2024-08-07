@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PatchMenuImage {
-    private List<MultipartFile> imgs;
+    private List<MultipartFile> menuImgs;
 }
