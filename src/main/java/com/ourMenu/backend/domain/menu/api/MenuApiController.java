@@ -17,6 +17,7 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +50,8 @@ public class MenuApiController {
     }
 
     // 이미지 추가
-    @PostMapping("/photo")
+    @PostMapping(value = "/photo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
@@ -78,7 +80,8 @@ public class MenuApiController {
         return ApiUtils.success("OK");  //OK 반환
     }
 
-    @PatchMapping("/{id}/photo")
+    @PatchMapping(value = "/{id}/photo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, PatchMenuImage patchMenuImage){
         menuService.updateMenuImage(patchMenuImage, id, userId);
         return ApiUtils.success("OK");

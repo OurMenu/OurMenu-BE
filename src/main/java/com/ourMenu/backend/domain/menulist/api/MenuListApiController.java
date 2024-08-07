@@ -15,6 +15,7 @@ import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,7 @@ public class MenuListApiController {
     }
 
     //메뉴판 등록
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
         MenuList menuList = menuListService.createMenuList(request, userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
@@ -79,7 +80,8 @@ public class MenuListApiController {
     }
 
     //메뉴판
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
         MenuList menuList = menuListService.updateMenuList(id, request,  userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
