@@ -4,7 +4,6 @@ import com.ourMenu.backend.domain.store.domain.UserStore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,16 +12,16 @@ import java.time.LocalDateTime;
 @Getter
 public class GetSearchHistory {
 
-    private String storeName;
+    private String placeTitle;
 
-    private String address;
+    private String placeAddress;
 
     private LocalDateTime modifiedAt;
 
     public static GetSearchHistory toDto(UserStore userStore){
         return GetSearchHistory.builder()
-                .storeName(userStore.getStoreName())
-                .address(userStore.getAddress())
+                .placeTitle(userStore.getStoreName())
+                .placeAddress(userStore.getAddress())
                 .modifiedAt(userStore.getModifiedAt())
                 .build();
     }
