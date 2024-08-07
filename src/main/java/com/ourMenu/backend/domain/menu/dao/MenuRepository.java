@@ -41,8 +41,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "AND (:title IS NULL OR m.title LIKE %:title%) " + // 제목 필터
             "AND (:tag IS NULL OR t.name LIKE %:tag%) " +       // 태그 필터
             "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId)") // 메뉴판 필터
-    List<Menu> findMenusByCriteria(@Param("title") String title,
-                                   @Param("tag") String tag,
+    List<Menu> findMenusByCriteria(@Param("title") String menuTitle,
+                                   @Param("tag") String menuTag,
                                    @Param("menuFolderId") Integer menuFolderId,
                                    @Param("userId") Long userId);
 

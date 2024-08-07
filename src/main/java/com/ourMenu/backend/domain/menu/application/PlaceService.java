@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +33,8 @@ public class PlaceService {
             if (storeInfo.getStoreAddress() != null) {
                 existingPlace.setAddress(storeInfo.getStoreAddress());
             }
-            if (storeInfo.getStoreInfo() != null) {
-                existingPlace.setInfo(storeInfo.getStoreInfo());
+            if (storeInfo.getStoreMemo() != null) {
+                existingPlace.setInfo(storeInfo.getStoreMemo());
             }
             if (storeInfo.getStoreLongitude() != null) {
                 existingPlace.setLongitude(storeInfo.getStoreLongitude());
@@ -53,7 +52,7 @@ public class PlaceService {
                 .title(storeInfo.getStoreName())
                 .user(user)
                 .address(storeInfo.getStoreAddress())
-                .info(storeInfo.getStoreInfo())
+                .info(storeInfo.getStoreMemo())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .longitude(storeInfo.getStoreLongitude())
