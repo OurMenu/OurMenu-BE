@@ -12,10 +12,7 @@ import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,8 +33,8 @@ public class StoreController {
         return ApiUtils.success(storeList.stream().map(GetSimpleStoreSearch::toDto).toList());
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<GetStoresSearch> findById(@RequestParam("id") String id,
+    @GetMapping("/search/{id}")
+    public ApiResponse<GetStoresSearch> findById(@PathVariable String id,
                                                  @UserId Long userId) {
         Store findStore = storeService.findOneByUser(id, userId);
         return ApiUtils.success(GetStoresSearch.toDto(findStore));
