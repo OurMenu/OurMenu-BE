@@ -82,7 +82,7 @@ public class MenuApiController {
     }
 
 
-    @PatchMapping("/{menuId}/photo",
+    @PatchMapping(value = "/{menuId}/photo",
             consumes = MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> updateMenuImages(@PathVariable Long menuId, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
         menuService.updateMenuImage(patchMenuImage, menuId, userId);

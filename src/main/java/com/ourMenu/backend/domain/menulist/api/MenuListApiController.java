@@ -83,7 +83,7 @@ public class MenuListApiController {
 
     //메뉴판
 
-    @PatchMapping("/{menuListId}"),
+    @PatchMapping(value = "/{menuListId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuListId, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
         MenuList menuList = menuListService.updateMenuList(menuListId, request,  userId);
