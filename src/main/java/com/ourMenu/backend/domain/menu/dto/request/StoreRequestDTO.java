@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StoreRequestDTO {
     private String storeName;
-    private String storeInfo;
+    private String storeMemo;
     private String storeAddress;
     private Double storeLatitude;  // 위도
     private Double storeLongitude; // 경도

@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.store.api;
 
 import com.ourMenu.backend.domain.store.api.response.GetSearchHistory;
+import com.ourMenu.backend.domain.store.api.response.GetSimpleStoreSearch;
 import com.ourMenu.backend.domain.store.api.response.GetStoresSearch;
 import com.ourMenu.backend.domain.store.application.StoreService;
 import com.ourMenu.backend.domain.store.domain.Store;
@@ -25,14 +26,14 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    @GetMapping("/info")
-    public ApiResponse<List<GetStoresSearch>> search(@RequestParam String title) {
+    @GetMapping("/search")
+    public ApiResponse<List<GetSimpleStoreSearch>> search(@RequestParam String title) {
         List<Store> storeList = storeService.searchStore(title);
         if (storeList.size() == 0) {
             throw new SearchResultNotFoundException();
 
         }
-        return ApiUtils.success(storeList.stream().map(GetStoresSearch::toDto).toList());
+        return ApiUtils.success(storeList.stream().map(GetSimpleStoreSearch::toDto).toList());
     }
 
     @GetMapping("/{id}")
