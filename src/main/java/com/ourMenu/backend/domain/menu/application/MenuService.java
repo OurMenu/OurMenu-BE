@@ -8,6 +8,7 @@ import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +52,6 @@ public class MenuService {
     }
 
 
-
-
     @Transactional
     // 메뉴 등록 * (이미지 제외)
     public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
@@ -66,6 +65,11 @@ public class MenuService {
 
         // 장소 가져오기(식당이 없는 경우 새로 생성)
         Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
+
+        boolean exists = menuRepository.existsByPlaceIdAndMenuListIdAndTitle(place.getId(), findMenuList.getId(), postMenuRequest.getTitle());
+        if (exists) {
+            throw new RuntimeException("해당 식당의 메뉴판에 동일한 메뉴명이 이미 존재합니다.");
+        }
 
         // 메뉴 생성
         Menu menu = Menu.builder()
@@ -215,7 +219,6 @@ public class MenuService {
                     .collect(Collectors.toList());
         }
 
-        // 메뉴 조회
     }
 
     @Transactional

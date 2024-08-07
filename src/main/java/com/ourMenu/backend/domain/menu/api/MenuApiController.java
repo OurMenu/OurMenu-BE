@@ -39,6 +39,7 @@ public class MenuApiController {
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest, @UserId Long id) {
+        log.info("현재 유저의 Id값 " + id);
         PostMenuResponse postMenuResponse = menuService.createMenu(postMenuRequest, id);
         return ApiUtils.success(postMenuResponse);
     }
@@ -53,8 +54,8 @@ public class MenuApiController {
     @GetMapping("")
     public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String title,
                                               @RequestParam(required = false) String tag,
-                                              @RequestParam(required = false) Integer menuFolderId) {
-        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId);
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId, userId);
         List<MenuDto> menuDtos = MenuDto.toDto(menus);
 
         return ApiUtils.success(menuDtos);
