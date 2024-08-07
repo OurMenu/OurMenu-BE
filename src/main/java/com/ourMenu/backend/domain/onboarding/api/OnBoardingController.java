@@ -29,7 +29,7 @@ public class OnBoardingController {
     public String getQuestionRecommand(@RequestParam("questionId") int questionId,
                                        @RequestParam("answer") AnswerType answerType,
                                        @UserId Long userId) {
-        onBoardService.findStoreByQuestionAnswer(questionId, answerType);
+        onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
         return "success";
     }
 }

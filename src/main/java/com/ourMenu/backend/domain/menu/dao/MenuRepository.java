@@ -46,5 +46,12 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
                                    @Param("menuFolderId") Integer menuFolderId,
                                    @Param("userId") Long userId);
 
+    @Query("SELECT m FROM Menu m " +
+            "JOIN FETCH m.place p " +         // 메뉴와 식당 조인
+            "JOIN FETCH m.images mi " +
+            "WHERE m.user.id = :userId AND " +
+            "REGEXP (:regexp)")
+    List<Menu> findMenusByRegexp(@Param("regexp")String regexp,@Param("userId") Long userId);
+
     boolean existsByPlaceIdAndMenuListIdAndTitle(Long placeId, Long menuListId, String title);
 }
