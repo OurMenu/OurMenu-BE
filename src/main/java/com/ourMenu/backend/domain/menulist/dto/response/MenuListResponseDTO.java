@@ -10,4 +10,5 @@ public class MenuListResponseDTO {
     private String title;
     private String imgUrl;
     private String iconType;
+    private Long priority;
 }

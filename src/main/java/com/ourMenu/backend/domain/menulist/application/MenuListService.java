@@ -9,9 +9,10 @@ import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
-import com.ourMenu.backend.global.common.Status;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -32,6 +31,7 @@ import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MenuListService {
 
     private final MenuListRepository menuListRepository;
@@ -61,6 +61,8 @@ public class MenuListService {
         String fileUrl = "";
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
+        Long newPriority = maxPriority + 1;
 
         try {
             if (file != null && !file.isEmpty()) {
@@ -84,6 +86,7 @@ public class MenuListService {
                 .imgUrl(fileUrl)
                 .user(user)
                 .iconType(request.getIconType())
+                .priority(newPriority)
                 .build();
 
         return menuListRepository.save(menuList);
@@ -168,13 +171,42 @@ public class MenuListService {
         MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
-        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+//        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+//
+//        removeMenuListBuilder.status(Status.DELETED);
+//
+//        MenuList removeMenuList = removeMenuListBuilder.build();
+//
 
-        removeMenuListBuilder.status(Status.DELETED);
+        Long currentPriority = menuList.getPriority();
+        menuList.softDelete();
+        menuListRepository.save(menuList);
 
-        MenuList removeMenuList = removeMenuListBuilder.build();
+        menuListRepository.decreasePriorityGreaterThan(currentPriority);
 
-        menuListRepository.save(removeMenuList);
+        return "OK";
+    }
+
+    @Transactional
+    public String setPriority(Long id, Long newPriority, Long userId) {
+        MenuList menuList = menuListRepository.findById(id)
+                .orElseThrow(() -> new MenuListException());
+
+        Long currentPriority = menuList.getPriority();
+        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElseThrow(() -> new RuntimeException("메뉴판 존재 X"));
+
+        if (newPriority <= 0 || newPriority > maxPriority) {
+            throw new RuntimeException("유효하지 않은 우선순위입니다.");
+        }
+
+        if(currentPriority < newPriority){
+            menuListRepository.decreasePriorityBetween(currentPriority, newPriority);
+        }else{
+            menuListRepository.increasePriorityBetween(currentPriority, newPriority);
+        }
+
+        MenuList updateMenuList = menuList.toBuilder().priority(newPriority).build();
+        menuListRepository.save(updateMenuList);
 
         return "OK";
     }

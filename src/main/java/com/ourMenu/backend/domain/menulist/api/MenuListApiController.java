@@ -53,6 +53,7 @@ public class MenuListApiController {
                 .title(menuList.getTitle())
                 .imgUrl(menuList.getImgUrl())
                 .iconType(menuList.getIconType())
+                .priority(menuList.getPriority())
                 .build();
 
         return ApiUtils.success(response);
@@ -70,6 +71,7 @@ public class MenuListApiController {
                         .menuCount((long) menuList.getMenus().size())
                         .imgUrl(menuList.getImgUrl())
                         .iconType(menuList.getIconType())
+                        .priority(menuList.getPriority())
                         .build()
         ).collect(Collectors.toList());
 
@@ -85,6 +87,7 @@ public class MenuListApiController {
                 .title(menuList.getTitle())
                 .imgUrl(menuList.getImgUrl())
                 .iconType(menuList.getIconType())
+                .priority(menuList.getPriority())
                 .build();
 
         return ApiUtils.success(response);
@@ -94,6 +97,12 @@ public class MenuListApiController {
     public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
         String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
         return ApiUtils.success(response);  //OK 반환
+    }
+
+    @PatchMapping("/priority/{id}")
+    public ApiResponse<String> changePriority(@PathVariable Long id, @RequestParam Long newPriority, @UserId Long userId){
+        String response = menuListService.setPriority(id, newPriority ,userId);
+        return ApiUtils.success(response);
     }
 
     /*
