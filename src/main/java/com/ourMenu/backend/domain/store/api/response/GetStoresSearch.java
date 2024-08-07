@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Getter
 public class GetStoresSearch {
 
+    private String id;
     private String name;
     private String address;
     private String type;
@@ -34,6 +35,7 @@ public class GetStoresSearch {
             menuList= Collections.emptyList();
         }
         return GetStoresSearch.builder()
+                .id(store.getId())
                 .name(store.getName())
                 .address(store.getAddress())
                 .type(store.getType())

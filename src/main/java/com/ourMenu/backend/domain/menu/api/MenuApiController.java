@@ -8,19 +8,20 @@ import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.*;
+import com.ourMenu.backend.domain.menu.dto.response.*;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
-import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
-import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
+import com.ourMenu.backend.global.exception.ErrorCode;
+import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,10 +37,14 @@ public class MenuApiController {
     private final MenuListService menuListService;
     private final MenuRepository menuRepository;
 
+    @ExceptionHandler(MenuNotFoundException.class)
+    public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
+}
+
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest, @UserId Long id) {
-        log.info("현재 유저의 Id값 " + id);
         PostMenuResponse postMenuResponse = menuService.createMenu(postMenuRequest, id);
         return ApiUtils.success(postMenuResponse);
     }
@@ -80,18 +85,8 @@ public class MenuApiController {
         return ApiUtils.success("OK");
     }
 
-//    @GetMapping("/menus/{menuId}")
-//    public String getMenu(@PathVariable Long menuId) {
-//        Menu findMenu = menuRepository.findMenuWithPlaceAndImages(menuId)
-//                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
-//
-//
-//
-//        return "Ok";
-//    }
 
-
-    @GetMapping("/{placeId}")
+    @GetMapping("/place/{placeId}")
     public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId) {
         List<Menu> menuList = menuService.findMenuByPlace(placeId);
         List<PlaceMenuDTO> response = menuList.stream().map(menu ->
@@ -117,6 +112,31 @@ public class MenuApiController {
         return ApiUtils.success(response);
     }
 
+    @GetMapping("/menuInfo/{menuId}")
+    public ApiResponse<MenuInfoDTO> findMenuInfo(@PathVariable Long menuId, @UserId Long userId){
+        Menu menu = menuService.findMenuInfo(menuId, userId);
+        MenuInfoDTO response = MenuInfoDTO.builder()
+                .menuId(menu.getId())
+                .placeId(menu.getPlace().getId())
+                .menuTitle(menu.getTitle())
+                .price(menu.getPrice())
+                .memo(menu.getMemo())
+                .icon(menu.getIcon())
+                .tags(menu.getTags().stream().map(tag ->
+                                TagDTO.builder()
+                                        .tagTitle(tag.getTag().getName())
+                                        .isCustom(tag.getTag().getIsCustom())
+                                        .build())
+                        .collect(Collectors.toList()))
+                .images(menu.getImages())
+                .menuFolder(PlaceMenuFolderDTO.builder()
+                        .menuFolderTitle(menu.getMenuList().getTitle())
+                        .icon(menu.getMenuList().getIconType())
+                        .build())
+                .build();
+
+        return ApiUtils.success(response);
+    }
     /*
     ID를 통한 메뉴 조회
 

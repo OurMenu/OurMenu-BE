@@ -30,7 +30,10 @@ public class WebConfig implements WebMvcConfigurer {
                         "/account/reissueToken",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
-                        "/v3/api-docs/**");
+                        "/v3/api-docs/**",
+                        "/dummy/**",
+                        "/place/info",
+                        "/onboarding");
     }
 
     @Override

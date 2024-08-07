@@ -12,11 +12,13 @@ import java.util.Optional;
 public interface MenuListRepository extends JpaRepository<MenuList, Long> {
     Optional<MenuList> findByTitle(String title);
 
-    @Query("SELECT m FROM MenuList m WHERE m.status IN :status")
-    List<MenuList> findAllMenuList(@Param("status")List<MenuListStatus> status);
+    @Query("SELECT m FROM MenuList m WHERE m.status IN :status AND m.user.id = :userId")
+    Optional<List<MenuList>> findAllMenuList(@Param("status")List<MenuListStatus> status, @Param("userId") Long userId);
 
-    @Query("SELECT m FROM MenuList m WHERE m.title = :title AND m.status IN (:status) AND m.user.id = :userId")
-    MenuList findMenuListByTitleAndUserId(@Param("title") String title,
-                                          @Param("status") List<MenuListStatus> status,
-                                          @Param("userId") Long userId);
+    @Query("SELECT m FROM MenuList m WHERE m.title = :title AND m.user.id = :userId AND m.status IN :status" )
+    Optional<MenuList> findMenuListByTitle(@Param("title") String title, @Param("userId") Long userId, @Param("status")List<MenuListStatus> status);
+
+    @Query("SELECT m FROM MenuList m WHERE m.id = :menulistId AND m.user.id = :userId AND m.status IN :status")
+    Optional<MenuList> findMenuListsById(@Param("menulistId") Long menulistId, @Param("userId") Long userId, @Param("status")List<MenuListStatus> status);
+
 }

@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("SELECT m FROM Menu m WHERE m.place.id = :placeId AND m.status IN :status")
-    List<Menu> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status")List<MenuStatus> statuses);
+    Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status")List<MenuStatus> statuses);
 
     Optional<Menu> findByIdAndUserId(Long menuId, Long userId);
 
