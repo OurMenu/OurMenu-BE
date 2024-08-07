@@ -69,22 +69,24 @@ public class MenuApiController {
     }
 
     // 삭제
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenu (@PathVariable Long id, @UserId Long userId){
-        String response = menuService.removeMenu(id, userId);       // Hard Delete
+    @DeleteMapping("/{menuId}")
+    public ApiResponse<String> removeMenu (@PathVariable Long menuId, @UserId Long userId){
+        String response = menuService.removeMenu(menuId, userId);       // Hard Delete
         return ApiUtils.success(response);  //OK 반환
     }
 
-    @PatchMapping("/{id}")
-    public ApiResponse<String> updateMenu (@PathVariable Long id, @UserId Long userId, PatchMenuRequest patchMenuRequest){
-        menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
+    @PatchMapping("/{menuId}")
+    public ApiResponse<String> updateMenu (@PathVariable Long menuId, @UserId Long userId, PatchMenuRequest patchMenuRequest){
+        menuService.updateMenu(menuId, userId, patchMenuRequest);       // Hard Delete
         return ApiUtils.success("OK");  //OK 반환
     }
 
-    @PatchMapping(value = "/{id}/photo",
+
+    @PatchMapping(value = "/{menuId}/photo",
             consumes = MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
-        menuService.updateMenuImage(patchMenuImage, id, userId);
+    public ApiResponse<String> updateMenuImages(@PathVariable Long menuId, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
+        menuService.updateMenuImage(patchMenuImage, menuId, userId);
+
         return ApiUtils.success("OK");
     }
 
