@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.store.api.response;
 
+import com.ourMenu.backend.domain.store.domain.Store;
 import com.ourMenu.backend.domain.store.domain.UserStore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class GetSearchHistory {
+public class GetSimpleStoreSearch {
 
     private String placeId;
 
@@ -18,14 +19,12 @@ public class GetSearchHistory {
 
     private String placeAddress;
 
-    private LocalDateTime modifiedAt;
-
-    public static GetSearchHistory toDto(UserStore userStore){
-        return GetSearchHistory.builder()
-                .placeId(userStore.getStoreId())
-                .placeTitle(userStore.getStoreName())
-                .placeAddress(userStore.getAddress())
-                .modifiedAt(userStore.getModifiedAt())
+    public static GetSimpleStoreSearch toDto(Store store){
+        return GetSimpleStoreSearch.builder()
+                .placeId(store.getId())
+                .placeTitle(store.getName())
+                .placeAddress(store.getAddress())
                 .build();
     }
+
 }

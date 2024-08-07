@@ -17,12 +17,15 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping("/menu")
@@ -48,7 +51,8 @@ public class MenuApiController {
     }
 
     // 이미지 추가
-    @PostMapping("/photo")
+    @PostMapping(value = "/photo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
@@ -77,9 +81,12 @@ public class MenuApiController {
         return ApiUtils.success("OK");  //OK 반환
     }
 
-    @PatchMapping("/{menuId}/photo")
-    public ApiResponse<String> updateMenuImages(@PathVariable Long menuId, @UserId Long userId, PatchMenuImage patchMenuImage){
+
+    @PatchMapping("/{menuId}/photo",
+            consumes = MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> updateMenuImages(@PathVariable Long menuId, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
         menuService.updateMenuImage(patchMenuImage, menuId, userId);
+
         return ApiUtils.success("OK");
     }
 

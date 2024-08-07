@@ -29,10 +29,18 @@ public class JwtProvider {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey).build()
                     .parseClaimsJws(token);
+            Object userId = claims.getBody().get("userId");
+
+            if(userId instanceof Integer) {
+                return ((Integer) userId).longValue();
+            } else if (userId instanceof Long) {
+                return (Long) userId;
+            } else {
+                throw new JwtException("");
+            }
         } catch(JwtException | IllegalArgumentException e) {
             throw new JwtException("");
         }
-        return 1L;
     }
 
     public boolean isValidToken(String token) {

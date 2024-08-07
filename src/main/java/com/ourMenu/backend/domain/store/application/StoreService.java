@@ -32,13 +32,9 @@ public class StoreService {
      * @return 음식점 갯수
      */
     public List<Store> searchStore(String name) {
-        Pageable pageable = PageRequest.of(0, 8);
-        Page<Store> storeByName = storeRepository.findByMenuNameContaining(name, pageable);
+        Pageable pageable = PageRequest.of(0, 15);
         Page<Store> storeByMenu = storeRepository.findByNameContaining(name, pageable);
-        Map<String, Store> map = new HashMap<>();
-        storeByName.stream().forEach(data->map.put(data.getId(),data));
-        storeByMenu.stream().forEach(data->map.put(data.getId(),data));
-        return map.values().stream().toList();
+        return storeByMenu.getContent();
     }
 
 

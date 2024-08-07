@@ -8,13 +8,13 @@ import lombok.Getter;
 @Getter
 public class GetMenuSearch {
 
-    private String name;
-    private String price;
+    private String menuTitle;
+    private String menuPrice;
 
     public static GetMenuSearch toDto(Menu menu){
         return GetMenuSearch.builder()
-                .name(menu.getName())
-                .price(menu.getPrice())
+                .menuTitle(menu.getName())
+                .menuPrice(menu.getPrice())
                 .build();
     }
 }
