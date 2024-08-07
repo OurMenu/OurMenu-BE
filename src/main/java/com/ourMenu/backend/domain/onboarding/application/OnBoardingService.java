@@ -8,9 +8,9 @@ import com.ourMenu.backend.domain.onboarding.util.S3Util;
 import com.ourMenu.backend.domain.store.domain.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +22,18 @@ public class OnBoardingService {
         return Question.getAllQuestions();
     }
 
+    @Transactional
     public List<Menu> findStoreByQuestionAnswer(Long userId, int questionId, AnswerType answerType) {
         List<String> foodStringList = Question.getAnswerFoodByIdAndAnswerType(questionId, answerType);
-        String regexp = S3Util.makeRegexp(foodStringList);
-        return menuRepository.findMenusByRegexp(regexp, userId);
+        Map<Long, Menu> map = new HashMap<>();
+        for (String s : foodStringList) {
+            List<Menu> menus = menuRepository.findMenusByTitleContainingAndUserId(s, userId);
+            for (Menu menu : menus) {
+                map.put(menu.getId(),menu);
+            }
+        }
+
+        return map.values().stream().toList();
     }
 
 

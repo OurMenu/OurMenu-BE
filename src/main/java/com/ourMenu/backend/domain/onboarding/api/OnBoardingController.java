@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.onboarding.api;
 
+import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.onboarding.api.response.GetOnboardingResponse;
 import com.ourMenu.backend.domain.onboarding.application.OnBoardingService;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
@@ -29,7 +30,8 @@ public class OnBoardingController {
     public String getQuestionRecommand(@RequestParam("questionId") int questionId,
                                        @RequestParam("answer") AnswerType answerType,
                                        @UserId Long userId) {
-        onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
+        List<Menu> menus = onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
+
         return "success";
     }
 }
