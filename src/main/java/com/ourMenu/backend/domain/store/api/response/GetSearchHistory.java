@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 public class GetSearchHistory {
 
+    private String placeId;
+
     private String placeTitle;
 
     private String placeAddress;
@@ -20,6 +22,7 @@ public class GetSearchHistory {
 
     public static GetSearchHistory toDto(UserStore userStore){
         return GetSearchHistory.builder()
+                .placeId(userStore.getStoreId())
                 .placeTitle(userStore.getStoreName())
                 .placeAddress(userStore.getAddress())
                 .modifiedAt(userStore.getModifiedAt())

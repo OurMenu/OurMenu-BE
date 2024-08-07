@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+
 @RestController
 @RequestMapping("/menu")
 @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class MenuApiController {
 
     // 이미지 추가
     @PostMapping(value = "/photo",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
@@ -81,8 +83,8 @@ public class MenuApiController {
     }
 
     @PatchMapping(value = "/{id}/photo",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, PatchMenuImage patchMenuImage){
+            consumes = MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
         menuService.updateMenuImage(patchMenuImage, id, userId);
         return ApiUtils.success("OK");
     }
