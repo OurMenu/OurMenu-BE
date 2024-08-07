@@ -32,7 +32,7 @@ public enum Question {
     public static List<String> getAnswerFoodByIdAndAnswerType(int id, AnswerType answerType) {
         for (Question question : values()) {
             if (question.getId() == id) {
-                question.getAnswer().getAnswerFood(answerType);
+                return question.getAnswer().getAnswerFood(answerType);
             }
         }
         throw new RuntimeException("questionId에 해당하는 값이 없습니다");
