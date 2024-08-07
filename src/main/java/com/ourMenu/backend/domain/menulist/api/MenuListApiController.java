@@ -46,7 +46,7 @@ public class MenuListApiController {
     }
 
     //메뉴판 등록
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
         MenuList menuList = menuListService.createMenuList(request, userId);
         MenuListResponseDTO response = MenuListResponseDTO.builder()
