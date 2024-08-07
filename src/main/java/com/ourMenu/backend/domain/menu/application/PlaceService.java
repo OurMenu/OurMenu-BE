@@ -24,13 +24,12 @@ public class PlaceService {
     @Transactional
     public Place createPlace(StoreRequestDTO storeInfo, Long userId) {
 
-        Place existingPlace = placeRepository.findByUserIdAndTitle(userId, storeInfo.getStoreName()).orElse(null);
+        Place existingPlace = placeRepository.findByUserIdAndTitleAndAddress(userId, storeInfo.getStoreName(), storeInfo.getStoreAddress()).orElse(null);
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당하는 유저가 없습니다"));
 
-        log.info("정말 정말 정말 재밌는 스프링 프로젝트.");
+
         if (existingPlace != null) {
-            log.info("기존의 존재하는 음식점 정보입니다.");
             // 필드값 업데이트 (null이 아닌 경우에만)
             if (storeInfo.getStoreAddress() != null) {
                 existingPlace.setAddress(storeInfo.getStoreAddress());
