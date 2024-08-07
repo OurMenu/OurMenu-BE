@@ -1,7 +1,6 @@
 package com.ourMenu.backend.domain.onboarding.application;
 
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
-import com.ourMenu.backend.domain.onboarding.domain.Answer;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
 import com.ourMenu.backend.domain.store.domain.Store;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OnBoardService {
+public class OnBoardingService {
 
     private final MenuRepository menuRepository;
 

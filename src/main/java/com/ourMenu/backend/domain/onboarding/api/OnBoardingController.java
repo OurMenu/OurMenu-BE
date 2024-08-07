@@ -1,8 +1,7 @@
 package com.ourMenu.backend.domain.onboarding.api;
 
 import com.ourMenu.backend.domain.onboarding.api.response.GetOnboardingResponse;
-import com.ourMenu.backend.domain.onboarding.application.OnBoardService;
-import com.ourMenu.backend.domain.onboarding.domain.Answer;
+import com.ourMenu.backend.domain.onboarding.application.OnBoardingService;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
 import com.ourMenu.backend.global.argument_resolver.UserId;
@@ -17,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OnBoardingController {
 
-    private final OnBoardService onBoardService;
+    private final OnBoardingService onBoardService;
 
     @GetMapping("/onboarding")
     public List<GetOnboardingResponse> getOnboarding() {
