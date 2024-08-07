@@ -10,4 +10,5 @@ public class GetMenuListResponse {
     private Long menuCount;
     private String imgUrl;
     private String iconType;
+    private Long priority;
 }

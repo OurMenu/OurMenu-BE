@@ -69,4 +69,9 @@ public class MenuList {
     public void removeMenu(Menu menu) {
         menus.remove(menu);
     }
+
+    public void softDelete() {
+        this.status = Status.DELETED;
+        this.priority = null;
+    }
 }

@@ -9,12 +9,16 @@ import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.global.argument_resolver.UserId;
+import com.ourMenu.backend.global.common.ApiResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -62,6 +66,11 @@ public class MenuService {
 
         // 장소 가져오기(식당이 없는 경우 새로 생성)
         Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
+
+        boolean exists = menuRepository.existsByPlaceIdAndMenuListIdAndTitle(place.getId(), findMenuList.getId(), postMenuRequest.getTitle());
+        if (exists) {
+            throw new RuntimeException("해당 식당의 메뉴판에 동일한 메뉴명이 이미 존재합니다.");
+        }
 
         // 메뉴 생성
         Menu menu = Menu.builder()
@@ -211,7 +220,6 @@ public class MenuService {
                     .collect(Collectors.toList());
         }
 
-        // 메뉴 조회
     }
 
     @Transactional
