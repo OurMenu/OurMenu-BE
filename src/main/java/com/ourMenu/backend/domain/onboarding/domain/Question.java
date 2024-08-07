@@ -29,10 +29,10 @@ public enum Question {
         return Arrays.stream(Question.values()).toList();
     }
 
-    public static Question findById(int id) {
-        for (Question q : values()) {
-            if (q.getId() == id) {
-                return q;
+    public static List<String> getAnswerFoodByIdAndAnswerType(int id,AnswerType answerType) {
+        for (Question question : values()) {
+            if (question.getId() == id) {
+                return question.getAnswer().getAnswerFood(answerType);
             }
         }
         throw new RuntimeException("questionId에 해당하는 값이 없습니다");

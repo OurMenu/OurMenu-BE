@@ -3,6 +3,8 @@ package com.ourMenu.backend.domain.onboarding.domain;
 import com.ourMenu.backend.domain.onboarding.util.S3Util;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public enum Answer {
     FEELING("좋아!", S3Util.S3Path + "좋아.svg", S3Util.S3Path + "기분이 꿀꿀할때는 돼지 파티다.svg", AnswerFood.LIKE,
@@ -35,6 +37,13 @@ public enum Answer {
         this.noImg = noImg;
         this.noAnswerImg = noAnswerImg;
         this.noAnswerFood = noAnswerFood;
+    }
+
+    public List<String> getAnswerFood(AnswerType answerType) {
+        if (answerType.equals(AnswerType.YES)) {
+            return yesAnswerFood.getStringList();
+        }
+        return noAnswerFood.getStringList();
     }
 
 
