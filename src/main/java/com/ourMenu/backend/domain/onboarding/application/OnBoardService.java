@@ -8,6 +8,7 @@ import com.ourMenu.backend.domain.store.domain.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ public class OnBoardService {
 
     public List<Store> findStoreByQuestionAnswer(int questionId, AnswerType answerType){
         List<String> foodStringList = Question.getAnswerFoodByIdAndAnswerType(questionId, answerType);
-
+        return Collections.emptyList();
     }
 
 

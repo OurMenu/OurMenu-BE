@@ -26,11 +26,11 @@ public class OnBoardingController {
 
     }
 
-    @GetMapping("/onboarding")
+    @GetMapping("/home/recommand")
     public String getQuestionRecommand(@RequestParam("questionId") int questionId,
                                        @RequestParam("answer") AnswerType answerType,
                                        @UserId Long userId) {
         onBoardService.findStoreByQuestionAnswer(questionId, answerType);
-
+        return "success";
     }
 }
