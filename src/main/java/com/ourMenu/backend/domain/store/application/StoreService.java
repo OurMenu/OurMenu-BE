@@ -33,7 +33,6 @@ public class StoreService {
      */
     public List<Store> searchStore(String name) {
         Pageable pageable = PageRequest.of(0, 8);
-        //return storeRepository.findByNameContaining(name);
         Page<Store> storeByName = storeRepository.findByMenuNameContaining(name, pageable);
         Page<Store> storeByMenu = storeRepository.findByNameContaining(name, pageable);
         Map<String, Store> map = new HashMap<>();
