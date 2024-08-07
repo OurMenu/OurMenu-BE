@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +34,7 @@ public class MenuApiController {
     private final MenuService menuService;
 
     private final MenuListService menuListService;
+    private final MenuRepository menuRepository;
 
     @ExceptionHandler(MenuNotFoundException.class)
     public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
@@ -50,6 +53,16 @@ public class MenuApiController {
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
+    }
+
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String title,
+                                              @RequestParam(required = false) String tag,
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId, userId);
+        List<MenuDto> menuDtos = MenuDto.toDto(menus);
+
+        return ApiUtils.success(menuDtos);
     }
 
     // 삭제
