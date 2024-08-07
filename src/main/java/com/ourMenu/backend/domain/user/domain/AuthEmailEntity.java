@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "email", timeToLive = 300)
+@RedisHash(value = "email", timeToLive = 60 * 60 * 24)
 public class AuthEmailEntity {
 
     @Id
