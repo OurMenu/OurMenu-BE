@@ -28,4 +28,13 @@ public enum Question {
     public static List<Question> getAllQuestions() {
         return Arrays.stream(Question.values()).toList();
     }
+
+    public static Question findById(int id) {
+        for (Question q : values()) {
+            if (q.getId() == id) {
+                return q;
+            }
+        }
+        throw new RuntimeException("questionId에 해당하는 값이 없습니다");
+    }
 }
