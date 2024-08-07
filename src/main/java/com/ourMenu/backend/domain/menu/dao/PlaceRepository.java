@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    Optional<Place> findByUserIdAndTitle(Long userId, String title);
+    Optional<Place> findByUserIdAndTitleAndAddress(Long userId, String title, String address);
 }
