@@ -37,15 +37,13 @@ public class StoreController {
 
     @GetMapping("/{id}")
     public ApiResponse<GetStoresSearch> findById(@RequestParam("id") String id,
-                                                 @Parameter(hidden = true)
                                                  @UserId Long userId) {
         Store findStore = storeService.findOneByUser(id, userId);
         return ApiUtils.success(GetStoresSearch.toDto(findStore));
     }
 
     @GetMapping("/search-history")
-    public ApiResponse<List<GetSearchHistory>> getSearchHistory(@Parameter(hidden = true)
-                                                             @UserId Long userId) {
+    public ApiResponse<List<GetSearchHistory>> getSearchHistory(@UserId Long userId) {
         List<UserStore> storeList=storeService.findHistory(userId);
 
         return ApiUtils.success(storeList.stream().map(GetSearchHistory::toDto).toList());
