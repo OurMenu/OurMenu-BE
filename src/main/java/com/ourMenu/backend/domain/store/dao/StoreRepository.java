@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 public interface StoreRepository extends MongoRepository<Store, String> {
     Optional<Store> findByName(String name);
-
-    List<Store> findByNameContaining(String name);
+    Page<Store> findByMenuNameContaining(String menuName, Pageable pageable);
     Page<Store> findByNameContaining(String name, Pageable pageable);
 }

@@ -42,8 +42,13 @@ public class GetStoresSearch {
                 .images(store.getImages())
                 .menus(menuList)
                 .time(store.getTime())
-                .mapx(store.getMapx())
-                .mapy(store.getMapy())
+                .mapx(formatCoordinate(store.getMapx()))
+                .mapy(formatCoordinate(store.getMapy()))
                 .build();
+    }
+    private static String formatCoordinate(String coordinate) {
+        double value = Double.parseDouble(coordinate) / 10000000.0;
+        return String.format("%.7f", value);
+
     }
 }

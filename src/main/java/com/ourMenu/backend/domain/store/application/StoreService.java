@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,15 +32,19 @@ public class StoreService {
      * @return 음식점 갯수
      */
     public List<Store> searchStore(String name) {
-        Pageable pageable = PageRequest.of(0, 15);
-        //return storeRepository.findByNameContaining(name);
-        Page<Store> page = storeRepository.findByNameContaining(name, pageable);
-        return page.getContent();
+        Pageable pageable = PageRequest.of(0, 8);
+        Page<Store> storeByName = storeRepository.findByMenuNameContaining(name, pageable);
+        Page<Store> storeByMenu = storeRepository.findByNameContaining(name, pageable);
+        Map<String, Store> map = new HashMap<>();
+        storeByName.stream().forEach(data->map.put(data.getId(),data));
+        storeByMenu.stream().forEach(data->map.put(data.getId(),data));
+        return map.values().stream().toList();
     }
 
 
     /**
      * 가게를 조회하고 해당 유저의 엔티티를 수정한다.
+     *
      * @param id
      * @param userId
      * @return
@@ -48,20 +54,21 @@ public class StoreService {
         Optional<Store> optionalStore = storeRepository.findById(id);
         if (optionalStore.isEmpty())
             throw new SearchResultNotFoundException();
-        updateUserStore(optionalStore.get(),userId);
+        updateUserStore(optionalStore.get(), userId);
         return optionalStore.get();
     }
 
     /**
      * user의 store 검색 기록을 업데이트한다.
+     *
      * @param store
      * @param userId
      * @return 수정된 userStore
      */
-    private UserStore updateUserStore(Store store,Long userId) {
+    private UserStore updateUserStore(Store store, Long userId) {
         Optional<UserStore> userStoreOptional = userStoreRepository.findByUserIdAndStoreId(userId, store.getId());
         if (userStoreOptional.isEmpty()) {
-            UserStore userStore = UserStore.toEntity(store,userId);
+            UserStore userStore = UserStore.toEntity(store, userId);
             return userStoreRepository.save(userStore);
         }
         return userStoreOptional.get().updateModifiedAt();
@@ -69,6 +76,7 @@ public class StoreService {
 
     /**
      * 검색 기록을 오름차순으로 검색한다.
+     *
      * @param userId
      * @return
      */
