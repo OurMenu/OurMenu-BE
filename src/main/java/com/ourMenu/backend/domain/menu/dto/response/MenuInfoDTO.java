@@ -5,15 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.function.LongFunction;
 
 @Data
 @Builder
-public class PlaceMenuDTO {
+public class MenuInfoDTO {
     private Long menuId;
+    private Long placeId;
     private String menuTitle;
-    private int menuPrice;
-    private String menuIcon;
-    private List<TagDTO> menuTags;
-    private List<MenuImageDto> menuImgsUrl;
+    private int price;
+    private String memo;
+    private String icon;
+    private List<TagDTO> tags;
+    private List<MenuImage> images;
     private PlaceMenuFolderDTO menuFolder;
 }

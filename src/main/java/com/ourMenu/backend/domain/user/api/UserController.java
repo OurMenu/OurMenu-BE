@@ -12,6 +12,7 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.ourMenu.backend.global.util.BindingResultUtils.getErrorMessages;
 
@@ -43,6 +44,12 @@ public class UserController {
     @GetMapping("")
     public ApiResponse<UserInfoResponse> getUserInfo(@UserId Long userId) {
         return ApiUtils.success(userService.getUserInfo(userId));
+    }
+
+    @PatchMapping("/image")
+    public ApiResponse<Object> uploadProfileImg(@UserId Long userId, @RequestParam("imgFile") MultipartFile file) {
+        userService.uploadProfileImg(userId, file);
+        return ApiUtils.success(null);
     }
 
 }
