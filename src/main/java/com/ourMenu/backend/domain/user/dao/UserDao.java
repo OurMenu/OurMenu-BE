@@ -72,4 +72,12 @@ public class UserDao {
         return jdbcTemplate.update(sql, param);
     }
 
+    public int updateProfileImg(Long userId, String imgUrl) {
+        String sql = "UPDATE user SET img_url = :profileImg WHERE user_id = :userId";
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("profileImg", imgUrl);
+        return jdbcTemplate.update(sql, param);
+    }
+
 }

@@ -12,6 +12,7 @@ import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.util.JwtProvider;
 import io.jsonwebtoken.JwtException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -47,6 +48,7 @@ public class AccountService {
         return new LoginResponse(GRANT_TYPE, accessToken, refreshToken, accessTokenExpiredAt, refreshTokenExpiredAt);
     }
 
+    @Transactional
     public LoginResponse signup(SignUpRequest request) {
         // validate email
         if(userDao.isEmailExists(request.getEmail()))

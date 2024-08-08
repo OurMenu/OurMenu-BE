@@ -1,14 +1,17 @@
 package com.ourMenu.backend.domain.menulist.application;
 
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
+import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.menulist.domain.MenuListStatus;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
-import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequest;
-import com.ourMenu.backend.global.common.Status;
+import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.domain.user.exception.UserException;
+import com.ourMenu.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -29,11 +30,13 @@ import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MenuListService {
 
     private final MenuListRepository menuListRepository;
     private final MenuRepository menuRepository;
     private final S3Client s3Client;
+    private final UserService userService;
 
     @Value("${spring.aws.s3.bucket-name}")
     private String bucketName;
@@ -52,9 +55,13 @@ public class MenuListService {
 //    }
 
     @Transactional
-    public MenuList createMenuList(MenuListRequestDTO request) {
-        MultipartFile file = request.getImg();
+    public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
+        MultipartFile file = request.getMenuFolderImgUrl();
         String fileUrl = "";
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
+        Long newPriority = maxPriority + 1;
 
         try {
             if (file != null && !file.isEmpty()) {
@@ -70,13 +77,15 @@ public class MenuListService {
 
             }
         }catch (Exception e) {
-            e.getMessage();
+            throw new ImageLoadException();
         }
 
         MenuList menuList = MenuList.builder()
-                .title(request.getTitle())
+                .title(request.getMenuFolderTitle())
                 .imgUrl(fileUrl)
-                .iconType(request.getIconType())
+                .user(user)
+                .iconType(request.getMenuFolderIcon())
+                .priority(newPriority)
                 .build();
 
         return menuListRepository.save(menuList);
@@ -85,30 +94,43 @@ public class MenuListService {
 
     // 메뉴판 조회 //
     @Transactional
-    public MenuList getMenuListByNameAndUserId(String title, Long userId) {
-        return menuListRepository.findMenuListByTitleAndUserId(title, Arrays.asList(CREATED, UPDATED), userId);
+    public MenuList getMenuListByName(String title, Long userId) {
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        return menuListRepository.findMenuListByTitle(title, userId, Arrays.asList(CREATED, UPDATED))
+                .orElseThrow(() -> new MenuListException());
     }
 
     //메뉴판 전체 조회
     @Transactional
-    public List<MenuList> getAllMenuList(){
-        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED));
+    public List<MenuList> getAllMenuList(Long userId){
+
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED), userId)
+                .orElseThrow(() -> new MenuListException());
     }
 
     //메뉴판 업데이트
     @Transactional
-    public MenuList updateMenuList(Long id, MenuListRequestDTO request) {
-        MenuList menuList = menuListRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
+    public MenuList updateMenuList(Long menulistId, MenuListRequestDTO request, Long userId) {
+
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        MenuList menuList = menuListRepository.findMenuListsById(menulistId, userId, Arrays.asList(CREATED, UPDATED))
+                .orElseThrow(() -> new MenuListException());
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
 
-        if (request.getTitle() != null){
-            updateMenuListBuilder.title(request.getTitle());
+        if (request.getMenuFolderTitle() != null) {
+            updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
-        if (request.getImg() != null){
-            MultipartFile file = request.getImg();
+        if (request.getMenuFolderImgUrl() != null) {
+            MultipartFile file = request.getMenuFolderImgUrl();
             String fileUrl = "";
 
             try {
@@ -121,40 +143,80 @@ public class MenuListService {
                             Paths.get(file.getOriginalFilename()));
 
                     fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+                    updateMenuListBuilder.imgUrl(fileUrl);
                 }
-            }catch (S3Exception e){
-                throw new RuntimeException("Failed to upload file to S3", e);
-            }catch (IOException e){
-                throw new RuntimeException("Failed to upload file to S3", e);       //예외 처리 필요
+            } catch (Exception e) {
+                throw new ImageLoadException();
             }
-            updateMenuListBuilder.imgUrl(fileUrl);
         }
 
-        if (request.getIconType() != null){
-            updateMenuListBuilder.iconType(request.getIconType());
-        }
+            if (request.getMenuFolderIcon() != null) {
+                updateMenuListBuilder.iconType(request.getMenuFolderIcon());
+            }
 
-        MenuList updateMenuList = updateMenuListBuilder.build();
+            MenuList updateMenuList = updateMenuListBuilder.build();
 
-        return menuListRepository.save(updateMenuList);
+            return menuListRepository.save(updateMenuList);
     }
+
 
     //메뉴판 삭제
     @Transactional
-    public String removeMenuList(Long id){
-        MenuList menuList = menuListRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
+    public String removeMenuList(Long menuListId, Long userId){
 
-        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        removeMenuListBuilder.status(Status.DELETED);
+        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
+                .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
-        MenuList removeMenuList = removeMenuListBuilder.build();
+//        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
+//
+//        removeMenuListBuilder.status(Status.DELETED);
+//
+//        MenuList removeMenuList = removeMenuListBuilder.build();
+//
 
-        menuListRepository.save(removeMenuList);
+        Long currentPriority = menuList.getPriority();
+        menuList.softDelete();
+        menuListRepository.save(menuList);
+
+        menuListRepository.decreasePriorityGreaterThan(currentPriority);
 
         return "OK";
     }
+
+    @Transactional
+    public String setPriority(Long id, Long newPriority, Long userId) {
+        MenuList menuList = menuListRepository.findById(id)
+                .orElseThrow(() -> new MenuListException());
+
+        Long currentPriority = menuList.getPriority();
+        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElseThrow(() -> new RuntimeException("메뉴판 존재 X"));
+
+        if (newPriority <= 0 || newPriority > maxPriority) {
+            throw new RuntimeException("유효하지 않은 우선순위입니다.");
+        }
+
+        if(currentPriority < newPriority){
+            menuListRepository.decreasePriorityBetween(currentPriority, newPriority);
+        }else{
+            menuListRepository.increasePriorityBetween(currentPriority, newPriority);
+        }
+
+        MenuList updateMenuList = menuList.toBuilder().priority(newPriority).build();
+        menuListRepository.save(updateMenuList);
+
+        return "OK";
+    }
+
+    @Transactional(readOnly = true)
+    public MenuList findMenuListById(Long menuFolderId, Long userId) {
+        // Optional로 감싸서 null 체크 및 예외 처리
+        return menuListRepository.findByIdAndUserId(menuFolderId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 메뉴판이 존재하지 않습니다."));
+    }
+
 
     /** 메뉴판 메뉴 추가 */
     /*
