@@ -42,7 +42,7 @@ public class MenuList {
     private String imgUrl;
 
     @Builder.Default
-    @OneToMany(mappedBy = "menuList")
+    @OneToMany(mappedBy = "menuList", orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
 
     @PrePersist
@@ -58,6 +58,11 @@ public class MenuList {
 
     public void addMenu(Menu menu) {
         menus.add(menu);
+    }
+
+    public void removeUser(User user){
+        this.user = user;
+        user.removeMenuList(this);
     }
 
     // 연관관계 메서드 //
