@@ -77,7 +77,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           #JWT_SECRET_KEY: ${secrets.JWT_SECRET_KEY}
           #ddl
-          SPRING_JPA_HIBERNATE_DDL-AUTO: update
+          SPRING_JPA_HIBERNATE_DDL_AUTO: update
         run: ./gradlew build --stacktrace
 
 
