@@ -71,6 +71,8 @@ jobs:
           S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          #ddl
+          SPRING_JPA_HIBERNATE_DDL_AUTO: update
         run: ./gradlew build --stacktrace
 
       # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push

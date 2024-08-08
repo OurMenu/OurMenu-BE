@@ -51,7 +51,7 @@ public class AccountService {
     @Transactional
     public LoginResponse signup(SignUpRequest request) {
         // validate email
-        if(userDao.isEmailExists(request.getEmail()))
+        if(isDuplicatedEmail(request.getEmail()))
             throw new EmailDuplicationException();
 
         // encode password
@@ -96,6 +96,10 @@ public class AccountService {
             throw new JwtException("");
 
         return makeLoginResponse(id);
+    }
+
+    public boolean isDuplicatedEmail(String email) {
+        return userDao.isEmailExists(email);
     }
 
 }

@@ -60,4 +60,8 @@ public class User {
     public void addArticles(Article article){
         articles.add(article);
     }
+
+    public void removeMenuList(MenuList menuList) {
+        menuLists.remove(menuList);
+    }
 }
