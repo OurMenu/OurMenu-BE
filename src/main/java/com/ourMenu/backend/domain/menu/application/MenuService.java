@@ -74,7 +74,11 @@ public class MenuService {
     // 메뉴 등록 * (이미지 제외)
     public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
 
+        // 메뉴 이름
         String menuTitle = postMenuRequest.getMenuTitle();
+
+        //
+        Long maxGroupId = findMaxGroupId(userId);
 
         // 유저 정보 가져오기
         User finduser = userService.getUserById(userId)
@@ -99,51 +103,33 @@ public class MenuService {
 
         List<Long> menuFolderIds = postMenuRequest.getMenuFolderIds();
 
-        // 메뉴 생성
-        Menu menu = Menu.builder()
-                .title(postMenuRequest.getMenuTitle())
-                .price(postMenuRequest.getMenuPrice())
-                .user(finduser)
-                .memo(postMenuRequest.getMenuMemo())
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .groupId(findMaxGroupId(userId))
-                .build();
-
         // 식당, 메뉴판 연관관계 설정
-
-        menu.confirmPlace(place);
 
         for (Long menuFolderId : menuFolderIds) {
             // findMenuList에서 해당 menuFolderId에 맞는 메뉴판을 찾아서 confirmMenuList 호출
             MenuList menuList = menuListService.findMenuListById(menuFolderId, userId); // 해당 ID로 MenuList를 찾는 메서드 호출
-            menu.confirmMenuList(menuList); // 메뉴를 메뉴판에 연결
+            Menu menu = Menu.builder()
+                    .title(postMenuRequest.getMenuTitle())
+                    .price(postMenuRequest.getMenuPrice())
+                    .user(finduser)
+                    .memo(postMenuRequest.getMenuMemo())
+                    .createdAt(LocalDateTime.now())
+                    .modifiedAt(LocalDateTime.now())
+                    .groupId(maxGroupId)
+                    .build();
+
+            menu.confirmPlace(place); // 메뉴, 식당 연관관계
+            menu.confirmMenuList(menuList); // 메뉴, 메뉴판 연관관계
+
+            // 태그 연관관계
+            List<MenuTag> menuTags = createMenuTags(postMenuRequest, menu);
+
+            Menu savedMenu = menuRepository.save(menu);
         }
 
-        // MenuTag 생성 및 연관관계 설정
-        List<MenuTag> menuTags = postMenuRequest.getTagInfo().stream()
-                .map(tagInfo -> {
-                    Tag tag = tagService.findByName(tagInfo.getTagTitle())
-                            .orElseGet(() -> tagService.createTag(tagInfo)); // 태그가 존재하지 않으면 생성
-
-                    // 중간 테이블 생성
-                    MenuTag menuTag = MenuTag.builder()
-                            .tag(tag)
-                            .menu(menu)
-                            .build();
-                    // 연관관계 설정
-                    menuTag.confirmTag(tag);
-                    menuTag.confirmMenu(menu);
-
-                    return menuTag;
-                })
-                .collect(Collectors.toList());
-
-
-        Menu savedMenu = menuRepository.save(menu);
         placeService.save(place);
 
-        return new PostMenuResponse(savedMenu.getId());
+        return new PostMenuResponse(maxGroupId);
     }
 
     // 메뉴 추가
@@ -153,13 +139,35 @@ public class MenuService {
     }
 
     // 메뉴 이미지 등록
-    @Transactional
-    public void createMenuImage(PostPhotoRequest request) {
-        List<MultipartFile> imgs = request.getMenuImgs();
-        long menuId = request.getMenuId();
+    private List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
+        return postMenuRequest.getTagInfo().stream()
+                .map(tagInfo -> {
+                    Tag tag = tagService.findByName(tagInfo.getTagTitle())
+                            .orElseGet(() -> tagService.createTag(tagInfo)); // 태그가 존재하지 않으면 생성
 
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+                    // 중간 테이블 생성
+                    MenuTag menuTag = MenuTag.builder()
+                            .tag(tag)
+                            .menu(menu)
+                            .build();
+
+                    // 연관관계 설정
+                    menuTag.confirmTag(tag);
+                    menuTag.confirmMenu(menu);
+
+                    return menuTag;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public void createMenuImage(PostPhotoRequest request, long userId) {
+        List<MultipartFile> imgs = request.getMenuImgs();
+        long menuGroupId = request.getMenuGroupId();
+
+        List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(menuGroupId, userId);
+
 
         List<String> fileUrls = new ArrayList<>();
 
@@ -179,19 +187,21 @@ public class MenuService {
                     fileUrls.add(fileUrl); // 변환된 URL 추가해줌
                 }
             } catch (Exception e) {
-                e.getMessage();
+                e.printStackTrace(); // 예외가 발생하면 스택 트레이스를 출력
             }
         }
 
-        List<MenuImage> menuImages = fileUrls.stream()
-                .map(url -> MenuImage.builder()
-                        .url(url)
-                        .menu(menu)
-                        .build())
-                .collect(Collectors.toList());
+        for (Menu menu : findGroupMenu) {
+            List<MenuImage> menuImages = fileUrls.stream()
+                    .map(url -> MenuImage.builder()
+                            .url(url)
+                            .build())
+                    .collect(Collectors.toList());
 
-        for (MenuImage menuImage : menuImages) {
-            menuImage.confirmMenu(menu);
+            for (MenuImage menuImage : menuImages) {
+                menuImage.confirmMenu(menu);
+                // 필요하다면 menuImage를 저장하는 로직도 추가할 수 있습니다.
+            }
         }
     }
 

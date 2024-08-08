@@ -15,6 +15,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     List<Menu> findByUserId(Long userId);
 
+    List<Menu> findByUserIdAndGroupId(Long userId, Long groupId);
+
     @Query("SELECT m FROM Menu m WHERE m.place.id = :placeId AND m.status IN :status")
     Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status")List<MenuStatus> statuses);
 
