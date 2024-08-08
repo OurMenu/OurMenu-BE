@@ -88,8 +88,8 @@ public class MenuListService {
         List<Long> menuIdList = request.getMenuId();
         List<Menu> menus = menuIdList.stream()
                 .map(id -> menuRepository.findByIdAndUserId(id, userId)
-//                        .orElseThrow(() -> new RuntimeException()))
-                        .orElse(null))  //디버깅용 (초기 메뉴판 생성 구현 필요)
+                        .orElseThrow(() -> new RuntimeException()))
+//                        .orElse(null))  //디버깅용 (초기 메뉴판 생성 구현 필요)
 
                 .collect(Collectors.toList());
 
