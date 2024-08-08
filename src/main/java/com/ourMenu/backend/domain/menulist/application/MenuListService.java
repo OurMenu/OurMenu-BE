@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ourMenu.backend.global.common.Status.*;
 
@@ -58,12 +59,13 @@ public class MenuListService {
 
     @Transactional
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
-        MultipartFile file = request.getMenuFolderImg();
-        String fileUrl = null;
+        MultipartFile file = request.getMenuFolderImg().orElse(null);
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
         Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
         Long newPriority = maxPriority + 1;
+
+        String fileUrl = null;
 
         try {
             if (file != null && !file.isEmpty()) {
@@ -82,10 +84,18 @@ public class MenuListService {
             throw new ImageLoadException();
         }
 
+        //메뉴판 메뉴 추가
+        List<Long> menuIdList = request.getMenuId();
+        List<Menu> menus = menuIdList.stream()
+                .map(id -> menuRepository.findByIdAndUserId(id, userId)
+                        .orElseThrow(() -> new RuntimeException()))
+                .collect(Collectors.toList());
+
         MenuList menuList = MenuList.builder()
                 .title(request.getMenuFolderTitle())
                 .imgUrl(fileUrl)
                 .user(user)
+                .menus(menus)
                 .iconType(request.getMenuFolderIcon())
                 .priority(newPriority)
                 .build();
@@ -132,7 +142,7 @@ public class MenuListService {
             updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
         if (request.getMenuFolderImg() != null) {
-            MultipartFile file = request.getMenuFolderImg();
+            MultipartFile file = request.getMenuFolderImg().orElseThrow(() -> new RuntimeException());
             String fileUrl = "";
 
             try {
