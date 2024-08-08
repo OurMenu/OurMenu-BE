@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class GetMenuListResponse {
+    private Long menuFolderId;
     private String menuFolderTitle;
     private Long menuCount;
     private String menuFolderImgUrl;

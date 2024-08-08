@@ -70,6 +70,7 @@ public class MenuListApiController {
         List<MenuList> menuLists = menuListService.getAllMenuList(userId);
         List<GetMenuListResponse> responses = menuLists.stream().map(menuList ->
                 GetMenuListResponse.builder()
+                        .menuFolderId(menuList.getId())
                         .menuFolderTitle(menuList.getTitle())
                         .menuCount((long) menuList.getMenus().size())
                         .menuFolderImgUrl(menuList.getImgUrl())
