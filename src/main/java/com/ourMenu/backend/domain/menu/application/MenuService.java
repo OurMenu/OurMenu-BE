@@ -124,14 +124,12 @@ public class MenuService {
             // 태그 연관관계
             List<MenuTag> menuTags = createMenuTags(postMenuRequest, menu);
 
-            Menu savedMenu = menuRepository.save(menu);
-
+            menuRepository.save(menu);
         }
-
-
 
         return new PostMenuResponse(maxGroupId);
     }
+
 
     // 메뉴 추가
     public Menu getMenuById(Long menuId) {
@@ -139,7 +137,8 @@ public class MenuService {
                 .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
     }
 
-    // 메뉴 이미지 등록
+
+    // 메뉴 태그 등록
     private List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
         return postMenuRequest.getTagInfo().stream()
                 .map(tagInfo -> {
@@ -207,65 +206,24 @@ public class MenuService {
     }
 
     @Transactional
-    public void updateMenu(Long menuId, Long userId, PatchMenuRequest patchMenuRequest) {
-        Menu menu = menuRepository.findAllWithUserAndMenuListAndPlace(menuId)
-                .orElseThrow(() -> new RuntimeException("해당하는 매뉴가 없습니다."));
+    public void updateMenu(Long groupId, Long userId, PostMenuRequest postMenuRequest) {
 
-        String MenuListTitle = patchMenuRequest.getMenuFolderTitle();
+        List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(userId, groupId);
 
-        // 메뉴 필드 값 업데이트
-        if (patchMenuRequest.getMenuTitle() != null) {
-            menu.changeTitle(patchMenuRequest.getMenuTitle());
+        List<Menu> menus = menuRepository.findByGroupIdWithFetch(groupId);
+
+        for (Menu menu : findGroupMenu) {
+            removeMenu(menu);
         }
 
-        if (patchMenuRequest.getMenuPrice() > 0) { // 가격이 0보다 큰 경우만 업데이트
-            menu.changePrice(patchMenuRequest.getMenuPrice());
-        }
-
-        if (patchMenuRequest.getMenuMemo() != null) {
-            menu.changeMemo(patchMenuRequest.getMenuMemo());
-        }
-        if (patchMenuRequest.getMenuIcon() != null) {
-            menu.changeIcon(patchMenuRequest.getMenuIcon());
-        }
-
-        // 메뉴판 변경
-        if(!patchMenuRequest.getMenuFolderTitle().equals(menu.getMenuList().getTitle())){
-            MenuList menulist = menuListService.getMenuListByName(patchMenuRequest.getMenuTitle(), userId);
-            menu.removeMenuList(menu.getMenuList());
-            menu.confirmMenuList(menulist);
-        }
-
-        // 식당 운영정보 변경
-        String storeInfo = patchMenuRequest.getStoreInfo().getStoreMemo();
-        if(storeInfo != null){
-            menu.getPlace().changeInfo(storeInfo);
-        }
-
-        // 태그 정보 변경
-        List<TagRequestDto> tagInfo = patchMenuRequest.getTagInfo();
-        if(tagInfo != null){
-            menu.getTags().clear();
-            List<MenuTag> menuTags = tagInfo.stream()
-                    .map(mt -> {
-                        Tag tag = tagService.findByName(mt.getTagTitle())
-                                .orElseGet(() -> tagService.createTag(mt)); // 태그가 존재하지 않으면 생성
-
-                        // 중간 테이블 생성
-                        MenuTag menuTag = MenuTag.builder()
-                                .tag(tag)
-                                .menu(menu)
-                                .build();
-                        // 연관관계 설정
-                        menuTag.confirmTag(tag);
-                        menuTag.confirmMenu(menu);
-
-                        return menuTag;
-                    })
-                    .collect(Collectors.toList());
-        }
+        createMenu(postMenuRequest, userId);
 
     }
+
+
+
+
+
 
     @Transactional
     public String updateMenuImage(PatchMenuImage patchMenuImage, long id, long userId) {
@@ -324,18 +282,11 @@ public class MenuService {
 
 
     @Transactional
-    public String removeMenu(Long id, Long userId){
-        Menu menu = menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+    public String removeMenu(Menu menu){
 
         User user = menu.getUser();
-        user.getId(); // 프록시 초기화
-
         Place place = menu.getPlace();
-        String placeName = place.getTitle(); // 프록시 초기화
-
         MenuList menuList = menu.getMenuList();
-        String title = menuList.getTitle(); // 프록시 초기화
 
         // 삭제 시 연관관계 제거
         menu.removeMenuList(menuList);
