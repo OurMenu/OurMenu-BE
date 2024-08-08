@@ -1,6 +1,5 @@
 package com.ourMenu.backend.domain.menulist.application;
 
-import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
@@ -27,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
+import static com.ourMenu.backend.global.common.Status.*;
 
 
 @Service
