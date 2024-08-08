@@ -205,10 +205,8 @@ public class MenuListService {
             menuRepository.delete(menu);
         }
 
-        log.info("메뉴 삭제");
         menuList.removeUser(user);
 
-        log.info("유저 삭제");
 
         menuListRepository.delete(menuList);
         return "OK";
