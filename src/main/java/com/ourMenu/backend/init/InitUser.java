@@ -8,6 +8,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class InitUser {
 
@@ -16,8 +18,9 @@ public class InitUser {
 
     @PostConstruct
     public void init() {
-        SignUpRequest signUpRequest=new SignUpRequest();
-        signUpRequest.setEmail("q1w2e3r4@naver.com");
+        SignUpRequest signUpRequest = new SignUpRequest();
+        UUID uuid = UUID.randomUUID();
+        signUpRequest.setEmail(uuid + "@naver.com");
         signUpRequest.setNickname("더미유저");
         signUpRequest.setPassword("q1w2e3r4");
         LoginResponse signup = accountService.signup(signUpRequest);
