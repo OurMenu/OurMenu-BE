@@ -1,6 +1,8 @@
 package com.ourMenu.backend.domain.menulist.application;
 
+import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
@@ -186,6 +188,34 @@ public class MenuListService {
 
         return "OK";
     }
+
+
+    @Transactional
+    public String hardDeleteMenuList(Long menuListId, Long userId){
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
+                .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
+
+        List<Menu> menus = menuList.getMenus();
+
+
+        for (Menu menu : menus) {
+            menuList.removeMenu(menu);
+            menu.removeMenuList(menuList);
+            menuRepository.delete(menu);
+        }
+
+        log.info("메뉴 삭제");
+        menuList.removeUser(user);
+
+        log.info("유저 삭제");
+
+        menuListRepository.delete(menuList);
+        return "OK";
+    }
+
 
     @Transactional
     public String setPriority(Long id, Long newPriority, Long userId) {

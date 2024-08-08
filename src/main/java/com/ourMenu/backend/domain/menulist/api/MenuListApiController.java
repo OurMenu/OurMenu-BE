@@ -93,9 +93,17 @@ public class MenuListApiController {
         return ApiUtils.success(response);
     }
 
+    //SoftDelete
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
+//        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
+//        return ApiUtils.success(response);  //OK 반환
+//    }
+
+    //HardDelete
     @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
-        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
+    public ApiResponse<String> deleteMenuList(@PathVariable Long id, @UserId Long userId){
+        String response = menuListService.hardDeleteMenuList(id, userId);
         return ApiUtils.success(response);  //OK 반환
     }
 
