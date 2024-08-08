@@ -13,5 +13,5 @@ public class MenuListRequestDTO {
     private Optional<MultipartFile> menuFolderImg;    //파일로 받아야 함
     private String menuFolderTitle;
     private String menuFolderIcon;
-    private List<Long> menuId;
+    private List<Long> menuIds;
 }
