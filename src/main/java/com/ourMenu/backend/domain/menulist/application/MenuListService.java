@@ -150,6 +150,7 @@ public class MenuListService {
                                         .build())
                                 .collect(Collectors.toList())))
                         .place(menu.getPlace())
+                        .groupId(menu.getGroupId())
                         .build();
                 menuRepository.save(copiedMenu);
 

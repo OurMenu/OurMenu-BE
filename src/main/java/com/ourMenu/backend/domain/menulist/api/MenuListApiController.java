@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menulist.dto.response.MenuGroupIdDTO;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -53,18 +54,24 @@ public class MenuListApiController {
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
         MenuList menuList = menuListService.createMenuList(request, userId);
+
+        List<MenuGroupIdDTO> menuIdGroupIdList = menuList.getMenus().stream()
+                .map(menu -> MenuGroupIdDTO.builder()
+                        .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
+                        .build())
+                .collect(Collectors.toList());
+
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .menuFolderId(menuList.getId())
                 .menuFolderTitle(menuList.getTitle())
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
-                .menuIds(menuList.getMenus().stream().map(menu ->
-                        menu.getId()
-                ).collect(Collectors.toList()))
+                .menuIds(menuIdGroupIdList)
                 .build();
 
-        log.info("menuId = " + menuList.getMenus().stream().map(menu -> menu.getId()));
+//        log.info("menuId = " + menuList.getMenus().stream().map(menu -> menu.getId()));
 
         return ApiUtils.success(response);
 
@@ -76,6 +83,8 @@ public class MenuListApiController {
     public ApiResponse<List<GetMenuListResponse>> findAllMenuList(@UserId Long userId){
         List<MenuList> menuLists = menuListService.getAllMenuList(userId);
         List<GetMenuListResponse> responses = menuLists.stream().map(menuList ->
+
+
                 GetMenuListResponse.builder()
                         .menuFolderId(menuList.getId())
                         .menuFolderTitle(menuList.getTitle())
@@ -85,9 +94,11 @@ public class MenuListApiController {
                         .menuFolderPriority(menuList.getPriority())
                         .menuIds(
                                 menuList.getMenus().stream().map(menu ->
-                                        menu.getId())
-                                        .collect(Collectors.toList())
-                        )
+                                        MenuGroupIdDTO.builder()
+                                                .menuId(menu.getId())
+                                                .groupId(menu.getGroupId())
+                                                .build()
+                        ).collect(Collectors.toList()))
                         .build()
         ).collect(Collectors.toList());
 

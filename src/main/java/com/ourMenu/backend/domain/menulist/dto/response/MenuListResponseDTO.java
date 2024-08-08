@@ -14,5 +14,5 @@ public class MenuListResponseDTO {
     private String menuFolderImgUrl;
     private String menuFolderIcon;
     private Long menuFolderPriority;
-    private List<Long> menuIds;
+    private List<MenuGroupIdDTO> menuIds;
 }
