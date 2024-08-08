@@ -59,6 +59,8 @@ public class Menu {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    
+    private Long groupId;
 
 //    @PrePersist
 //    public void prePersist() {

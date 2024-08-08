@@ -25,4 +25,7 @@ public class PostMenuRequest {
     // 태그 관련 정보
     private List<TagRequestDto> tagInfo;
 
+    private List<Long> menuFolderIds;
+
+
 }

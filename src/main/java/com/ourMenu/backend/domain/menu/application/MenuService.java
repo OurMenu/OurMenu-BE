@@ -49,24 +49,55 @@ public class MenuService {
     }
 
 
+    @Transactional(readOnly = true)
+    public Long findMaxGroupId(Long userId){
+        List<Menu> menus = menuRepository.findByUserId(userId);
+
+        Long maxGroupId = null;
+
+        for (Menu menu : menus) {
+            Long groupId = menu.getGroupId(); // 각 메뉴의 groupId를 가져옵니다.
+
+            // maxGroupId가 null이거나 현재 groupId가 maxGroupId보다 크면 업데이트
+            if (maxGroupId == null || groupId > maxGroupId) {
+                maxGroupId = groupId;
+            }
+        }
+
+        // 최고 groupId가 null일 경우 1 반환
+        return (maxGroupId != null) ? maxGroupId : 1L;
+    }
+
+
+
     @Transactional
     // 메뉴 등록 * (이미지 제외)
     public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
+
+        String menuTitle = postMenuRequest.getMenuTitle();
 
         // 유저 정보 가져오기
         User finduser = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당하는 유저가 없습니다."));
 
-        // 메뉴판 정보 가져오기
-        MenuList findMenuList = menuListService.getMenuListByName(postMenuRequest.getMenuFolderTitle(), userId);
-
         // 장소 가져오기(식당이 없는 경우 새로 생성)
         Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
 
-        boolean exists = menuRepository.existsByPlaceIdAndMenuListIdAndTitle(place.getId(), findMenuList.getId(), postMenuRequest.getMenuTitle());
-        if (exists) {
-            throw new RuntimeException("해당 식당의 메뉴판에 동일한 메뉴명이 이미 존재합니다.");
+        boolean isMenuExists = false;
+
+        for (Menu menu : place.getMenus()) {
+            if (menu.getTitle().equals(menuTitle)) {
+                isMenuExists = true; // 동일한 메뉴 이름이 있으면 true
+                break; // 하나라도 찾으면 루프 종료
+            }
         }
+
+        if(isMenuExists){
+            throw new RuntimeException("해당 식당에 동일한 메뉴명이 이미 존재합니다");
+        }
+
+
+        List<Long> menuFolderIds = postMenuRequest.getMenuFolderIds();
 
         // 메뉴 생성
         Menu menu = Menu.builder()
@@ -76,11 +107,18 @@ public class MenuService {
                 .memo(postMenuRequest.getMenuMemo())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
+                .groupId(findMaxGroupId(userId))
                 .build();
 
         // 식당, 메뉴판 연관관계 설정
-        menu.confirmMenuList(findMenuList);
+
         menu.confirmPlace(place);
+
+        for (Long menuFolderId : menuFolderIds) {
+            // findMenuList에서 해당 menuFolderId에 맞는 메뉴판을 찾아서 confirmMenuList 호출
+            MenuList menuList = menuListService.findMenuListById(menuFolderId, userId); // 해당 ID로 MenuList를 찾는 메서드 호출
+            menu.confirmMenuList(menuList); // 메뉴를 메뉴판에 연결
+        }
 
         // MenuTag 생성 및 연관관계 설정
         List<MenuTag> menuTags = postMenuRequest.getTagInfo().stream()

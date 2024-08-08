@@ -17,6 +17,9 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,14 +62,22 @@ public class MenuApiController {
     }
 
     @GetMapping("")
-    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String menuTitle,
-                                              @RequestParam(required = false) String menuTag,
-                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
-        List<Menu> menus = menuRepository.findMenusByCriteria(menuTitle, menuTag, menuFolderId, userId);
-        List<MenuDto> menuDtos = MenuDto.toDto(menus);
+    public ApiResponse<List<MenuDto>> getMenu(
+            @RequestParam(required = false) String menuTitle,
+            @RequestParam(required = false) String menuTag,
+            @RequestParam(required = false) Integer menuFolderId,
+            @RequestParam(defaultValue = "0") int pageNumber, // 기본값을 0으로 설정
+            @RequestParam(defaultValue = "10") int pageSize, // 기본값을 10으로 설정
+            @UserId Long userId) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Menu> menuPage = menuRepository.findMenusByCriteria(menuTitle, menuFolderId, userId, pageable);
+
+        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
 
         return ApiUtils.success(menuDtos);
     }
+
 
     // 삭제
     @DeleteMapping("/{menuId}")
