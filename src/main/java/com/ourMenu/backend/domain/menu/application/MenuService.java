@@ -125,9 +125,10 @@ public class MenuService {
             List<MenuTag> menuTags = createMenuTags(postMenuRequest, menu);
 
             Menu savedMenu = menuRepository.save(menu);
+
         }
 
-        placeService.save(place);
+
 
         return new PostMenuResponse(maxGroupId);
     }
