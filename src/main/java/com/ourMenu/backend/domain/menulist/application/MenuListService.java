@@ -196,6 +196,8 @@ public class MenuListService {
         MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
+        Long priority = menuList.getPriority();
+
         List<Menu> menus = menuList.getMenus();
 
 
@@ -206,9 +208,8 @@ public class MenuListService {
         }
 
         menuList.removeUser(user);
-
-
         menuListRepository.delete(menuList);
+        menuListRepository.decreasePriorityGreaterThan(priority);
         return "OK";
     }
 
