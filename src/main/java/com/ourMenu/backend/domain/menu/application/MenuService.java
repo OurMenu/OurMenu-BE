@@ -317,9 +317,26 @@ public class MenuService {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
+    @Transactional
     public List<MenuDto> getMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId, Long groupId) {
         List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId, userId, groupId);
         return MenuDto.toDto(menus);
+    }
+
+    @Transactional
+    public void removeCertainMenu(Long menuId, Long userId) {
+        Menu menu = menuRepository.findByIdAndUserId(menuId, userId)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다"));
+
+        removeMenu(menu);
+    }
+
+    @Transactional
+    public void removeAllMenus(Long groupId, Long userId) {
+        List<Menu> byUserIdAndGroupId = menuRepository.findByUserIdAndGroupId(userId, groupId);
+        for (Menu menu : byUserIdAndGroupId) {
+            removeMenu(menu);
+        }
     }
 
 

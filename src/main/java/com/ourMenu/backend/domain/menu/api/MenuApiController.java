@@ -94,11 +94,17 @@ public class MenuApiController {
 
 
     // 삭제
-//    @DeleteMapping("/{menuId}")
-//    public ApiResponse<String> removeMenu (@PathVariable Long menuId, @UserId Long userId){
-//        String response = menuService.removeMenu(menuId, userId);       // Hard Delete
-//        return ApiUtils.success(response);  //OK 반환
-//    }
+    @DeleteMapping("/{menuId}")
+    public ApiResponse<String> removeMenu (@PathVariable Long menuId, @UserId Long userId){
+        menuService.removeCertainMenu(menuId, userId);       // Hard Delete
+        return ApiUtils.success("OK");  //OK 반환
+    }
+
+    @DeleteMapping("/group/{groupId}")
+    public ApiResponse<String> removeAllMenu(@PathVariable Long groupId, @UserId Long userId){
+        menuService.removeAllMenus(groupId, userId);
+        return ApiUtils.success("OK");  //OK 반환
+    }
 
     @PatchMapping("/{groupId}")
     public ApiResponse<String> updateMenu (@PathVariable Long groupId, @UserId Long userId, PostMenuRequest postMenuRequest){
