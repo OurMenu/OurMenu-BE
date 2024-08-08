@@ -15,6 +15,7 @@ import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/menuFolder")
 public class MenuListApiController {
 
@@ -57,8 +59,12 @@ public class MenuListApiController {
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
-                .menuList(menuList.getMenus())
+                .menuIds(menuList.getMenus().stream().map(menu ->
+                        menu.getId()
+                ).collect(Collectors.toList()))
                 .build();
+
+        log.info("menuId = " + menuList.getMenus().stream().map(menu -> menu.getId()));
 
         return ApiUtils.success(response);
 
@@ -77,6 +83,11 @@ public class MenuListApiController {
                         .menuFolderImgUrl(menuList.getImgUrl())
                         .menuFolderIcon(menuList.getIconType())
                         .menuFolderPriority(menuList.getPriority())
+                        .menuIds(
+                                menuList.getMenus().stream().map(menu ->
+                                        menu.getId())
+                                        .collect(Collectors.toList())
+                        )
                         .build()
         ).collect(Collectors.toList());
 

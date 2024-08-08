@@ -84,23 +84,32 @@ public class MenuListService {
             throw new ImageLoadException();
         }
 
-        //메뉴판 메뉴 추가
-        List<Long> menuIdList = request.getMenuId();
-        List<Menu> menus = menuIdList.stream()
-                .map(id -> menuRepository.findByIdAndUserId(id, userId)
-                        .orElseThrow(() -> new RuntimeException()))
-//                        .orElse(null))  //디버깅용 (초기 메뉴판 생성 구현 필요)
-
-                .collect(Collectors.toList());
+        // 메뉴판 메뉴 추가
+        List<Long> menuIdList = request.getMenuIds();
+        List<Menu> menus = new ArrayList<>();
+        if (!menuIdList.isEmpty()) {
+            menus = menuIdList.stream()
+                    .map(id -> menuRepository.findByIdAndUserId(id, userId)
+                            .orElseThrow(() -> new RuntimeException("Menu not found with id " + id + " for user " + userId)))
+                    .collect(Collectors.toList());
+        }
 
         MenuList menuList = MenuList.builder()
                 .title(request.getMenuFolderTitle())
                 .imgUrl(fileUrl)
                 .user(user)
-                .menus(menus)
+//                .menus(menus)
                 .iconType(request.getMenuFolderIcon())
                 .priority(newPriority)
                 .build();
+
+        if (!menus.isEmpty()) {
+            for (Menu menu : menus) {
+                Menu copiedMenu = menu;
+                copiedMenu.confirmMenuList(menuList); // 명시적으로 Menu에 MenuList 설정
+
+            }
+        }
 
         return menuListRepository.save(menuList);
 
