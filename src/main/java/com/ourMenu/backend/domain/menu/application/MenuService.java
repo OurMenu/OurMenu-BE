@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -315,6 +316,12 @@ public class MenuService {
     public Menu findMenuInfo(Long menuId, Long userId) {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
+
+    public List<MenuDto> getMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId, Long groupId) {
+        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId, userId, groupId);
+        return MenuDto.toDto(menus);
+    }
+
 
 
 

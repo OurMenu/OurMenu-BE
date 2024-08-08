@@ -18,6 +18,7 @@ public class MenuDto {
     private String placeAddress;
     private int menuPrice;
     private String menuImgUrl;
+    private Long groupId;
 
     public static List<MenuDto> toDto(List<Menu> menus){
         return menus.stream()
@@ -27,6 +28,7 @@ public class MenuDto {
                         .placeTitle(menu.getPlace().getTitle())
                         .placeAddress(menu.getPlace().getAddress())
                         .menuPrice(menu.getPrice())
+                        .groupId(menu.getGroupId())
                         .menuImgUrl(menu.getImages().isEmpty() ? null : menu.getImages().get(0).getUrl())
                         .build())
                 .collect(Collectors.toList());

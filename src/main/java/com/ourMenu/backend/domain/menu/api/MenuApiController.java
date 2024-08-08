@@ -44,7 +44,16 @@ public class MenuApiController {
     @ExceptionHandler(MenuNotFoundException.class)
     public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
         return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
-}
+    }
+
+    @GetMapping("/{groupId}")
+    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String title,
+                                              @RequestParam(required = false) String tag,
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId, @PathVariable Long groupId) {
+        List<MenuDto> menusByCriteria = menuService.getMenusByCriteria(title, tag, menuFolderId, userId, groupId);
+
+        return ApiUtils.success(menusByCriteria);
+    }
 
     // 메뉴 생성
     @PostMapping("")
@@ -61,22 +70,27 @@ public class MenuApiController {
         return ApiUtils.success("OK");
     }
 
-    @GetMapping("")
-    public ApiResponse<List<MenuDto>> getMenu(
-            @RequestParam(required = false) String menuTitle,
-            @RequestParam(required = false) String menuTag,
-            @RequestParam(required = false) Integer menuFolderId,
-            @RequestParam(defaultValue = "0") int pageNumber, // 기본값을 0으로 설정
-            @RequestParam(defaultValue = "10") int pageSize, // 기본값을 10으로 설정
-            @UserId Long userId) {
+//    @GetMapping("")
+//    public ApiResponse<List<MenuDto>> getMenu(
+//            @RequestParam(required = false) String menuTitle,
+//            @RequestParam(required = false) String menuTag,
+//            @RequestParam(required = false) Integer menuFolderId,
+//
+//            @UserId Long userId) {
+//
+//
+//        Page<Menu> menuPage = menuRepository.findMenusByCriteria(menuTitle, menuFolderId, userId);
+//
+//        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
+//
+//        return ApiUtils.success(menuDtos);
+//    }
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<Menu> menuPage = menuRepository.findMenusByCriteria(menuTitle, menuFolderId, userId, pageable);
 
-        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
 
-        return ApiUtils.success(menuDtos);
-    }
+
+
+
 
 
     // 삭제
@@ -91,6 +105,7 @@ public class MenuApiController {
         menuService.updateMenu(groupId, userId, postMenuRequest);       // Hard Delete
         return ApiUtils.success("OK");  //OK 반환
     }
+
 
 
 
