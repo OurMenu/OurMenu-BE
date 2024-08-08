@@ -8,7 +8,7 @@ package com.ourMenu.backend.domain.menulist.dto.request;
 @Builder
 public class MenuListRequestDTO {
 //    private String img;
-    private MultipartFile menuFolderImgUrl;    //파일로 받아야 함
+    private MultipartFile menuFolderImg;    //파일로 받아야 함
     private String menuFolderTitle;
     private String menuFolderIcon;
 }

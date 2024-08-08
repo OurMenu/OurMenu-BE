@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menulist.domain;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.user.domain.User;
 
+import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class MenuList {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private MenuListStatus status = MenuListStatus.CREATED;
+    private Status status = Status.CREATED;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -42,13 +43,13 @@ public class MenuList {
     private String imgUrl;
 
     @Builder.Default
-    @OneToMany(mappedBy = "menuList")
+    @OneToMany(mappedBy = "menuList", orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = (this.status == null) ? MenuListStatus.CREATED : this.status;
+        this.status = (this.status == null) ? Status.CREATED : this.status;
     }
 
     @PreUpdate
@@ -58,6 +59,11 @@ public class MenuList {
 
     public void addMenu(Menu menu) {
         menus.add(menu);
+    }
+
+    public void removeUser(User user){
+        this.user = user;
+        user.removeMenuList(this);
     }
 
     // 연관관계 메서드 //
@@ -71,7 +77,7 @@ public class MenuList {
     }
 
     public void softDelete() {
-        this.status = MenuListStatus.DELETED;
+        this.status = Status.DELETED;
         this.priority = null;
     }
 }

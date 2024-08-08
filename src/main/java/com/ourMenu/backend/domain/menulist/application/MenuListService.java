@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.menulist.application;
 
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
@@ -25,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static com.ourMenu.backend.domain.menulist.domain.MenuListStatus.*;
+import static com.ourMenu.backend.global.common.Status.*;
 
 
 @Service
@@ -56,8 +57,8 @@ public class MenuListService {
 
     @Transactional
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
-        MultipartFile file = request.getMenuFolderImgUrl();
-        String fileUrl = "";
+        MultipartFile file = request.getMenuFolderImg();
+        String fileUrl = null;
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
         Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
@@ -115,12 +116,12 @@ public class MenuListService {
 
     //메뉴판 업데이트
     @Transactional
-    public MenuList updateMenuList(Long menulistId, MenuListRequestDTO request, Long userId) {
+    public MenuList updateMenuList(Long menuFolderId, MenuListRequestDTO request, Long userId) {
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        MenuList menuList = menuListRepository.findMenuListsById(menulistId, userId, Arrays.asList(CREATED, UPDATED))
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException());
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
@@ -129,8 +130,8 @@ public class MenuListService {
         if (request.getMenuFolderTitle() != null) {
             updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
-        if (request.getMenuFolderImgUrl() != null) {
-            MultipartFile file = request.getMenuFolderImgUrl();
+        if (request.getMenuFolderImg() != null) {
+            MultipartFile file = request.getMenuFolderImg();
             String fileUrl = "";
 
             try {
@@ -162,12 +163,12 @@ public class MenuListService {
 
     //메뉴판 삭제
     @Transactional
-    public String removeMenuList(Long menuListId, Long userId){
+    public String removeMenuList(Long menuFolderId, Long userId){
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
 //        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
@@ -186,9 +187,36 @@ public class MenuListService {
         return "OK";
     }
 
+
     @Transactional
-    public String setPriority(Long id, Long newPriority, Long userId) {
-        MenuList menuList = menuListRepository.findById(id)
+    public String hardDeleteMenuList(Long menuFolderId, Long userId){
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
+                .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
+
+        Long priority = menuList.getPriority();
+
+        List<Menu> menus = menuList.getMenus();
+
+
+        for (Menu menu : menus) {
+            menuList.removeMenu(menu);
+            menu.removeMenuList(menuList);
+            menuRepository.delete(menu);
+        }
+
+        menuList.removeUser(user);
+        menuListRepository.delete(menuList);
+        menuListRepository.decreasePriorityGreaterThan(priority);
+        return "OK";
+    }
+
+
+    @Transactional
+    public String setPriority(Long menuFolderId, Long newPriority, Long userId) {
+        MenuList menuList = menuListRepository.findById(menuFolderId)
                 .orElseThrow(() -> new MenuListException());
 
         Long currentPriority = menuList.getPriority();
