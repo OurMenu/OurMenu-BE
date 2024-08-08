@@ -57,8 +57,8 @@ public class MenuListService {
 
     @Transactional
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
-        MultipartFile file = request.getMenuFolderImgUrl();
-        String fileUrl = "";
+        MultipartFile file = request.getMenuFolderImg();
+        String fileUrl = null;
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
         Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
@@ -130,8 +130,8 @@ public class MenuListService {
         if (request.getMenuFolderTitle() != null) {
             updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
-        if (request.getMenuFolderImgUrl() != null) {
-            MultipartFile file = request.getMenuFolderImgUrl();
+        if (request.getMenuFolderImg() != null) {
+            MultipartFile file = request.getMenuFolderImg();
             String fileUrl = "";
 
             try {
