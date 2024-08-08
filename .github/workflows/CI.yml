@@ -32,7 +32,37 @@ jobs:
           --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create MySQL container with volume
+        run: |
+          docker run -d \
+            --name mysql_db \
+            -e MYSQL_DATABASE=users_db \
+            -e MYSQL_ROOT_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+            -v ${{ github.workspace }}/mysql/data:/var/lib/mysql \
+            -v ${{ github.workspace }}/mysql/config:/etc/mysql/conf.d \
+            -v ${{ github.workspace }}/mysql/init:/docker-entrypoint-initdb.d \
+            -p 3307:3306 \
+            mysql/mysql-server:5.7 \
+            mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+      - name: Wait for MySQL to be healthy
+        run: |
+          for i in {1..10}; do
+            if docker exec mysql_db mysqladmin ping --silent; then
+              echo "MySQL is healthy!"
+              break
+            else
+              echo "Waiting for MySQL to be healthy..."
+              sleep 5
+            fi
+          done
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
