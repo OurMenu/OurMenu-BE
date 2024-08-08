@@ -1,5 +1,69 @@
 use users_db
 
+create table article (
+                         article_id bigint not null auto_increment,
+                         created_at datetime(6),
+                         modified_at datetime(6),
+                         user_id bigint,
+                         views bigint,
+                         content varchar(255),
+                         thumbnail varchar(255),
+                         title varchar(255),
+                         status enum ('CREATED','DELETED','UPDATED'),
+                         primary key (article_id)
+) engine=InnoDB;
+
+create table article_menu (
+                              article_id bigint,
+                              article_menu_id bigint not null auto_increment,
+                              price bigint,
+                              image varchar(255),
+                              title varchar(255),
+                              primary key (article_menu_id)
+) engine=InnoDB;
+
+create table jdbc_entity (
+                             id bigint not null auto_increment,
+                             name varchar(255),
+                             primary key (id)
+) engine=InnoDB;
+
+create table menu (
+                      price integer not null,
+                      created_at datetime(6),
+                      group_id bigint,
+                      menu_id bigint not null auto_increment,
+                      menulist_id bigint,
+                      modified_at datetime(6),
+                      place_id bigint,
+                      user_id bigint,
+                      icon varchar(255),
+                      memo varchar(255),
+                      title varchar(255),
+                      status enum ('CREATED','DELETED','UPDATED'),
+                      primary key (menu_id)
+) engine=InnoDB;
+
+create table menu_image (
+                            menu_id bigint,
+                            menu_image_id bigint not null auto_increment,
+                            url varchar(255),
+                            primary key (menu_image_id)
+) engine=InnoDB;
+
+create table menu_list (
+                           created_at datetime(6),
+                           menulist_id bigint not null auto_increment,
+                           modified_at datetime(6),
+                           priority bigint,
+                           user_id bigint,
+                           icon_type varchar(255),
+                           title varchar(255),
+                           image tinytext,
+                           status enum ('CREATED','DELETED','UPDATED'),
+                           primary key (menulist_id)
+) engine=InnoDB;
+
 create table menu_tag (
                           menu_id bigint,
                           menu_tag_id bigint not null auto_increment,

@@ -253,6 +253,14 @@ public class MenuListService {
         return "OK";
     }
 
+    @Transactional(readOnly = true)
+    public MenuList findMenuListById(Long menuFolderId, Long userId) {
+        // Optional로 감싸서 null 체크 및 예외 처리
+        return menuListRepository.findByIdAndUserId(menuFolderId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 메뉴판이 존재하지 않습니다."));
+    }
+
+
     /** 메뉴판 메뉴 추가 */
     /*
 

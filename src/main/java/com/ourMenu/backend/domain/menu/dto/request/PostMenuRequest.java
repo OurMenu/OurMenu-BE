@@ -17,12 +17,15 @@ public class PostMenuRequest {
     private int menuPrice;
     private String menuMemo;
     private String menuIcon;
-    private String menuFolderTitle;
+    //private String menuFolderTitle;
 
     // 식당 관련 정보
     private StoreRequestDTO storeInfo;
 
     // 태그 관련 정보
     private List<TagRequestDto> tagInfo;
+
+    private List<Long> menuFolderIds;
+
 
 }
