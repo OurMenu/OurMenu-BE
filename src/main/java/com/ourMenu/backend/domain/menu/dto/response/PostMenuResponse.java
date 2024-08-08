@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PostMenuResponse {
-    private Long menuId;
+    private Long menuGroupId;
 }
