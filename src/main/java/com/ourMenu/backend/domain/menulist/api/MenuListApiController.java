@@ -57,6 +57,7 @@ public class MenuListApiController {
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
+                .menuList(menuList.getMenus())
                 .build();
 
         return ApiUtils.success(response);
