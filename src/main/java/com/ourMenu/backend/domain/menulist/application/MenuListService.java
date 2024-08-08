@@ -2,6 +2,8 @@ package com.ourMenu.backend.domain.menulist.application;
 
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuImage;
+import com.ourMenu.backend.domain.menu.domain.MenuTag;
 import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
@@ -103,11 +105,57 @@ public class MenuListService {
                 .priority(newPriority)
                 .build();
 
+//        if (!menus.isEmpty()) {
+//            for (Menu menu : menus) {
+//                Menu copiedMenu = Menu.builder()
+//                        .title(menu.getTitle())
+//                        .price(menu.getPrice())
+//                        .status(menu.getStatus())
+//                        .createdAt(menu.getCreatedAt())
+//                        .modifiedAt(menu.getModifiedAt())
+//                        .memo(menu.getMemo())
+//                        .icon(menu.getIcon())
+//                        .images(menu.getImages())
+//                        .tags(menu.getTags())
+//                        .build();
+//
+//
+//                copiedMenu.confirmMenuList(menuList); // 명시적으로 Menu에 MenuList 설정
+//
+//            }
+//        }
+
         if (!menus.isEmpty()) {
             for (Menu menu : menus) {
-                Menu copiedMenu = menu;
-                copiedMenu.confirmMenuList(menuList); // 명시적으로 Menu에 MenuList 설정
+                // 복사된 메뉴 생성
+                Menu copiedMenu = Menu.builder()
+                        .title(menu.getTitle())
+                        .price(menu.getPrice())
+                        .status(menu.getStatus())
+                        .createdAt(menu.getCreatedAt())
+                        .modifiedAt(menu.getModifiedAt())
+                        .memo(menu.getMemo())
+                        .icon(menu.getIcon())
+                        .user(user)
+                        .images(new ArrayList<>(menu.getImages().stream()
+                                .map(image -> MenuImage.builder()
+                                        .url(image.getUrl())
+                                        .menu(menu) // 기존 메뉴가 아니라 새 메뉴로 설정
+                                        .build())
+                                .collect(Collectors.toList())))
+                        .tags(new ArrayList<>(menu.getTags().stream()
+                                .map(tag -> MenuTag.builder()
+                                        .tag(tag.getTag())
+                                        .menu(menu) // 기존 메뉴가 아니라 새 메뉴로 설정
+                                        .build())
+                                .collect(Collectors.toList())))
+                        .place(menu.getPlace())
+                        .build();
+                menuRepository.save(copiedMenu);
 
+                // 복사된 메뉴와 메뉴판 연결
+                copiedMenu.confirmMenuList(menuList);
+//                menuList.addMenu(copiedMenu); // 메뉴판에 복사된 메뉴 추가
             }
         }
 
