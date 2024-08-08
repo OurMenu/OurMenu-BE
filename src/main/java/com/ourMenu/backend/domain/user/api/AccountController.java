@@ -5,6 +5,7 @@ import com.ourMenu.backend.domain.user.api.response.AuthEmailResponse;
 import com.ourMenu.backend.domain.user.api.response.LoginResponse;
 import com.ourMenu.backend.domain.user.application.AccountService;
 import com.ourMenu.backend.domain.user.application.EmailService;
+import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.exception.AuthEmailException;
 import com.ourMenu.backend.domain.user.exception.EmailDuplicationException;
 import com.ourMenu.backend.domain.user.exception.UserException;
@@ -52,7 +53,8 @@ public class AccountController {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
-        // TODO: Add logic to ensure email exists
+        if(accountService.isDuplicatedEmail(request.getEmail()))
+            throw new UserException(ErrorCode.DUPLICATED_EMAIL_ERROR);
         String code = emailService.sendMail(request.getEmail());
         log.info("success sending! email: {} / code: {}", request.getEmail(), code);
         return ApiUtils.success(new AuthEmailResponse(code));

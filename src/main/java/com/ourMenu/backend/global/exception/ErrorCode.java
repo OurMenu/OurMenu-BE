@@ -18,8 +18,9 @@ public enum ErrorCode {
 
     // user
     EMAIL_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "G5001", "유효하지 않은 이메일입니다"),
-    INVALID_PASSWORD_ERROR(HttpStatus.UNAUTHORIZED, "G5002", "올바르지 않은 비밀번호입니다"),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "G5003", "유저가 존재하지 않습니다."),
+    DUPLICATED_EMAIL_ERROR(HttpStatus.BAD_REQUEST, "G5002", "이미 존재하는 이메일입니다"),
+    INVALID_PASSWORD_ERROR(HttpStatus.UNAUTHORIZED, "G5003", "올바르지 않은 비밀번호입니다"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "G5004", "유저가 존재하지 않습니다."),
 
     //search
     SEARCH_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND,"S404","검색 결과가 없습니다"),
