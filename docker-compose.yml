@@ -21,8 +21,11 @@ services:
       TZ: 'Asia/Seoul'
     ports:
       - "3307:3306"
-    #volumes:
-    #  - ./mysql/conf.d:/etc/mysql/conf.d # MySQL 설정 파일 위치
+
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/config:/etc/mysql/conf.d
+      - ./mysql/init:/docker-entrypoint-initdb.d
     command:
       - "mysqld"
       - "--character-set-server=utf8mb4"
@@ -46,6 +49,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DATA_MONGODB_URL: ${MONGODB_URL}
       SPRING_SWAGGER_SERVER_URL: https://bluesparrow.shop
+
       #auth
       SPRING_MAIL_USERNAME: ${GMAIL_ADDRESS}
       SPRING_MAIL_PASSWORD: ${GMAIL_PASSWORD}

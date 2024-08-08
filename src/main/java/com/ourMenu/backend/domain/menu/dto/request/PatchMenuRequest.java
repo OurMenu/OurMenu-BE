@@ -23,4 +23,6 @@ public class PatchMenuRequest {
     // 태그 관련 정보
     private List<TagRequestDto> tagInfo;
 
+    // 메뉴판 관련 정보
+    private List<Long> menuFolderIds;
 }
