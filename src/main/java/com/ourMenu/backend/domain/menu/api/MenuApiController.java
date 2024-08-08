@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.menu.api;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
 import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
@@ -16,12 +17,15 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping("/menu")
@@ -32,6 +36,7 @@ public class MenuApiController {
     private final MenuService menuService;
 
     private final MenuListService menuListService;
+    private final MenuRepository menuRepository;
 
     @ExceptionHandler(MenuNotFoundException.class)
     public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
@@ -46,28 +51,42 @@ public class MenuApiController {
     }
 
     // 이미지 추가
-    @PostMapping("/photo")
+    @PostMapping(value = "/photo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
         menuService.createMenuImage(photoRequest);
         return ApiUtils.success("OK");
     }
 
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String menuTitle,
+                                              @RequestParam(required = false) String menuTag,
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+        List<Menu> menus = menuRepository.findMenusByCriteria(menuTitle, menuTag, menuFolderId, userId);
+        List<MenuDto> menuDtos = MenuDto.toDto(menus);
+
+        return ApiUtils.success(menuDtos);
+    }
+
     // 삭제
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenu (@PathVariable Long id, @UserId Long userId){
-        String response = menuService.removeMenu(id, userId);       // Hard Delete
+    @DeleteMapping("/{menuId}")
+    public ApiResponse<String> removeMenu (@PathVariable Long menuId, @UserId Long userId){
+        String response = menuService.removeMenu(menuId, userId);       // Hard Delete
         return ApiUtils.success(response);  //OK 반환
     }
 
-    @PatchMapping("/{id}")
-    public ApiResponse<String> updateMenu (@PathVariable Long id, @UserId Long userId, PatchMenuRequest patchMenuRequest){
-        menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
+    @PatchMapping("/{menuId}")
+    public ApiResponse<String> updateMenu (@PathVariable Long menuId, @UserId Long userId, PatchMenuRequest patchMenuRequest){
+        menuService.updateMenu(menuId, userId, patchMenuRequest);       // Hard Delete
         return ApiUtils.success("OK");  //OK 반환
     }
 
-    @PatchMapping("/{id}/photo")
-    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, PatchMenuImage patchMenuImage){
-        menuService.updateMenuImage(patchMenuImage, id, userId);
+
+    @PatchMapping(value = "/{menuId}/photo",
+            consumes = MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> updateMenuImages(@PathVariable Long menuId, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
+        menuService.updateMenuImage(patchMenuImage, menuId, userId);
+
         return ApiUtils.success("OK");
     }
 
@@ -79,134 +98,27 @@ public class MenuApiController {
                 PlaceMenuDTO.builder()
                         .menuId(menu.getId())
                         .menuTitle(menu.getTitle())
-                        .price(menu.getPrice())
-                        .icon(menu.getIcon())
-                        .tags(menu.getTags().stream().map(tag ->
+                        .menuPrice(menu.getPrice())
+                        .menuIcon(menu.getIcon())
+                        .menuTags(menu.getTags().stream().map(tag ->
                                 TagDTO.builder()
                                         .tagTitle(tag.getTag().getName())
                                         .isCustom(tag.getTag().getIsCustom())
                                         .build())
                                 .collect(Collectors.toList())
                         )
-                        .images(menu.getImages())
+                        .menuImgsUrl(menu.getImages().stream().map(image ->
+                                        MenuImageDto.builder() // ImageDTO 클래스에 맞게 수정
+                                                .menuImgUrl(image.getUrl()) // 이미지 URL 필드 예시
+                                                .build())
+                                .collect(Collectors.toList())
+                        )
                         .menuFolder(PlaceMenuFolderDTO.builder()
                                 .menuFolderTitle(menu.getMenuList().getTitle())
-                                .icon(menu.getMenuList().getIconType())
+                                .menuIcon(menu.getMenuList().getIconType())
                                 .build())
                         .build())
                 .collect(Collectors.toList());
         return ApiUtils.success(response);
     }
-
-    @GetMapping("/menuInfo/{menuId}")
-    public ApiResponse<MenuInfoDTO> findMenuInfo(@PathVariable Long menuId, @UserId Long userId){
-        Menu menu = menuService.findMenuInfo(menuId, userId);
-        MenuInfoDTO response = MenuInfoDTO.builder()
-                .menuId(menu.getId())
-                .placeId(menu.getPlace().getId())
-                .menuTitle(menu.getTitle())
-                .price(menu.getPrice())
-                .memo(menu.getMemo())
-                .icon(menu.getIcon())
-                .tags(menu.getTags().stream().map(tag ->
-                                TagDTO.builder()
-                                        .tagTitle(tag.getTag().getName())
-                                        .isCustom(tag.getTag().getIsCustom())
-                                        .build())
-                        .collect(Collectors.toList()))
-                .images(menu.getImages())
-                .menuFolder(PlaceMenuFolderDTO.builder()
-                        .menuFolderTitle(menu.getMenuList().getTitle())
-                        .icon(menu.getMenuList().getIconType())
-                        .build())
-                .build();
-
-        return ApiUtils.success(response);
-    }
-    /*
-    ID를 통한 메뉴 조회
-
-    @GetMapping("/{id}")
-    public ApiResponse<MenuDto> getMenuById(@PathVariable Long id) {
-        Menu menu = menuService.getMenuById(id);
-
-        MenuDto response = menuDto(menu);
-
-        return ApiUtils.success(response);
-    }
-
-
-    @GetMapping("")
-    public ApiResponse<List<MenuDto>> getAllMenu() {
-        List<Menu> menuList = menuService.getAllMenus();
-        List<MenuDto> responseList = menuList.stream().map(menu -> {
-            return menuDto(menu);
-        }).collect(Collectors.toList());
-
-        return ApiUtils.success(responseList);
-    }
-
-    /*
-    메뉴 삭제
-
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenu(@PathVariable Long id){
-        menuService.deleteMenu(id);
-        return ApiUtils.success("OK");
-    }
-
-//    @PatchMapping("/{id}")
-//    public ApiResponse<PatchMenuResponse> updateMenu(@PathVariable Long id, @RequestParam String title,
-//                                                     @RequestParam String imgUrl,
-//                                                     @RequestParam int price, @RequestParam String memo){
-//        Menu menu = new Menu();
-//        menu.setTitle(title);
-//        menu.setImgUrl(imgUrl);
-//        menu.setPrice(price);
-//        menu.setMemo(memo);
-//
-//        Menu updatedMenu = menuService.updateMenu(id, menu);
-//
-//        PatchMenuResponse response = new PatchMenuResponse();
-//        response.setId(updatedMenu.getId());
-//        response.setTitle(updatedMenu.getTitle());
-//        response.setImgUrl(updatedMenu.getImgUrl());
-//        response.setPrice(updatedMenu.getPrice());
-//        response.setMemo(updatedMenu.getMemo());
-//        response.setCreatedAt(updatedMenu.getCreatedAt());
-//        response.setModifiedAt(updatedMenu.getModifiedAt());
-//        response.setStatus(updatedMenu.getStatus());
-//
-//
-//        return ApiUtils.success(response);
-//    }
-
-
-    메뉴 업데이트
-
-    @PatchMapping("/{id}")
-    public ApiResponse<MenuDto> updateMenu(@PathVariable Long id, @RequestBody PatchMenuRequest patchMenuRequest){
-        Menu updatedMenu = menuService.updateMenu(id, patchMenuRequest);
-
-        MenuDto response = menuDto(updatedMenu);
-        return ApiUtils.success(response);
-    }
-
-
-
-    private static MenuDto menuDto(Menu menu) {
-        MenuDto response = MenuDto.builder()
-                        .id(menu.getId())
-                .title(menu.getTitle())
-                .price(menu.getPrice())
-                .imgUrl(menu.getImgUrl())
-                .createdAt(menu.getCreatedAt())
-                .modifiedAt(menu.getModifiedAt())
-                .memo(menu.getMemo())
-                .status(menu.getStatus())
-                .build();
-        return response;
-    }
-
-     */
 }

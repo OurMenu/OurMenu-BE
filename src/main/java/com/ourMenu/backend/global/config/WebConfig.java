@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
                         "/dummy/**",
-                        "/place/info",
+                        "/place/search",
                         "/onboarding");
     }
 

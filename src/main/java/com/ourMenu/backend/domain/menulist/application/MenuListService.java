@@ -14,7 +14,6 @@ import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +58,7 @@ public class MenuListService {
 
     @Transactional
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
-        MultipartFile file = request.getImg();
+        MultipartFile file = request.getMenuFolderImgUrl();
         String fileUrl = "";
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
@@ -84,10 +83,10 @@ public class MenuListService {
         }
 
         MenuList menuList = MenuList.builder()
-                .title(request.getTitle())
+                .title(request.getMenuFolderTitle())
                 .imgUrl(fileUrl)
                 .user(user)
-                .iconType(request.getIconType())
+                .iconType(request.getMenuFolderIcon())
                 .priority(newPriority)
                 .build();
 
@@ -129,11 +128,11 @@ public class MenuListService {
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
 
-        if (request.getTitle() != null) {
-            updateMenuListBuilder.title(request.getTitle());
+        if (request.getMenuFolderTitle() != null) {
+            updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
-        if (request.getImg() != null) {
-            MultipartFile file = request.getImg();
+        if (request.getMenuFolderImgUrl() != null) {
+            MultipartFile file = request.getMenuFolderImgUrl();
             String fileUrl = "";
 
             try {
@@ -153,8 +152,8 @@ public class MenuListService {
             }
         }
 
-            if (request.getIconType() != null) {
-                updateMenuListBuilder.iconType(request.getIconType());
+            if (request.getMenuFolderIcon() != null) {
+                updateMenuListBuilder.iconType(request.getMenuFolderIcon());
             }
 
             MenuList updateMenuList = updateMenuListBuilder.build();

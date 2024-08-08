@@ -2,7 +2,7 @@ package com.ourMenu.backend.domain.menulist.domain;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.user.domain.User;
-import com.ourMenu.backend.global.common.Status;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +24,7 @@ public class MenuList {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Status status = Status.CREATED;
+    private MenuListStatus status = MenuListStatus.CREATED;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -48,7 +48,7 @@ public class MenuList {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = (this.status == null) ? Status.CREATED : this.status;
+        this.status = (this.status == null) ? MenuListStatus.CREATED : this.status;
     }
 
     @PreUpdate
@@ -76,7 +76,7 @@ public class MenuList {
     }
 
     public void softDelete() {
-        this.status = Status.DELETED;
+        this.status = MenuListStatus.DELETED;
         this.priority = null;
     }
 }

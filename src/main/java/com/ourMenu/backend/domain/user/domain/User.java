@@ -25,12 +25,15 @@ public class User {
     private String nickname;
     private String password;
 
+    @Column(name = "created_at", updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
+    @Column(name = "modified_at", insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime modifiedAt;
 
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('CREATED', 'DELETED', 'UPDATED') DEFAULT 'CREATED'")
     @Builder.Default
     private Status status = Status.CREATED;
 

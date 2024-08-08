@@ -1,27 +1,25 @@
 package com.ourMenu.backend.domain.store.api.response;
 
-import com.ourMenu.backend.domain.store.domain.Menu;
 import com.ourMenu.backend.domain.store.domain.Store;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @Getter
 public class GetStoresSearch {
 
-    private String name;
-    private String address;
-    private String type;
-    private List<String> images;
+    private String placeId;
+    private String placeTitle;
+    private String placeAddress;
+    private String placeType;
+    private List<String> placeImgsUrl;
     private List<GetMenuSearch> menus;
-    private String time;
-    private String mapx;
-    private String mapy;
+    private String timeInfo;
+    private String latitude;
+    private String longitude;
 
     public static GetStoresSearch toDto(Store store){
         List<GetMenuSearch> menuList;
@@ -34,14 +32,20 @@ public class GetStoresSearch {
             menuList= Collections.emptyList();
         }
         return GetStoresSearch.builder()
-                .name(store.getName())
-                .address(store.getAddress())
-                .type(store.getType())
-                .images(store.getImages())
+                .placeId(store.getId())
+                .placeTitle(store.getName())
+                .placeAddress(store.getAddress())
+                .placeType(store.getType())
+                .placeImgsUrl(store.getImages())
                 .menus(menuList)
-                .time(store.getTime())
-                .mapx(store.getMapx())
-                .mapy(store.getMapy())
+                .timeInfo(store.getTime())
+                .latitude(formatCoordinate(store.getMapx()))
+                .longitude(formatCoordinate(store.getMapy()))
                 .build();
+    }
+    private static String formatCoordinate(String coordinate) {
+        double value = Double.parseDouble(coordinate) / 10000000.0;
+        return String.format("%.7f", value);
+
     }
 }

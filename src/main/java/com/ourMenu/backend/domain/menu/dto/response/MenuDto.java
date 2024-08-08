@@ -1,20 +1,36 @@
 package com.ourMenu.backend.domain.menu.dto.response;
 
-import com.ourMenu.backend.domain.menu.domain.MenuStatus;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Data
+@Getter
 @Builder
+@AllArgsConstructor
 public class MenuDto {
-    private Long id;
-    private String title;
-    private int price;
-    private String imgUrl;
-    private MenuStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
-    private String memo;
+    private Long menuId;
+    private String menuTitle;
+    private String placeTitle;
+    private String placeAddress;
+    private int menuPrice;
+    private String menuImgUrl;
+
+    public static List<MenuDto> toDto(List<Menu> menus){
+        return menus.stream()
+                .map(menu -> MenuDto.builder()
+                        .menuId(menu.getId())
+                        .menuTitle(menu.getTitle())
+                        .placeTitle(menu.getPlace().getTitle())
+                        .placeAddress(menu.getPlace().getAddress())
+                        .menuPrice(menu.getPrice())
+                        .menuImgUrl(menu.getImages().isEmpty() ? null : menu.getImages().get(0).getUrl())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,19 +24,18 @@ public class PlaceService {
     @Transactional
     public Place createPlace(StoreRequestDTO storeInfo, Long userId) {
 
-        Place existingPlace = placeRepository.findByUserIdAndTitle(userId, storeInfo.getStoreName()).orElse(null);
+        Place existingPlace = placeRepository.findByUserIdAndTitleAndAddress(userId, storeInfo.getStoreName(), storeInfo.getStoreAddress()).orElse(null);
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당하는 유저가 없습니다"));
 
-        log.info("정말 정말 정말 재밌는 스프링 프로젝트.");
+
         if (existingPlace != null) {
-            log.info("기존의 존재하는 음식점 정보입니다.");
             // 필드값 업데이트 (null이 아닌 경우에만)
             if (storeInfo.getStoreAddress() != null) {
                 existingPlace.setAddress(storeInfo.getStoreAddress());
             }
-            if (storeInfo.getStoreInfo() != null) {
-                existingPlace.setInfo(storeInfo.getStoreInfo());
+            if (storeInfo.getStoreMemo() != null) {
+                existingPlace.setInfo(storeInfo.getStoreMemo());
             }
             if (storeInfo.getStoreLongitude() != null) {
                 existingPlace.setLongitude(storeInfo.getStoreLongitude());
@@ -54,7 +53,7 @@ public class PlaceService {
                 .title(storeInfo.getStoreName())
                 .user(user)
                 .address(storeInfo.getStoreAddress())
-                .info(storeInfo.getStoreInfo())
+                .info(storeInfo.getStoreMemo())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .longitude(storeInfo.getStoreLongitude())
@@ -64,5 +63,14 @@ public class PlaceService {
 
     public Place save(Place place) {
         return placeRepository.save(place); // Place 객체를 저장하고 반환
+    }
+
+    /**
+     * GET /place를 위한 메서드
+     * @param userId
+     * @return
+     */
+    public List<Place> findPlacesByUserId(Long userId){
+        return placeRepository.findAllByUserId(userId);
     }
 }

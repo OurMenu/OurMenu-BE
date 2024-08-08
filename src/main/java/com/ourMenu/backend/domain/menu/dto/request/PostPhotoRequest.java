@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostPhotoRequest {
-    private List<MultipartFile> imgs;
+    private List<MultipartFile> menuImgs;
     private long menuId;
 }
