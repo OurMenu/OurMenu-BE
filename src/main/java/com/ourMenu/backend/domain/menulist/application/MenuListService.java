@@ -116,12 +116,12 @@ public class MenuListService {
 
     //메뉴판 업데이트
     @Transactional
-    public MenuList updateMenuList(Long menulistId, MenuListRequestDTO request, Long userId) {
+    public MenuList updateMenuList(Long menuFolderId, MenuListRequestDTO request, Long userId) {
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        MenuList menuList = menuListRepository.findMenuListsById(menulistId, userId, Arrays.asList(CREATED, UPDATED))
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException());
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
@@ -163,12 +163,12 @@ public class MenuListService {
 
     //메뉴판 삭제
     @Transactional
-    public String removeMenuList(Long menuListId, Long userId){
+    public String removeMenuList(Long menuFolderId, Long userId){
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
 //        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
@@ -189,11 +189,11 @@ public class MenuListService {
 
 
     @Transactional
-    public String hardDeleteMenuList(Long menuListId, Long userId){
+    public String hardDeleteMenuList(Long menuFolderId, Long userId){
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        MenuList menuList = menuListRepository.findMenuListsById(menuListId, userId, Arrays.asList(CREATED, UPDATED))
+        MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
 
         Long priority = menuList.getPriority();
@@ -215,8 +215,8 @@ public class MenuListService {
 
 
     @Transactional
-    public String setPriority(Long id, Long newPriority, Long userId) {
-        MenuList menuList = menuListRepository.findById(id)
+    public String setPriority(Long menuFolderId, Long newPriority, Long userId) {
+        MenuList menuList = menuListRepository.findById(menuFolderId)
                 .orElseThrow(() -> new MenuListException());
 
         Long currentPriority = menuList.getPriority();

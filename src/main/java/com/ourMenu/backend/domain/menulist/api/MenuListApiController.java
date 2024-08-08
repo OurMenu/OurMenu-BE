@@ -83,10 +83,10 @@ public class MenuListApiController {
 
     //메뉴판
 
-    @PatchMapping(value = "/{menuListId}",
+    @PatchMapping(value = "/{menuFolderId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuListId, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
-        MenuList menuList = menuListService.updateMenuList(menuListId, request,  userId);
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuFolderId, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
+        MenuList menuList = menuListService.updateMenuList(menuFolderId, request,  userId);
 
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .menuFolderId(menuList.getId())
@@ -108,15 +108,15 @@ public class MenuListApiController {
 //    }
 
     //HardDelete
-    @DeleteMapping("/{menuListId}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
-        String response = menuListService.hardDeleteMenuList(id, userId);
+    @DeleteMapping("/{menuFolderId}")
+    public ApiResponse<String> removeMenuList(@PathVariable Long menuFolderId, @UserId Long userId){
+        String response = menuListService.hardDeleteMenuList(menuFolderId, userId);
         return ApiUtils.success(response);  //OK 반환
     }
 
-    @PatchMapping("/priority/{menuListId}")
-    public ApiResponse<String> changePriority(@PathVariable Long menuListId, @RequestParam Long newPriority, @UserId Long userId){
-        String response = menuListService.setPriority(menuListId, newPriority ,userId);
+    @PatchMapping("/priority/{menuFolderId}")
+    public ApiResponse<String> changePriority(@PathVariable Long menuFolderId, @RequestParam Long newPriority, @UserId Long userId){
+        String response = menuListService.setPriority(menuFolderId, newPriority ,userId);
         return ApiUtils.success(response);
     }
 
