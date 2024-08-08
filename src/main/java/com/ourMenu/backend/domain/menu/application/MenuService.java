@@ -139,7 +139,6 @@ public class MenuService {
     }
 
     // 메뉴 이미지 등록
-
     private List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
         return postMenuRequest.getTagInfo().stream()
                 .map(tagInfo -> {
@@ -163,12 +162,12 @@ public class MenuService {
 
 
     @Transactional
-    public void createMenuImage(PostPhotoRequest request) {
+    public void createMenuImage(PostPhotoRequest request, long userId) {
         List<MultipartFile> imgs = request.getMenuImgs();
-        long menuId = request.getMenuId();
+        long menuGroupId = request.getMenuGroupId();
 
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+        List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(menuGroupId, userId);
+
 
         List<String> fileUrls = new ArrayList<>();
 
@@ -188,19 +187,21 @@ public class MenuService {
                     fileUrls.add(fileUrl); // 변환된 URL 추가해줌
                 }
             } catch (Exception e) {
-                e.getMessage();
+                e.printStackTrace(); // 예외가 발생하면 스택 트레이스를 출력
             }
         }
 
-        List<MenuImage> menuImages = fileUrls.stream()
-                .map(url -> MenuImage.builder()
-                        .url(url)
-                        .menu(menu)
-                        .build())
-                .collect(Collectors.toList());
+        for (Menu menu : findGroupMenu) {
+            List<MenuImage> menuImages = fileUrls.stream()
+                    .map(url -> MenuImage.builder()
+                            .url(url)
+                            .build())
+                    .collect(Collectors.toList());
 
-        for (MenuImage menuImage : menuImages) {
-            menuImage.confirmMenu(menu);
+            for (MenuImage menuImage : menuImages) {
+                menuImage.confirmMenu(menu);
+                // 필요하다면 menuImage를 저장하는 로직도 추가할 수 있습니다.
+            }
         }
     }
 
