@@ -21,6 +21,25 @@ public class GetStoresSearch {
     private String latitude;
     private String longitude;
 
+    public static String processTimeInfo(String timeInfo) {
+        try {
+            String[] lines = timeInfo.split("\n");
+
+            StringBuilder processedTimeInfo = new StringBuilder();
+            for (int i = 1; i < lines.length - 1; i++) {
+                processedTimeInfo.append(lines[i]);
+                if (i < lines.length - 2) {
+                    processedTimeInfo.append("\n");
+                }
+            }
+
+            return processedTimeInfo.toString();
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
     public static GetStoresSearch toDto(Store store){
         List<GetMenuSearch> menuList;
         if (store.getMenu() != null) {
@@ -38,7 +57,7 @@ public class GetStoresSearch {
                 .placeType(store.getType())
                 .placeImgsUrl(store.getImages())
                 .menus(menuList)
-                .timeInfo(store.getTime())
+                .timeInfo(processTimeInfo(store.getTime()))
                 .latitude(formatCoordinate(store.getMapx()))
                 .longitude(formatCoordinate(store.getMapy()))
                 .build();
