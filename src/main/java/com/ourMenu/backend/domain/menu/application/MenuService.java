@@ -68,7 +68,7 @@ public class MenuService {
         }
 
         // 최고 groupId가 null일 경우 1 반환
-        return (maxGroupId != null) ? maxGroupId : 1L;
+        return (maxGroupId != null) ? maxGroupId + 1 : 1L;
     }
 
 
