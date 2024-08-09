@@ -8,6 +8,7 @@ import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.GetMenuListResponse;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
+import com.ourMenu.backend.domain.menulist.exception.PriorityException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.argument_resolver.UserId;
@@ -48,6 +49,11 @@ public class MenuListApiController {
     @ExceptionHandler(ImageLoadException.class)
     public ResponseEntity<?> imageLoadException(ImageLoadException e){
         return ApiUtils.error(ErrorResponse.of(ErrorCode.IMAGE_NOT_LOADED_ERROR, e.getMessage()));
+    }
+
+    @ExceptionHandler(PriorityException.class)
+    public ResponseEntity<?> priorityException(PriorityException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.PRIORITY_NOT_VALID, e.getMessage()));
     }
 
     //메뉴판 등록

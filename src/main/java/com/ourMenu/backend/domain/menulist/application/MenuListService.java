@@ -4,11 +4,13 @@ import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import com.ourMenu.backend.domain.menu.domain.MenuTag;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
+import com.ourMenu.backend.domain.menulist.exception.PriorityException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
@@ -21,13 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,7 +60,7 @@ public class MenuListService {
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
         MultipartFile file = request.getMenuFolderImg() != null ? request.getMenuFolderImg().orElse(null) : null;
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserException());
         Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
         Long newPriority = maxPriority + 1;
 
@@ -94,7 +90,7 @@ public class MenuListService {
         if (menuIdList != null && !menuIdList.isEmpty()) {
             menus = menuIdList.stream()
                     .map(id -> menuRepository.findByIdAndUserId(id, userId)
-                            .orElseThrow(() -> new RuntimeException("Menu not found with id " + id + " for user " + userId)))
+                            .orElseThrow(() -> new MenuNotFoundException()))
                     .collect(Collectors.toList());
         }
 
@@ -170,7 +166,7 @@ public class MenuListService {
     @Transactional(readOnly = true)
     public MenuList getMenuListByName(String title, Long userId) {
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException());
 
         return menuListRepository.findMenuListByTitle(title, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException());
@@ -181,7 +177,7 @@ public class MenuListService {
     public List<MenuList> getAllMenuList(Long userId){
 
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException());
 
         List<MenuList> menuLists = menuListRepository.findMenuListsByUserId(userId, Arrays.asList(Status.CREATED, Status.UPDATED))
                 .orElseThrow(() -> new MenuListException());
@@ -196,7 +192,7 @@ public class MenuListService {
     public MenuList updateMenuList(Long menuFolderId, MenuListRequestDTO request, Long userId) {
 
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException());
 
         MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException());
@@ -257,10 +253,10 @@ public class MenuListService {
     public String removeMenuList(Long menuFolderId, Long userId){
 
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException());
 
         MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
-                .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
+                .orElseThrow(() -> new MenuListException());
 
 //        MenuList.MenuListBuilder removeMenuListBuilder = menuList.toBuilder();
 //
@@ -282,10 +278,10 @@ public class MenuListService {
     @Transactional
     public String hardDeleteMenuList(Long menuFolderId, Long userId){
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException());
 
         MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
-                .orElseThrow(() -> new MenuListException("해당 메뉴판이 존재하지 않습니다."));
+                .orElseThrow(() -> new MenuListException());
 
         Long priority = menuList.getPriority();
 
@@ -318,10 +314,10 @@ public class MenuListService {
                 .orElseThrow(() -> new MenuListException());
 
         Long currentPriority = menuList.getPriority();
-        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElseThrow(() -> new RuntimeException("메뉴판 존재 X"));
+        Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElseThrow(() -> new MenuListException());
 
         if (newPriority <= 0 || newPriority > maxPriority) {
-            throw new RuntimeException("유효하지 않은 우선순위입니다.");
+            throw new PriorityException();
         }
 
         if(currentPriority < newPriority){
@@ -340,7 +336,7 @@ public class MenuListService {
     public MenuList findMenuListById(Long menuFolderId, Long userId) {
         // Optional로 감싸서 null 체크 및 예외 처리
         return menuListRepository.findByIdAndUserId(menuFolderId, userId)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 메뉴판이 존재하지 않습니다."));
+                .orElseThrow(() -> new MenuListException());
     }
 
 
