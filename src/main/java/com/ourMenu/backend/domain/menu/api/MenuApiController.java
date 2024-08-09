@@ -3,8 +3,6 @@ package com.ourMenu.backend.domain.menu.api;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.*;
@@ -17,9 +15,6 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +41,23 @@ public class MenuApiController {
         return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
     }
 
-    @GetMapping("/{groupId}")
-    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String title,
+    // 전체 조회
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getAllMenu(@RequestParam(required = false) String title,
                                               @RequestParam(required = false) String tag,
-                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId, @PathVariable Long groupId) {
-        List<MenuDto> menusByCriteria = menuService.getMenusByCriteria(title, tag, menuFolderId, userId, groupId);
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+        List<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria(title, tag, menuFolderId, userId);
 
         return ApiUtils.success(menusByCriteria);
+    }
+
+
+    // 특정 메뉴 조회
+    @GetMapping("/{groupId}")
+    public ApiResponse<MenuDto> getMenu(@UserId Long userId, @PathVariable Long groupId) {
+        MenuDto certainMenu = menuService.getCertainMenu(userId, groupId);
+
+        return ApiUtils.success(certainMenu);
     }
 
     // 메뉴 생성
