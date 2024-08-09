@@ -181,8 +181,12 @@ public class MenuListService {
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        return menuListRepository.findAllMenuList(Arrays.asList(CREATED, UPDATED), userId)
+        List<MenuList> menuLists = menuListRepository.findMenuListsByUserId(userId, Arrays.asList(Status.CREATED, Status.UPDATED))
                 .orElseThrow(() -> new MenuListException());
+
+        return menuLists.stream()
+                .sorted((ml1, ml2) -> Long.compare(ml1.getPriority(), ml2.getPriority()))
+                .collect(Collectors.toList());
     }
 
     //메뉴판 업데이트

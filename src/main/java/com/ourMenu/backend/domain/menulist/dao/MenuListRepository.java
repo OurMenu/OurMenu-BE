@@ -14,7 +14,6 @@ public interface MenuListRepository extends JpaRepository<MenuList, Long> {
 
     Optional<MenuList> findByIdAndUserId(Long id, Long userId);
 
-
     @Query("SELECT m FROM MenuList m WHERE m.status IN :status AND m.user.id = :userId")
     Optional<List<MenuList>> findAllMenuList(@Param("status")List<Status> status, @Param("userId") Long userId);
 
@@ -38,4 +37,6 @@ public interface MenuListRepository extends JpaRepository<MenuList, Long> {
     @Query("UPDATE MenuList m SET m.priority = m.priority - 1 WHERE m.priority > :currentPriority")
     void decreasePriorityGreaterThan(@Param("currentPriority") Long currentPriority);
 
+    @Query("SELECT m FROM MenuList m WHERE m.user.id = :userId AND m.status IN :status")
+    Optional<List<MenuList>> findMenuListsByUserId(@Param("userId") Long userId, @Param("status") List<Status> status);
 }
