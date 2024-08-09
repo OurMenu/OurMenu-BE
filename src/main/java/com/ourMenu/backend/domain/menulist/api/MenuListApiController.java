@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuGroupIdDTO;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
@@ -115,7 +116,7 @@ public class MenuListApiController {
 
     @PatchMapping(value = "/{menuFolderId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuFolderId, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuFolderId, @UserId Long userId, @ModelAttribute PatchMenuListRequestDTO request){
         MenuList menuList = menuListService.updateMenuList(menuFolderId, request,  userId);
 
         List<MenuGroupIdDTO> menuIdGroupIdList = menuList.getMenus().stream()

@@ -210,11 +210,6 @@ public class MenuListService {
         //이미지 수정
         String fileUrl = menuList.getImgUrl();
 
-            try {
-                if (file != null && !file.isEmpty()) {
-                    // 파일의 원래 이름을 사용하여 S3 키 설정
-//                    String fileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
-                    String fileKey = s3Service.generateFileHash(file);
         try {
             if (file != null && !file.isEmpty()) {
                 String fileKey = s3Service.generateFileHash(file);
