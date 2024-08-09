@@ -10,6 +10,7 @@ import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.global.util.S3Service;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class MenuService {
     private final UserService userService;
     private final EntityManager em;
     private final S3Client s3Client;
+    private final S3Service s3Service;
 
     @Value("${spring.aws.s3.bucket-name}")
     private String bucketName;
@@ -78,6 +80,7 @@ public class MenuService {
         // 메뉴 이름
         String menuTitle = postMenuRequest.getMenuTitle();
 
+        List<Long> menuFolderIds = postMenuRequest.getMenuFolderIds();
         //
         Long maxGroupId = findMaxGroupId(userId);
 
@@ -91,8 +94,9 @@ public class MenuService {
         boolean isMenuExists = false;
 
         for (Menu menu : place.getMenus()) {
-            if (menu.getTitle().equals(menuTitle)) {
-                isMenuExists = true; // 동일한 메뉴 이름이 있으면 true
+            // 메뉴 제목과 menuFolderId가 모두 일치하는 경우
+            if (menu.getTitle().equals(menuTitle) && menuFolderIds.contains(menu.getMenuList().getId())) {
+                isMenuExists = true; // 제목과 folderId가 모두 일치하면 true
                 break; // 하나라도 찾으면 루프 종료
             }
         }
@@ -102,7 +106,7 @@ public class MenuService {
         }
 
 
-        List<Long> menuFolderIds = postMenuRequest.getMenuFolderIds();
+
 
         // 식당, 메뉴판 연관관계 설정
 
@@ -132,12 +136,6 @@ public class MenuService {
     }
 
 
-    // 메뉴 추가
-    public Menu getMenuById(Long menuId) {
-        return menuRepository.findById(menuId)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
-    }
-
 
     // 메뉴 태그 등록
     private List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
@@ -162,13 +160,15 @@ public class MenuService {
     }
 
 
-    @Transactional
     public void createMenuImage(PostPhotoRequest request, long userId) {
+        log.info("이미지 등록하는 중이다");
         List<MultipartFile> imgs = request.getMenuImgs();
         long menuGroupId = request.getMenuGroupId();
 
         List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(menuGroupId, userId);
-
+        if (findGroupMenu == null || findGroupMenu.isEmpty()) {
+            throw new RuntimeException("해당하는 메뉴가 없습니다");
+        }
 
         List<String> fileUrls = new ArrayList<>();
 
@@ -176,16 +176,12 @@ public class MenuService {
             String fileUrl = "";
             try {
                 if (img != null && !img.isEmpty()) {
-                    String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(img.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+                    String fileName = UUID.randomUUID() + "_" +
+                            URLEncoder.encode(img.getOriginalFilename(), StandardCharsets.UTF_8.toString());
 
-                    s3Client.putObject(PutObjectRequest.builder()
-                                    .bucket(bucketName)
-                                    .key(fileName)
-                                    .build(),
-                            RequestBody.fromBytes(img.getBytes()));
-
-                    fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
-                    fileUrls.add(fileUrl); // 변환된 URL 추가해줌
+                    // S3Service의 uploadFile 메서드를 사용하여 파일 업로드
+                    fileUrl = s3Service.uploadFile(fileName, img); // S3Service를 통해 업로드
+                    fileUrls.add(fileUrl); // 변환된 URL 추가
                 }
             } catch (Exception e) {
                 e.printStackTrace(); // 예외가 발생하면 스택 트레이스를 출력
@@ -317,9 +313,17 @@ public class MenuService {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
+    
     @Transactional
-    public List<MenuDto> getMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId, Long groupId) {
-        List<Menu> menus = menuRepository.findMenusByCriteria(title, tag, menuFolderId, userId, groupId);
+    public MenuDto getCertainMenu(Long userId, Long groupId) {
+        Menu menu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId)
+                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
+        return MenuDto.toDto(menu);
+    }
+
+    @Transactional
+    public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
+        List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
         return MenuDto.toDto(menus);
     }
 
@@ -338,44 +342,4 @@ public class MenuService {
             removeMenu(menu);
         }
     }
-
-
-
-
-    /*
-
-    @Transactional
-    public Menu updateMenu(Long id, PatchMenuRequest patchMenuRequest) {
-        Menu menu = menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Menu not found"));
-
-        if (patchMenuRequest.getTitle() != null) {
-            menu.setTitle(patchMenuRequest.getTitle());
-        }
-        if (patchMenuRequest.getImgUrl() != null) {
-            menu.setImgUrl(patchMenuRequest.getImgUrl());
-        }
-        if (patchMenuRequest.getPrice() != 0) { // 가격이 0이 아닌 경우에만 업데이트
-            menu.setPrice(patchMenuRequest.getPrice());
-        }
-        if (patchMenuRequest.getMemo() != null) {
-            menu.setMemo(patchMenuRequest.getMemo());
-        }
-
-        return menuRepository.save(menu);
-    }
-
-    // 메뉴 삭제 *
-    @Transactional
-    public Menu deleteMenu(Long id) {
-        Menu menu = menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴판이 없습니다."));
-        if (menu != null) {
-            menu.setStatus(MenuStatus.DELETED); // 상태를 'DELETED'로 변경
-            return menuRepository.save(menu); //  상태를 저장
-        } else {
-            return null;
-        }
-    }
-    */
 }
