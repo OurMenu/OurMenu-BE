@@ -68,7 +68,7 @@ public class AccountService {
         MenuListRequestDTO menuListRequestDTO = MenuListRequestDTO.builder()
                 .menuFolderIcon("1")
                 .menuFolderTitle("기본 메뉴판")
-                .menuFolderImg(java.util.Optional.empty())
+                .menuFolderImg(null)
                 .menuIds(Collections.emptyList())
                 .build();
         menuListService.createMenuList(menuListRequestDTO, id);
