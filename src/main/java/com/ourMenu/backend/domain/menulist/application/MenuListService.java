@@ -13,7 +13,9 @@ import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
+import com.ourMenu.backend.global.common.Status;
 import com.ourMenu.backend.global.exception.ErrorCode;
+import com.ourMenu.backend.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,8 +42,8 @@ public class MenuListService {
 
     private final MenuListRepository menuListRepository;
     private final MenuRepository menuRepository;
-    private final S3Client s3Client;
     private final UserService userService;
+    private final S3Service s3Service;
 
     @Value("${spring.aws.s3.bucket-name}")
     private String bucketName;
@@ -71,16 +73,17 @@ public class MenuListService {
 
         try {
             if (file != null && !file.isEmpty()) {
-                String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+//                String fileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
+                String fileKey = s3Service.generateFileHash(file);
+                boolean fileExists = s3Service.doesObjectExist(fileKey);
 
-                s3Client.putObject(PutObjectRequest.builder()
-                                .bucket(bucketName)
-                                .key(fileName)
-                                .build(),
-                        RequestBody.fromBytes(file.getBytes()));
-
-                fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
-
+                if (!fileExists) {
+                    // 새로운 이미지 업로드
+                    fileUrl = s3Service.uploadFile(fileKey, file);
+                } else {
+                    // 중복된 이미지가 이미 존재하는 경우 해당 URL을 반환
+                    fileUrl = s3Service.getExistingFileUrl(fileKey);
+                }
             }
         }catch (Exception e) {
             throw new ImageLoadException();
@@ -165,7 +168,7 @@ public class MenuListService {
     }
 
     // 메뉴판 조회 //
-    @Transactional
+    @Transactional(readOnly = true)
     public MenuList getMenuListByName(String title, Long userId) {
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
@@ -175,7 +178,7 @@ public class MenuListService {
     }
 
     //메뉴판 전체 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public List<MenuList> getAllMenuList(Long userId){
 
         User user = userService.getUserById(userId)
@@ -201,24 +204,38 @@ public class MenuListService {
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
-
+        //제목 수정
         if (request.getMenuFolderTitle() != null) {
             updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
-        if (request.getMenuFolderImg() != null) {
+
+
+        //이미지 수정
+        if (request.getMenuFolderImg().isPresent()) {
             MultipartFile file = request.getMenuFolderImg().orElseThrow(() -> new RuntimeException());
             String fileUrl = "";
 
             try {
                 if (file != null && !file.isEmpty()) {
-                    String fileName = UUID.randomUUID() + "_" + URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
-                    s3Client.putObject(PutObjectRequest.builder()
-                                    .bucket(bucketName)
-                                    .key(fileName)
-                                    .build(),
-                            Paths.get(file.getOriginalFilename()));
+                    // 파일의 원래 이름을 사용하여 S3 키 설정
+//                    String fileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
+                    String fileKey = s3Service.generateFileHash(file);
 
-                    fileUrl = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+                    // S3에 파일이 이미 존재하는지 확인
+                    boolean fileExists = s3Service.doesObjectExist(fileKey);
+
+                    if (!fileExists) {
+                        // 기존 이미지 삭제
+                        if (menuList.getImgUrl() != null && !menuList.getImgUrl().isEmpty()) {
+                            s3Service.deleteFile(menuList.getImgUrl());
+                        }
+
+                        fileUrl = s3Service.uploadFile(fileKey, file);
+                    } else {
+                        // 중복된 이미지가 이미 존재하는 경우 해당 URL을 반환
+                        fileUrl = s3Service.getExistingFileUrl(fileKey);
+                    }
+
                     updateMenuListBuilder.imgUrl(fileUrl);
                 }
             } catch (Exception e) {
