@@ -140,7 +140,8 @@ public class MenuService {
 
 
     // 메뉴 태그 등록
-    private List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
+    @Transactional
+    public List<MenuTag> createMenuTags(PostMenuRequest postMenuRequest, Menu menu) {
         return postMenuRequest.getTagInfo().stream()
                 .map(tagInfo -> {
                     Tag tag = tagService.findByName(tagInfo.getTagTitle())
@@ -162,6 +163,7 @@ public class MenuService {
     }
 
 
+    @Transactional
     public void createMenuImage(PostPhotoRequest request, long userId) {
         log.info("이미지 등록하는 중이다");
         List<MultipartFile> imgs = request.getMenuImgs();
@@ -199,7 +201,6 @@ public class MenuService {
 
             for (MenuImage menuImage : menuImages) {
                 menuImage.confirmMenu(menu);
-                // 필요하다면 menuImage를 저장하는 로직도 추가할 수 있습니다.
             }
         }
     }
