@@ -4,7 +4,6 @@ import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import com.ourMenu.backend.domain.menu.domain.MenuTag;
-import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
@@ -290,25 +289,18 @@ public class MenuListService {
 
         Long priority = menuList.getPriority();
 
-        List<Menu> menus = menuList.getMenus();
+        List<Long> menus = menuList.getMenus().stream().map(m -> m.getId()).collect(Collectors.toList());
 
+        for (Long menuId : menus) {
+            Menu menu = menuRepository.findMenuByUserId(menuId, userId).orElseThrow(() -> new RuntimeException());
+            String placeName = menu.getPlace().getTitle();
+            String title = menuList.getTitle();
 
-        for (Menu menu : menus) {
-            menuList.removeMenu(menu);
-//            menu.removeMenuList(menuList);
-//            menuRepository.delete(menu);
-            user.getId(); // 프록시 초기화
-
-            Place place = menu.getPlace();
-            String placeName = place.getTitle(); // 프록시 초기화
-
-            String title = menuList.getTitle(); // 프록시 초기화
-
-            // 삭제 시 연관관계 제거
+            // 연관 관계 제거
             menu.removeMenuList(menuList);
-            menu.removePlace(place);
+            menu.removePlace(menu.getPlace());
             menu.removeUser(user);
-            menu.getTags().forEach(menuTag -> menuTag.removeTag());
+            menu.getTags().forEach(MenuTag::removeTag);
 
             menuRepository.delete(menu);
         }
