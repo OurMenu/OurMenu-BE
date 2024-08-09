@@ -1,5 +1,7 @@
 package com.ourMenu.backend.domain.user.application;
 
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
+import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.api.request.LoginRequest;
 import com.ourMenu.backend.domain.user.api.request.ReissueTokenRequest;
 import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,6 +36,7 @@ public class AccountService {
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MenuListService menuListService;
 
     private LoginResponse makeLoginResponse(long id) {
         String GRANT_TYPE = "Bearer";
@@ -59,6 +63,15 @@ public class AccountService {
         request.setPassword(encodedPassword);
 
         long id = userDao.createUser(request);
+
+        // 기본 메뉴판 생성
+        MenuListRequestDTO menuListRequestDTO = MenuListRequestDTO.builder()
+                .menuFolderIcon("1")
+                .menuFolderTitle("기본 메뉴판")
+                .menuFolderImg(java.util.Optional.empty())
+                .menuIds(Collections.emptyList())
+                .build();
+        menuListService.createMenuList(menuListRequestDTO, id);
 
         return makeLoginResponse(id);
     }
