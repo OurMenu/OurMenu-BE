@@ -5,36 +5,49 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @Builder
 @AllArgsConstructor
 public class MenuDto {
-    private Long menuId;
-    private String menuTitle;
+    private Long groupId;
+    private String menuTitle;        // menuId 필드 제거
     private String placeTitle;
     private String placeAddress;
     private int menuPrice;
     private String menuImgUrl;
-    private Long groupId;
+
 
     public static List<MenuDto> toDto(List<Menu> menus) {
-        return menus.stream()
-                .map(MenuDto::fromMenu)
-                .collect(Collectors.toList());
+        List<MenuDto> dtoList = new ArrayList<>();
+        Set<String> uniqueKeys = new HashSet<>();
+
+        for (Menu menu : menus) {
+            MenuDto dto = fromMenu(menu);
+            String uniqueKey = dto.getMenuTitle() + "|" + dto.getPlaceTitle() + "|" +
+                    dto.getPlaceAddress() + "|" + dto.getMenuPrice() + "|" +
+                    dto.getGroupId();
+
+            if (!uniqueKeys.contains(uniqueKey)) {
+                uniqueKeys.add(uniqueKey);
+                dtoList.add(dto);
+            }
+        }
+
+        return dtoList;
     }
 
-    // 단일 Menu 객체를 받아 DTO로 변환하는 메서드
     public static MenuDto toDto(Menu menu) {
         return fromMenu(menu);
     }
 
-    // Menu 객체를 DTO로 변환하는 내부 메서드
     private static MenuDto fromMenu(Menu menu) {
         return MenuDto.builder()
-                .menuId(menu.getId())
                 .menuTitle(menu.getTitle())
                 .placeTitle(menu.getPlace().getTitle())
                 .placeAddress(menu.getPlace().getAddress())

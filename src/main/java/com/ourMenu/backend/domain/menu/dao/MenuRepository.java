@@ -32,8 +32,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "JOIN mt.tag t " +
             "WHERE m.user.id = :userId " +
             "AND m.groupId = :groupId")
-    Optional<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
-                                      @Param("groupId") Long groupId);
+    List<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
+                                                     @Param("groupId") Long groupId);
 
 
     @Query("SELECT m FROM Menu m " +

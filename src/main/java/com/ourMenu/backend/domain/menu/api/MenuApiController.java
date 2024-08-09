@@ -54,8 +54,8 @@ public class MenuApiController {
 
     // 특정 메뉴 조회
     @GetMapping("/{groupId}")
-    public ApiResponse<MenuDto> getMenu(@UserId Long userId, @PathVariable Long groupId) {
-        MenuDto certainMenu = menuService.getCertainMenu(userId, groupId);
+    public ApiResponse<List<MenuDto>> getMenu(@UserId Long userId, @PathVariable Long groupId) {
+        List<MenuDto> certainMenu = menuService.getCertainMenu(userId, groupId);
 
         return ApiUtils.success(certainMenu);
     }

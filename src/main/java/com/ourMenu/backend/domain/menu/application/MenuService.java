@@ -165,11 +165,12 @@ public class MenuService {
 
     @Transactional
     public void createMenuImage(PostPhotoRequest request, long userId) {
-        log.info("이미지 등록하는 중이다");
-        List<MultipartFile> imgs = request.getMenuImgs();
-        long menuGroupId = request.getMenuGroupId();
 
-        List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(menuGroupId, userId);
+        List<MultipartFile> imgs = request.getMenuImgs();
+        long groupId = request.getMenuGroupId();
+
+
+        List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(userId, groupId);
         if (findGroupMenu == null || findGroupMenu.isEmpty()) {
             throw new RuntimeException("해당하는 메뉴가 없습니다");
         }
@@ -227,7 +228,7 @@ public class MenuService {
 
     @Transactional
     public String updateMenuImage(PatchMenuImage patchMenuImage, long id, long userId) {
-        log.info("현재 id 값은 : " + id);
+
         Menu menu = menuRepository.findMenuAndImages(id)
                 .orElseThrow(() -> new RuntimeException("해당하는 매뉴가 없습니다."));
 
@@ -236,7 +237,7 @@ public class MenuService {
         List<String> fileUrls = new ArrayList<>();
         if(imgs != null) {
             removeImages(menu);
-            log.info("메뉴 이미지 삭제 ");
+
             for (MultipartFile img : imgs) {
                 String fileUrl = "";
                 try {
@@ -318,16 +319,16 @@ public class MenuService {
 
     
     @Transactional
-    public MenuDto getCertainMenu(Long userId, Long groupId) {
-        Menu menu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
-        return MenuDto.toDto(menu);
+    public List<MenuDto> getCertainMenu(Long userId, Long groupId) {
+        List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
+
+        return MenuDto.toDto(certainMenu);
     }
 
     @Transactional
     public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
         List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
-        return MenuDto.toDto(menus);
+        return MenuDto.toDto(menus); // List<MenuDto> 반환
     }
 
     @Transactional
