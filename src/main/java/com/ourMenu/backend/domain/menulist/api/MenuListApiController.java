@@ -112,12 +112,20 @@ public class MenuListApiController {
     public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuFolderId, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
         MenuList menuList = menuListService.updateMenuList(menuFolderId, request,  userId);
 
+        List<MenuGroupIdDTO> menuIdGroupIdList = menuList.getMenus().stream()
+                .map(menu -> MenuGroupIdDTO.builder()
+                        .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
+                        .build())
+                .collect(Collectors.toList());
+
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .menuFolderId(menuList.getId())
                 .menuFolderTitle(menuList.getTitle())
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
+                .menuIds(menuIdGroupIdList)
                 .build();
 
         return ApiUtils.success(response);
