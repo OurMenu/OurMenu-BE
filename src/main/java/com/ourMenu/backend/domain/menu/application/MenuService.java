@@ -92,17 +92,19 @@ public class MenuService {
         Place place = placeService.createPlace(postMenuRequest.getStoreInfo(), userId);
 
         boolean isMenuExists = false;
+        Long existingId = null;
 
         for (Menu menu : place.getMenus()) {
             // 메뉴 제목과 menuFolderId가 모두 일치하는 경우
             if (menu.getTitle().equals(menuTitle) && menuFolderIds.contains(menu.getMenuList().getId())) {
+                existingId = menu.getMenuList().getId(); // 기존 메뉴의 ID를 저장
                 isMenuExists = true; // 제목과 folderId가 모두 일치하면 true
                 break; // 하나라도 찾으면 루프 종료
             }
         }
 
-        if(isMenuExists){
-            throw new RuntimeException("해당 식당에 동일한 메뉴명이 이미 존재합니다");
+        if (isMenuExists) {
+            throw new RuntimeException("해당 식당에 이미 동일한 메뉴명이 존재합니다. 메뉴판 ID: " + existingId + " (해당 메뉴판에서 확인해주세요.)");
         }
 
 
