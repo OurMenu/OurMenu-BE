@@ -5,6 +5,7 @@ import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import com.ourMenu.backend.domain.menu.domain.MenuTag;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
+import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
@@ -189,7 +190,7 @@ public class MenuListService {
 
     //메뉴판 업데이트
     @Transactional
-    public MenuList updateMenuList(Long menuFolderId, MenuListRequestDTO request, Long userId) {
+    public MenuList updateMenuList(Long menuFolderId, PatchMenuListRequestDTO request, Long userId) {
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException());
