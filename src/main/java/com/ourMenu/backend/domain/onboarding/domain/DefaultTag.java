@@ -1,5 +1,7 @@
 package com.ourMenu.backend.domain.onboarding.domain;
 
+import java.util.Random;
+
 public enum DefaultTag {
 
     KOREA("한식","집밥이 그리울 땐,"),
@@ -14,7 +16,7 @@ public enum DefaultTag {
     FISH("생선","부드러운 속살의 고소한 생선이 떠오를 땐,"),
     DESSERT("디저트","달달한 디저트가 땡길 땐,"),
     CAFE("카페","커피가 생각날 땐,"),
-    FASTFOOD("패스트푸드","빠르고 맛있게!"),
+    FAST_FOOD("패스트푸드","빠르고 맛있게!"),
     SPICY("매콤함","스트레스 풀리는 매콤함,"),
     SWEET("달달함","기분 좋아지는 달달함,"),
     COOL("시원함","더위가 사라지는 시원함,"),
@@ -27,8 +29,6 @@ public enum DefaultTag {
     DATE("데이트","데이트 하는 날엔,"),
     BUY_FOOD("밥약","밥약하기 좋은 곳,"),
     ORGANIZATION("단체","단체로 방문한다면,")
-
-
     ;
 
     private String TagName;
@@ -37,5 +37,12 @@ public enum DefaultTag {
     DefaultTag(String tagName, String tagMemo) {
         TagName = tagName;
         TagMemo = tagMemo;
+    }
+
+    public static DefaultTag getRandomTag(){
+        DefaultTag[] tags = DefaultTag.values();
+        Random random = new Random();
+        int randomValue = random.nextInt(26);
+        return tags[randomValue];
     }
 }
