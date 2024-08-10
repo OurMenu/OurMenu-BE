@@ -45,7 +45,7 @@ public enum DefaultTag {
     public static DefaultTag getRandomTag(){
         DefaultTag[] tags = DefaultTag.values();
         Random random = new Random();
-        int randomValue = random.nextInt(26);
+        int randomValue = random.nextInt(25);
         return tags[randomValue];
     }
 }

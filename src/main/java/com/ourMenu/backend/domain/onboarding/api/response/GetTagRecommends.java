@@ -7,11 +7,13 @@ import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
 @AllArgsConstructor
 @Builder
+@Getter
 public class GetTagRecommends {
 
     private String tagName;
@@ -22,7 +24,7 @@ public class GetTagRecommends {
     public static GetTagRecommends toDto(List<MenuDto> menus, DefaultTag tag) {
         List<GetRecommand> recommandList = menus.stream().map(GetRecommand::toDto).toList();
         return GetTagRecommends.builder()
-                .tagName(tag.getTagName())
+                .tagName(tag.getTagMemo())
                 .menus(recommandList)
                 .build();
 
