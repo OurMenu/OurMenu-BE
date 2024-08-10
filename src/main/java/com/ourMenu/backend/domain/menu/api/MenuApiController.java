@@ -15,6 +15,9 @@ import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,20 +45,42 @@ public class MenuApiController {
     }
 
     // 전체 조회
-    @GetMapping("")
-    public ApiResponse<List<MenuDto>> getAllMenu(@RequestParam(required = false) String title,
-                                              @RequestParam(required = false) String tag,
-                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
-        List<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria(title, tag, menuFolderId, userId);
+//    @GetMapping("")
+//    public ApiResponse<List<MenuDto>> getAllMenu(@RequestParam(required = false) String title,
+//                                              @RequestParam(required = false) String tag,
+//                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+//        List<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria(title, tag, menuFolderId, userId);
+//
+//        return ApiUtils.success(menusByCriteria);
+//    }
 
-        return ApiUtils.success(menusByCriteria);
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getAllMenu(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String[] tags, // 태그를 배열로 받도록 수정
+            @RequestParam(required = false) Integer menuFolderId,
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호, 기본값은 0
+            @RequestParam(defaultValue = "5") int size, // 페이지 크기, 기본값은 5
+            @RequestParam int minPrice, // 최소 가격
+            @RequestParam int maxPrice, // 최대 가격
+            @UserId Long userId) {
+
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 서비스 호출
+        Page<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria2(title, tags, menuFolderId, userId, minPrice, maxPrice, pageable);
+
+        log.info("난 하지 못해 이 것");
+        // ApiResponse로 반환
+        return ApiUtils.success(menusByCriteria.getContent());
     }
 
 
     // 특정 메뉴 조회
     @GetMapping("/{groupId}")
-    public ApiResponse<List<MenuDto>> getMenu(@UserId Long userId, @PathVariable Long groupId) {
-        List<MenuDto> certainMenu = menuService.getCertainMenu(userId, groupId);
+    public ApiResponse<MenuDetailDto> getMenu(@UserId Long userId, @PathVariable Long groupId) {
+        MenuDetailDto certainMenu = menuService.getCertainMenu(userId, groupId);
 
         return ApiUtils.success(certainMenu);
     }
@@ -74,28 +99,6 @@ public class MenuApiController {
         menuService.createMenuImage(photoRequest, userId);
         return ApiUtils.success("OK");
     }
-
-//    @GetMapping("")
-//    public ApiResponse<List<MenuDto>> getMenu(
-//            @RequestParam(required = false) String menuTitle,
-//            @RequestParam(required = false) String menuTag,
-//            @RequestParam(required = false) Integer menuFolderId,
-//
-//            @UserId Long userId) {
-//
-//
-//        Page<Menu> menuPage = menuRepository.findMenusByCriteria(menuTitle, menuFolderId, userId);
-//
-//        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
-//
-//        return ApiUtils.success(menuDtos);
-//    }
-
-
-
-
-
-
 
 
     // 삭제

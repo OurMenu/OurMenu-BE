@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
@@ -15,6 +16,9 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -319,16 +323,44 @@ public class MenuService {
 
     
     @Transactional
-    public List<MenuDto> getCertainMenu(Long userId, Long groupId) {
+    public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
         List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
-
-        return MenuDto.toDto(certainMenu);
+        if (certainMenu.isEmpty()) {
+            throw new RuntimeException("해당하는 메뉴가 없습니다");
+        }
+        return MenuDetailDto.toDto(certainMenu);
     }
 
+//    @Transactional
+//    public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
+//        List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+//        return MenuDto.toDto(menus); // List<MenuDto> 반환
+//    }
+
     @Transactional
-    public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
-        List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
-        return MenuDto.toDto(menus); // List<MenuDto> 반환
+    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
+        // 메뉴를 페이징 처리하여 조회
+
+        Integer tagCount = (tags != null && tags.length > 0) ? tags.length : null; // 태그가 없으면 null로 설정
+
+        if (minPrice == 5000) {
+            minPrice = 0; // 기본값: 5,000원 (최소)
+        }
+        if (maxPrice == 50000) {
+            maxPrice = 999999; // 기본값: 무한대 (최대)
+        }
+
+        log.info("가격은 " +minPrice);
+        log.info("가격은 " +maxPrice);
+        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(title, tags, tagCount, menuFolderId, userId, minPrice, maxPrice, pageable);
+
+
+        log.info("Retrieved menuPage: {}", menuPage.getContent());
+        // Menu 엔티티를 MenuDto로 변환
+        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
+
+        // Page<MenuDto> 객체로 변환하여 반환
+        return new PageImpl<>(menuDtos, pageable, menuPage.getTotalElements());
     }
 
     @Transactional

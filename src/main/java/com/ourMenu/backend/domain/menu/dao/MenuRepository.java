@@ -50,35 +50,45 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "JOIN FETCH m.images mi ")        // 메뉴와 메뉴 이미지 조인)           // 특정 메뉴 ID로 필터링
      List<Menu> findMenuWithPlaceAndImages();
 
-    @Query("SELECT DISTINCT m FROM Menu m " +
-            "JOIN FETCH m.place p " +         // 메뉴와 식당 조인
-            "LEFT JOIN FETCH m.images mi " +  // 메뉴와 메뉴 이미지의 LEFT JOIN
-            "JOIN m.tags mt " +               // 중간 테이블을 통해 메뉴 태그 조인
-            "JOIN mt.tag t " +                // 태그 엔티티 조인
-            "WHERE m.user.id = :userId " +    // 유저 아이디 필터
-            "AND m.groupId = :groupId " +      // 그룹 ID 필터
-            "AND (:title IS NULL OR m.title LIKE %:title%) " + // 제목 필터
-            "AND (:tag IS NULL OR t.name LIKE %:tag%) " +       // 태그 필터
-            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId)") // 메뉴판 필터
-    List<Menu> findMenusByCriteria(@Param("title") String title,
-                                   @Param("tag") String tag,
-                                   @Param("menuFolderId") Integer menuFolderId,
-                                   @Param("userId") Long userId,
-                                   @Param("groupId") Long groupId);
 
-    @Query("SELECT DISTINCT m FROM Menu m " +
-            "JOIN FETCH m.place p " +
-            "LEFT JOIN FETCH m.images mi " +
+
+//    @Query("SELECT DISTINCT m FROM Menu m " +
+//            "JOIN FETCH m.place p " +
+//            "LEFT JOIN FETCH m.images mi " +
+//            "JOIN m.tags mt " +
+//            "JOIN mt.tag t " +
+//            "WHERE m.user.id = :userId " +
+//            "AND (:title IS NULL OR m.title LIKE %:title%) " +
+//            "AND (:tag IS NULL OR t.name LIKE %:tag%) " +
+//            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId)") // groupId 필터 제거
+//    List<Menu> findingMenusByCriteria(@Param("title") String title,
+//                                   @Param("tag") String tag,
+//                                   @Param("menuFolderId") Integer menuFolderId,
+//                                   @Param("userId") Long userId);
+
+    @Query("SELECT m FROM Menu m " +
             "JOIN m.tags mt " +
             "JOIN mt.tag t " +
             "WHERE m.user.id = :userId " +
             "AND (:title IS NULL OR m.title LIKE %:title%) " +
-            "AND (:tag IS NULL OR t.name LIKE %:tag%) " +
-            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId)") // groupId 필터 제거
-    List<Menu> findingMenusByCriteria(@Param("title") String title,
-                                   @Param("tag") String tag,
-                                   @Param("menuFolderId") Integer menuFolderId,
-                                   @Param("userId") Long userId);
+            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId) " +
+            "AND (:minPrice IS NULL OR m.price >= :minPrice) " + // 최소 가격 조건
+            "AND (:maxPrice IS NULL OR m.price <= :maxPrice) " + // 최대 가격 조건
+            "AND (:tags IS NULL OR t.name IN :tags) " + // 태그 조건
+            "GROUP BY m.id " +
+            "HAVING (:tagCount IS NULL OR COUNT(DISTINCT t.name) = :tagCount) " + // tagCount가 null인 경우 조건 무시
+            "ORDER BY m.groupId ASC") // groupId를 기준으로 오름차순 정렬
+    Page<Menu> findingMenusByCriteria2(@Param("title") String title,
+                                       @Param("tags") String[] tags, // 태그 배열
+                                       @Param("tagCount") Integer tagCount, // 태그 개수
+                                       @Param("menuFolderId") Integer menuFolderId,
+                                       @Param("userId") Long userId,
+                                       @Param("minPrice") int minPrice,
+                                       @Param("maxPrice") int maxPrice,
+                                       Pageable pageable);
+
+
+
 
 
 
