@@ -1,5 +1,7 @@
 package com.ourMenu.backend.domain.menulist.api;
 
+import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequestDTO;
+import com.ourMenu.backend.domain.menulist.dto.response.MenuGroupIdDTO;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -7,6 +9,7 @@ import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.dto.response.GetMenuListResponse;
 import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
+import com.ourMenu.backend.domain.menulist.exception.PriorityException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.argument_resolver.UserId;
@@ -15,6 +18,7 @@ import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +30,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/menuFolder")
 public class MenuListApiController {
 
@@ -47,17 +52,33 @@ public class MenuListApiController {
         return ApiUtils.error(ErrorResponse.of(ErrorCode.IMAGE_NOT_LOADED_ERROR, e.getMessage()));
     }
 
+    @ExceptionHandler(PriorityException.class)
+    public ResponseEntity<?> priorityException(PriorityException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.PRIORITY_NOT_VALID, e.getMessage()));
+    }
+
     //메뉴판 등록
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MenuListResponseDTO> createMenuList(@ModelAttribute MenuListRequestDTO request, @UserId Long userId){
         MenuList menuList = menuListService.createMenuList(request, userId);
+
+        List<MenuGroupIdDTO> menuIdGroupIdList = menuList.getMenus().stream()
+                .map(menu -> MenuGroupIdDTO.builder()
+                        .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
+                        .build())
+                .collect(Collectors.toList());
+
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .menuFolderId(menuList.getId())
                 .menuFolderTitle(menuList.getTitle())
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
+                .menuIds(menuIdGroupIdList)
                 .build();
+
+//        log.info("menuId = " + menuList.getMenus().stream().map(menu -> menu.getId()));
 
         return ApiUtils.success(response);
 
@@ -69,12 +90,22 @@ public class MenuListApiController {
     public ApiResponse<List<GetMenuListResponse>> findAllMenuList(@UserId Long userId){
         List<MenuList> menuLists = menuListService.getAllMenuList(userId);
         List<GetMenuListResponse> responses = menuLists.stream().map(menuList ->
+
+
                 GetMenuListResponse.builder()
+                        .menuFolderId(menuList.getId())
                         .menuFolderTitle(menuList.getTitle())
                         .menuCount((long) menuList.getMenus().size())
                         .menuFolderImgUrl(menuList.getImgUrl())
                         .menuFolderIcon(menuList.getIconType())
                         .menuFolderPriority(menuList.getPriority())
+                        .menuIds(
+                                menuList.getMenus().stream().map(menu ->
+                                        MenuGroupIdDTO.builder()
+                                                .menuId(menu.getId())
+                                                .groupId(menu.getGroupId())
+                                                .build()
+                        ).collect(Collectors.toList()))
                         .build()
         ).collect(Collectors.toList());
 
@@ -82,103 +113,53 @@ public class MenuListApiController {
     }
 
     //메뉴판
-    @PatchMapping(value = "/{id}",
+
+    @PatchMapping(value = "/{menuFolderId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long id, @UserId Long userId, @ModelAttribute MenuListRequestDTO request){
-        MenuList menuList = menuListService.updateMenuList(id, request,  userId);
+    public ApiResponse<MenuListResponseDTO> updateMenuList(@PathVariable Long menuFolderId, @UserId Long userId, @ModelAttribute PatchMenuListRequestDTO request){
+        MenuList menuList = menuListService.updateMenuList(menuFolderId, request,  userId);
+
+        List<MenuGroupIdDTO> menuIdGroupIdList = menuList.getMenus().stream()
+                .map(menu -> MenuGroupIdDTO.builder()
+                        .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
+                        .build())
+                .collect(Collectors.toList());
+
         MenuListResponseDTO response = MenuListResponseDTO.builder()
                 .menuFolderId(menuList.getId())
                 .menuFolderTitle(menuList.getTitle())
                 .menuFolderImgUrl(menuList.getImgUrl())
                 .menuFolderIcon(menuList.getIconType())
                 .menuFolderPriority(menuList.getPriority())
+                .menuIds(menuIdGroupIdList)
                 .build();
 
         return ApiUtils.success(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
-        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
+
+    //SoftDelete
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<String> removeMenuList(@PathVariable Long id, @UserId Long userId){
+//        String response = menuListService.removeMenuList(id, userId);       //STATUS를 DELETED로 변환
+//        return ApiUtils.success(response);  //OK 반환
+//    }
+
+    //HardDelete
+    @DeleteMapping("/{menuFolderId}")
+    public ApiResponse<String> removeMenuList(@PathVariable Long menuFolderId, @UserId Long userId){
+        String response = menuListService.hardDeleteMenuList(menuFolderId, userId);
         return ApiUtils.success(response);  //OK 반환
     }
 
-    @PatchMapping("/priority/{id}")
-    public ApiResponse<String> changePriority(@PathVariable Long id, @RequestParam Long newPriority, @UserId Long userId){
-        String response = menuListService.setPriority(id, newPriority ,userId);
+    @PatchMapping("/priority/{menuFolderId}")
+    public ApiResponse<String> changePriority(@PathVariable Long menuFolderId, @RequestParam Long newPriority, @UserId Long userId){
+        String response = menuListService.setPriority(menuFolderId, newPriority ,userId);
         return ApiUtils.success(response);
     }
 
     /*
-    메뉴판 등록
-
-    @PostMapping("")
-    public ApiResponse<PostMenuListResponse> saveMenuList(@RequestBody PostMenuListRequest postMenuListRequest) {
-        MenuList menuList = MenuList.builder()
-                .title(postMenuListRequest.getTitle())
-                .imgUrl(postMenuListRequest.getImgUrl())
-                .build();
-
-        MenuList savedMenuList = menuListService.createMenuList(menuList);
-
-        PostMenuListResponse response = PostMenuListResponse.builder()
-                .id(savedMenuList.getId())
-                .build();
-        return ApiUtils.success(response);
-    }
-
-
-    메뉴판 전체 조회
-
-    @GetMapping("")
-    public ApiResponse<List<MenuListDto>> findAllMenuList(){
-        List<MenuList> menuLists = menuListService.getAllMenuLists();
-        List<MenuListDto> responseList = menuLists.stream().map(menuList -> {
-            return getMenuListDto(menuList);
-        }).collect(Collectors.toList());
-
-        return ApiUtils.success(responseList);
-    }
-
-
-    메뉴판 단건 조회
-
-    @GetMapping("/{id}")
-    public ApiResponse<MenuListDto> findMenuListById(@PathVariable Long id){
-        MenuList menuList = menuListService.getMenuListById(id);
-        MenuListDto response = getMenuListDto(menuList);
-        return ApiUtils.success(response);
-    }
-
-
-    메뉴판 수정(제목, 사진)
-
-    @PatchMapping("/{id}")
-    public ApiResponse<MenuListDto> updateMenuList(@PathVariable Long id, @RequestBody PatchMenuListRequest patchMenuListRequest){
-        MenuList menuList = menuListService.updateMenuList(id, patchMenuListRequest);
-        MenuListDto response = getMenuListDto(menuList);
-        return ApiUtils.success(response);
-    }
-
-
-    메뉴판 삭제
-
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenuList(@PathVariable Long id){
-        menuListService.deleteMenuList(id);
-        return ApiUtils.success("OK");
-    }
-
-
-    메뉴판 메뉴 추가
-
-    @PatchMapping("")
-    public ApiResponse<MenuListDto> addMenuInMenuList(@RequestParam Long menuId, @RequestParam Long menuListId){
-        MenuList menuList = menuListService.addMenu(menuId, menuListId);
-        MenuListDto response = getMenuListDto(menuList);
-        return ApiUtils.success(response);
-    }
-
 
     메뉴판 메뉴 삭제
 

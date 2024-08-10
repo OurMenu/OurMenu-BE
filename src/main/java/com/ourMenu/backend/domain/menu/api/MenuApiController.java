@@ -3,8 +3,6 @@ package com.ourMenu.backend.domain.menu.api;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuImage;
-import com.ourMenu.backend.domain.menu.dto.request.PatchMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.*;
@@ -41,7 +39,26 @@ public class MenuApiController {
     @ExceptionHandler(MenuNotFoundException.class)
     public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
         return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
-}
+    }
+
+    // 전체 조회
+    @GetMapping("")
+    public ApiResponse<List<MenuDto>> getAllMenu(@RequestParam(required = false) String title,
+                                              @RequestParam(required = false) String tag,
+                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
+        List<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria(title, tag, menuFolderId, userId);
+
+        return ApiUtils.success(menusByCriteria);
+    }
+
+
+    // 특정 메뉴 조회
+    @GetMapping("/{groupId}")
+    public ApiResponse<List<MenuDto>> getMenu(@UserId Long userId, @PathVariable Long groupId) {
+        List<MenuDto> certainMenu = menuService.getCertainMenu(userId, groupId);
+
+        return ApiUtils.success(certainMenu);
+    }
 
     // 메뉴 생성
     @PostMapping("")
@@ -53,40 +70,64 @@ public class MenuApiController {
     // 이미지 추가
     @PostMapping(value = "/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest) {
-        menuService.createMenuImage(photoRequest);
+    public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest, @UserId Long userId) {
+        menuService.createMenuImage(photoRequest, userId);
         return ApiUtils.success("OK");
     }
 
-    @GetMapping("")
-    public ApiResponse<List<MenuDto>> getMenu(@RequestParam(required = false) String menuTitle,
-                                              @RequestParam(required = false) String menuTag,
-                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
-        List<Menu> menus = menuRepository.findMenusByCriteria(menuTitle, menuTag, menuFolderId, userId);
-        List<MenuDto> menuDtos = MenuDto.toDto(menus);
+//    @GetMapping("")
+//    public ApiResponse<List<MenuDto>> getMenu(
+//            @RequestParam(required = false) String menuTitle,
+//            @RequestParam(required = false) String menuTag,
+//            @RequestParam(required = false) Integer menuFolderId,
+//
+//            @UserId Long userId) {
+//
+//
+//        Page<Menu> menuPage = menuRepository.findMenusByCriteria(menuTitle, menuFolderId, userId);
+//
+//        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
+//
+//        return ApiUtils.success(menuDtos);
+//    }
 
-        return ApiUtils.success(menuDtos);
-    }
+
+
+
+
+
+
 
     // 삭제
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeMenu (@PathVariable Long id, @UserId Long userId){
-        String response = menuService.removeMenu(id, userId);       // Hard Delete
-        return ApiUtils.success(response);  //OK 반환
-    }
-
-    @PatchMapping("/{id}")
-    public ApiResponse<String> updateMenu (@PathVariable Long id, @UserId Long userId, PatchMenuRequest patchMenuRequest){
-        menuService.updateMenu(id, userId, patchMenuRequest);       // Hard Delete
+    @DeleteMapping("/{menuId}")
+    public ApiResponse<String> removeMenu (@PathVariable Long menuId, @UserId Long userId){
+        menuService.removeCertainMenu(menuId, userId);       // Hard Delete
         return ApiUtils.success("OK");  //OK 반환
     }
 
-    @PatchMapping(value = "/{id}/photo",
+    @DeleteMapping("/group/{groupId}")
+    public ApiResponse<String> removeAllMenu(@PathVariable Long groupId, @UserId Long userId){
+        menuService.removeAllMenus(groupId, userId);
+        return ApiUtils.success("OK");  //OK 반환
+    }
+
+    @PatchMapping("/{groupId}")
+    public ApiResponse<String> updateMenu (@PathVariable Long groupId, @UserId Long userId, PostMenuRequest postMenuRequest){
+        menuService.updateMenu(groupId, userId, postMenuRequest);       // Hard Delete
+        return ApiUtils.success("OK");  //OK 반환
+    }
+
+
+
+
+    @PatchMapping(value = "/{groupId}/photo",
             consumes = MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<String> updateMenuImages(@PathVariable Long id, @UserId Long userId, @ModelAttribute PatchMenuImage patchMenuImage){
-        menuService.updateMenuImage(patchMenuImage, id, userId);
+    public ApiResponse<String> updateMenuImages(@PathVariable Long groupId, @UserId Long userId, @ModelAttribute PostPhotoRequest photoRequest){
+        menuService.createMenuImage(photoRequest, userId);
+
         return ApiUtils.success("OK");
     }
+
 
 
     @GetMapping("/place/{placeId}")

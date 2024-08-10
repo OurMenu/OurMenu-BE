@@ -49,7 +49,7 @@ public class PlaceService {
             return placeRepository.save(existingPlace);
         }
 
-        return Place.builder()
+        Place place = Place.builder()
                 .title(storeInfo.getStoreName())
                 .user(user)
                 .address(storeInfo.getStoreAddress())
@@ -59,6 +59,7 @@ public class PlaceService {
                 .longitude(storeInfo.getStoreLongitude())
                 .latitude(storeInfo.getStoreLatitude())
                 .build();
+        return placeRepository.save(place);
     }
 
     public Place save(Place place) {

@@ -1,5 +1,7 @@
 package com.ourMenu.backend.domain.user.application;
 
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
+import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.user.api.request.LoginRequest;
 import com.ourMenu.backend.domain.user.api.request.ReissueTokenRequest;
 import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,10 +36,11 @@ public class AccountService {
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MenuListService menuListService;
 
     private LoginResponse makeLoginResponse(long id) {
         String GRANT_TYPE = "Bearer";
-        String accessToken = jwtProvider.createToken(id, 1);
+        String accessToken = jwtProvider.createToken(id, 24);
         String refreshToken = jwtProvider.createToken(id, 24 * 30);
 
         RefreshTokenEntity entity = new RefreshTokenEntity(id, refreshToken);
@@ -51,7 +55,7 @@ public class AccountService {
     @Transactional
     public LoginResponse signup(SignUpRequest request) {
         // validate email
-        if(userDao.isEmailExists(request.getEmail()))
+        if(isDuplicatedEmail(request.getEmail()))
             throw new EmailDuplicationException();
 
         // encode password
@@ -59,6 +63,15 @@ public class AccountService {
         request.setPassword(encodedPassword);
 
         long id = userDao.createUser(request);
+
+        // 기본 메뉴판 생성
+        MenuListRequestDTO menuListRequestDTO = MenuListRequestDTO.builder()
+                .menuFolderIcon("1")
+                .menuFolderTitle("기본 메뉴판")
+                .menuFolderImg(null)
+                .menuIds(Collections.emptyList())
+                .build();
+        menuListService.createMenuList(menuListRequestDTO, id);
 
         return makeLoginResponse(id);
     }
@@ -96,6 +109,10 @@ public class AccountService {
             throw new JwtException("");
 
         return makeLoginResponse(id);
+    }
+
+    public boolean isDuplicatedEmail(String email) {
+        return userDao.isEmailExists(email);
     }
 
 }

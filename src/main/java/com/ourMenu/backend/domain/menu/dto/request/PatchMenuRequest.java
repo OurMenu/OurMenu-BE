@@ -11,11 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 public class PatchMenuRequest {
 
-    private String title;
-    private int price;
-    private String memo;
-    private String icon;
-    private String menuListTitle;
+    private String menuTitle;
+    private int menuPrice;
+    private String menuMemo;
+    private String menuIcon;
+    private String menuFolderTitle;
 
     // 식당 관련 정보
     private StoreRequestDTO storeInfo;
@@ -23,4 +23,6 @@ public class PatchMenuRequest {
     // 태그 관련 정보
     private List<TagRequestDto> tagInfo;
 
+    // 메뉴판 관련 정보
+    private List<Long> menuFolderIds;
 }
