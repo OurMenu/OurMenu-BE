@@ -136,6 +136,7 @@ public class MenuApiController {
         List<PlaceMenuDTO> response = menuList.stream().map(menu ->
                 PlaceMenuDTO.builder()
                         .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
                         .menuTitle(menu.getTitle())
                         .menuPrice(menu.getPrice())
                         .menuIcon(menu.getIcon())

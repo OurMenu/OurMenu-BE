@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 public class PlaceMenuDTO {
     private Long menuId;
+    private Long groupId;
     private String menuTitle;
     private int menuPrice;
     private String menuIcon;
