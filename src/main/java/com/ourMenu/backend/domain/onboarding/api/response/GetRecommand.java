@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.onboarding.api.response;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,15 @@ public class GetRecommand {
                 .menuImgUrl(menu.getTitle())
                 .placeName(menu.getPlace().getAddress())
                 .groupId(menu.getGroupId())
+                .build();
+    }
+
+    public static GetRecommand toDto(MenuDto menuDto){
+        return GetRecommand.builder()
+                .menuImgUrl(menuDto.getMenuImgUrl())
+                .menuTitle(menuDto.getMenuTitle())
+                .placeName(menuDto.getPlaceAddress())
+                .groupId(menuDto.getGroupId())
                 .build();
     }
 

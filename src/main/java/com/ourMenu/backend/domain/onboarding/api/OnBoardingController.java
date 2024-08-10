@@ -1,10 +1,13 @@
 package com.ourMenu.backend.domain.onboarding.api;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.onboarding.api.response.GetOnboardingResponse;
 import com.ourMenu.backend.domain.onboarding.api.response.GetQuestionRecommands;
+import com.ourMenu.backend.domain.onboarding.api.response.GetTagRecommends;
 import com.ourMenu.backend.domain.onboarding.application.OnBoardingService;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
+import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
@@ -41,10 +44,10 @@ public class OnBoardingController {
     }
 
     @GetMapping("/recommend/tag")
-    public String getQuestionRecommand(@UserId Long userId) {
-        onBoardService.findStoreByRandomTag(userId);
-
-        return "success";
+    public ApiResponse<GetTagRecommends> getQuestionRecommand(@UserId Long userId) {
+        DefaultTag randomTag = DefaultTag.getRandomTag();
+        List<MenuDto> menuDtoList = onBoardService.findStoreByRandomTag(userId, randomTag);
+        return ApiUtils.success(GetTagRecommends.toDto(menuDtoList, randomTag));
 
     }
 }

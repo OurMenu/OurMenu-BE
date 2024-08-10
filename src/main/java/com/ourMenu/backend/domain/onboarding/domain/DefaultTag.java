@@ -1,7 +1,10 @@
 package com.ourMenu.backend.domain.onboarding.domain;
 
+import lombok.Getter;
+
 import java.util.Random;
 
+@Getter
 public enum DefaultTag {
 
     KOREA("한식","집밥이 그리울 땐,"),
