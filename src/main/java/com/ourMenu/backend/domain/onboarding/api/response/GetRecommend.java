@@ -9,14 +9,14 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class GetRecommand {
+public class GetRecommend {
 
     private String menuImgUrl;
     private String menuTitle;
     private String placeName;
     private Long groupId;
-    public static GetRecommand toDto(Menu menu){
-        return GetRecommand.builder()
+    public static GetRecommend toDto(Menu menu){
+        return GetRecommend.builder()
                 .menuImgUrl(menu.getImages() != null && !menu.getImages().isEmpty() ? menu.getImages().get(0).getUrl() : null)
                 .menuImgUrl(menu.getTitle())
                 .placeName(menu.getPlace().getAddress())
@@ -24,8 +24,8 @@ public class GetRecommand {
                 .build();
     }
 
-    public static GetRecommand toDto(MenuDto menuDto){
-        return GetRecommand.builder()
+    public static GetRecommend toDto(MenuDto menuDto){
+        return GetRecommend.builder()
                 .menuImgUrl(menuDto.getMenuImgUrl())
                 .menuTitle(menuDto.getMenuTitle())
                 .placeName(menuDto.getPlaceAddress())

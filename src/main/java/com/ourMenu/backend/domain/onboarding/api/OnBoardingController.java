@@ -35,7 +35,7 @@ public class OnBoardingController {
     }
 
     @GetMapping("/recommend")
-    public ApiResponse<GetQuestionRecommands> getQuestionRecommand(@RequestParam("questionId") int questionId,
+    public ApiResponse<GetQuestionRecommands> getQuestionRecommend(@RequestParam("questionId") int questionId,
                                                                    @RequestParam("answer") AnswerType answerType,
                                                                    @UserId Long userId) {
         List<Menu> menus = onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
@@ -44,7 +44,7 @@ public class OnBoardingController {
     }
 
     @GetMapping("/recommend/tag")
-    public ApiResponse<GetTagRecommends> getQuestionRecommand(@UserId Long userId) {
+    public ApiResponse<GetTagRecommends> getQuestionRecommend(@UserId Long userId) {
         DefaultTag randomTag = DefaultTag.getRandomTag();
         List<MenuDto> menuDtoList = onBoardService.findStoreByRandomTag(userId, randomTag);
         return ApiUtils.success(GetTagRecommends.toDto(menuDtoList, randomTag));
