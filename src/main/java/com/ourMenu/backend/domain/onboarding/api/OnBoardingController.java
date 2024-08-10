@@ -31,7 +31,7 @@ public class OnBoardingController {
         return ApiUtils.success(list);
     }
 
-    @GetMapping("/recommand")
+    @GetMapping("/recommend")
     public ApiResponse<GetQuestionRecommands> getQuestionRecommand(@RequestParam("questionId") int questionId,
                                             @RequestParam("answer") AnswerType answerType,
                                             @UserId Long userId) {
