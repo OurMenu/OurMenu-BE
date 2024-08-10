@@ -134,9 +134,19 @@ public class MenuApiController {
     public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId, @UserId Long userId) {
         List<Menu> menus = menuService.findMenuByPlace(placeId, userId);
 
+        int menuFolderCount = 0;
 
-        List<PlaceMenuDTO> response = menus.stream().map(menu ->
-                PlaceMenuDTO.builder()
+
+        List<PlaceMenuDTO> response = menus.stream().map(menu ->{
+                List<PlaceMenuFolderDTO> menuFolders = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).stream().map(m ->
+                    PlaceMenuFolderDTO.builder()
+                            .menuFolderTitle(m.getMenuList().getTitle())
+                            .menuFolderIcon(m.getMenuList().getIconType())
+                            .build()
+                      ).collect(Collectors.toList());
+
+
+                return PlaceMenuDTO.builder()
 //                        .menuId(menu.getId())
                         .groupId(menu.getGroupId())
                         .menuTitle(menu.getTitle())
@@ -155,14 +165,11 @@ public class MenuApiController {
                                                 .build())
                                 .collect(Collectors.toList())
                         )
-                        .menuFolder(menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).stream().map(m ->
-                                PlaceMenuFolderDTO.builder()
-                                        .menuFolderTitle(m.getMenuList().getTitle())
-                                        .menuFolderIcon(m.getMenuList().getIconType())
-                                        .build()
-                        ).collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
+                        .menuFolders(menuFolders)
+                        .menuFolderCount(menuFolders.size() - 1)
+                        .build();
+        }).collect(Collectors.toList());
+
         return ApiUtils.success(response);
     }
 }
