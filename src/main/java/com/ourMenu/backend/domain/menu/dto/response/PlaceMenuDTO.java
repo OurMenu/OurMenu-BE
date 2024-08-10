@@ -1,6 +1,5 @@
 package com.ourMenu.backend.domain.menu.dto.response;
 
-import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +15,6 @@ public class PlaceMenuDTO {
     private String menuIcon;
     private List<TagDTO> menuTags;
     private List<MenuImageDto> menuImgsUrl;
-    private List<PlaceMenuFolderDTO> menuFolder;
+    private List<PlaceMenuFolderDTO> menuFolders;
+    private int menuFolderCount;
 }
