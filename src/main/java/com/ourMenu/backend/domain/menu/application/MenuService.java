@@ -301,8 +301,8 @@ public class MenuService {
     }
 
     @Transactional
-    public List<Menu> findMenuByPlace(Long placeId){
-        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+    public List<Menu> findMenuByPlace(Long placeId, Long userId){
+        List<Menu> menuList = menuRepository.findMenuByPlaceIdAndUserId(placeId, userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
                 .orElseThrow(() -> new MenuNotFoundException());
 
         if(menuList.isEmpty()){
@@ -345,5 +345,10 @@ public class MenuService {
         for (Menu menu : byUserIdAndGroupId) {
             removeMenu(menu);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
+        return menuRepository.findByUserIdAndGroupId(userId, groupId);
     }
 }
