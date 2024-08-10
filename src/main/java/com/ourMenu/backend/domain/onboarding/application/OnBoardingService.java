@@ -37,4 +37,8 @@ public class OnBoardingService {
     }
 
 
+    public List<Menu> findStoreByRandomTag(Long userId) {
+        return null;
+
+    }
 }

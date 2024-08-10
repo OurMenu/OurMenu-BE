@@ -33,10 +33,18 @@ public class OnBoardingController {
 
     @GetMapping("/recommend")
     public ApiResponse<GetQuestionRecommands> getQuestionRecommand(@RequestParam("questionId") int questionId,
-                                            @RequestParam("answer") AnswerType answerType,
-                                            @UserId Long userId) {
+                                                                   @RequestParam("answer") AnswerType answerType,
+                                                                   @UserId Long userId) {
         List<Menu> menus = onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
-        return ApiUtils.success(GetQuestionRecommands.toDto(menus,questionId,answerType));
+        return ApiUtils.success(GetQuestionRecommands.toDto(menus, questionId, answerType));
+
+    }
+
+    @GetMapping("/recommend/tag")
+    public String getQuestionRecommand(@UserId Long userId) {
+        onBoardService.findStoreByRandomTag(userId);
+
+        return "success";
 
     }
 }

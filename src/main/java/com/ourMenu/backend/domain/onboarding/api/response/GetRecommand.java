@@ -13,12 +13,13 @@ public class GetRecommand {
     private String menuImgUrl;
     private String menuTitle;
     private String placeName;
-
+    private Long groupId;
     public static GetRecommand toDto(Menu menu){
         return GetRecommand.builder()
                 .menuImgUrl(menu.getImages() != null && !menu.getImages().isEmpty() ? menu.getImages().get(0).getUrl() : null)
                 .menuImgUrl(menu.getTitle())
                 .placeName(menu.getPlace().getAddress())
+                .groupId(menu.getGroupId())
                 .build();
     }
 
