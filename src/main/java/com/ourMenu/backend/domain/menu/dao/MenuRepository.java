@@ -2,6 +2,8 @@ package com.ourMenu.backend.domain.menu.dao;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.domain.MenuStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -78,6 +80,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "GROUP BY m.id " +
             "HAVING (:tagCount IS NULL OR COUNT(DISTINCT t.name) = :tagCount) " + // tagCount가 null인 경우 조건 무시
             "ORDER BY m.groupId ASC") // groupId를 기준으로 오름차순 정렬
+
     Page<Menu> findingMenusByCriteria2(@Param("title") String title,
                                        @Param("tags") String[] tags, // 태그 배열
                                        @Param("tagCount") Integer tagCount, // 태그 개수
