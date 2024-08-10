@@ -134,11 +134,24 @@ public class MenuApiController {
 
 
     @GetMapping("/place/{placeId}")
-    public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId) {
-        List<Menu> menuList = menuService.findMenuByPlace(placeId);
-        List<PlaceMenuDTO> response = menuList.stream().map(menu ->
-                PlaceMenuDTO.builder()
-                        .menuId(menu.getId())
+    public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId, @UserId Long userId) {
+        List<Menu> menus = menuService.findMenuByPlace(placeId, userId);
+
+        int menuFolderCount = 0;
+
+
+        List<PlaceMenuDTO> response = menus.stream().map(menu ->{
+                List<PlaceMenuFolderDTO> menuFolders = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).stream().map(m ->
+                    PlaceMenuFolderDTO.builder()
+                            .menuFolderTitle(m.getMenuList().getTitle())
+                            .menuFolderIcon(m.getMenuList().getIconType())
+                            .build()
+                      ).collect(Collectors.toList());
+
+
+                return PlaceMenuDTO.builder()
+//                        .menuId(menu.getId())
+                        .groupId(menu.getGroupId())
                         .menuTitle(menu.getTitle())
                         .menuPrice(menu.getPrice())
                         .menuIcon(menu.getIcon())
@@ -155,12 +168,11 @@ public class MenuApiController {
                                                 .build())
                                 .collect(Collectors.toList())
                         )
-                        .menuFolder(PlaceMenuFolderDTO.builder()
-                                .menuFolderTitle(menu.getMenuList().getTitle())
-                                .menuIcon(menu.getMenuList().getIconType())
-                                .build())
-                        .build())
-                .collect(Collectors.toList());
+                        .menuFolders(menuFolders)
+                        .menuFolderCount(menuFolders.size() - 1)
+                        .build();
+        }).collect(Collectors.toList());
+
         return ApiUtils.success(response);
     }
 }

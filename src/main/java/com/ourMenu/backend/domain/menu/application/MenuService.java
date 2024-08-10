@@ -296,9 +296,13 @@ public class MenuService {
         return "OK";
     }
 
-    @Transactional
+/*    @Transactional
     public List<Menu> findMenuByPlace(Long placeId) {
-        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
+    }*/
+    public List<Menu> findMenuByPlace(Long placeId, Long userId){
+        List<Menu> menuList = menuRepository.findMenuByPlaceIdAndUserId(placeId, userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+
                 .orElseThrow(() -> new MenuNotFoundException());
 
         if (menuList.isEmpty()) {
@@ -371,14 +375,20 @@ public class MenuService {
         }
     }
 
+
     @Transactional
-    public List<Menu> getAllMenusByTagName(String tag, Long userId) {
-        String[] integers = {tag};
-        Pageable pageable = PageRequest.of(1, 5);
-        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId, 0, 100000000, pageable);
+    public List<Menu> getAllMenusByTagName(String tag, Long userId){
+            String[] integers = {tag};
+            Pageable pageable = PageRequest.of(1, 5);
+            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId, 0, 100000000, pageable);
 //        List<Menu> menus = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId);
-        //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
-        List<Menu> menuList = menuPage.getContent();
-        return menuList; // List<MenuDto> 반환
+            //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+            List<Menu> menuList = menuPage.getContent();
+            return menuList; // List<MenuDto> 반환
+        }
+    @Transactional(readOnly = true)
+    public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
+        return menuRepository.findByUserIdAndGroupId(userId, groupId);
+
     }
 }

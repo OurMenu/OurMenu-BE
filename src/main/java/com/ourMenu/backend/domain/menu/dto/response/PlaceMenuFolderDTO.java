@@ -9,5 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class PlaceMenuFolderDTO {
     private String menuFolderTitle;
-    private String menuIcon;
+    private String menuFolderIcon;
 }
