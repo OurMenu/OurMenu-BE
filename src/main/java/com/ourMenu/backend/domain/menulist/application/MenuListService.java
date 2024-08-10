@@ -5,6 +5,7 @@ import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import com.ourMenu.backend.domain.menu.domain.MenuTag;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
+import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequestDTO;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.dao.MenuListRepository;
@@ -58,7 +59,7 @@ public class MenuListService {
 
     @Transactional
     public MenuList createMenuList(MenuListRequestDTO request, Long userId) {
-        MultipartFile file = request.getMenuFolderImg() != null ? request.getMenuFolderImg().orElse(null) : null;
+        MultipartFile file = request.getMenuFolderImg();
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException());
         Long maxPriority = menuListRepository.findMaxPriorityByUserId(userId).orElse(0L);
@@ -188,13 +189,15 @@ public class MenuListService {
 
     //메뉴판 업데이트
     @Transactional
-    public MenuList updateMenuList(Long menuFolderId, MenuListRequestDTO request, Long userId) {
+    public MenuList updateMenuList(Long menuFolderId, PatchMenuListRequestDTO request, Long userId) {
 
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new UserException());
 
         MenuList menuList = menuListRepository.findMenuListsById(menuFolderId, userId, Arrays.asList(CREATED, UPDATED))
                 .orElseThrow(() -> new MenuListException());
+
+        MultipartFile file = request.getMenuFolderImg();
 
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
@@ -205,45 +208,39 @@ public class MenuListService {
 
 
         //이미지 수정
-        if (request.getMenuFolderImg().isPresent()) {
-            MultipartFile file = request.getMenuFolderImg().orElseThrow(() -> new ImageLoadException());
-            String fileUrl = "";
+        String fileUrl = menuList.getImgUrl();
 
-            try {
-                if (file != null && !file.isEmpty()) {
-                    // 파일의 원래 이름을 사용하여 S3 키 설정
-//                    String fileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
-                    String fileKey = s3Service.generateFileHash(file);
+        try {
+            if (file != null && !file.isEmpty()) {
+                String fileKey = s3Service.generateFileHash(file);
 
-                    // S3에 파일이 이미 존재하는지 확인
-                    boolean fileExists = s3Service.doesObjectExist(fileKey);
+                // S3에 파일이 이미 존재하는지 확인
+                boolean fileExists = s3Service.doesObjectExist(fileKey);
 
-                    if (!fileExists) {
-                        // 기존 이미지 삭제
-                        if (menuList.getImgUrl() != null && !menuList.getImgUrl().isEmpty()) {
-                            s3Service.deleteFile(menuList.getImgUrl());
-                        }
-
-                        fileUrl = s3Service.uploadFile(fileKey, file);
-                    } else {
-                        // 중복된 이미지가 이미 존재하는 경우 해당 URL을 반환
-                        fileUrl = s3Service.getExistingFileUrl(fileKey);
+                if (!fileExists) {
+                    // 기존 이미지 삭제
+                    if (menuList.getImgUrl() != null && !menuList.getImgUrl().isEmpty()) {
+                        s3Service.deleteFile(menuList.getImgUrl());
                     }
-
-                    updateMenuListBuilder.imgUrl(fileUrl);
+                    fileUrl = s3Service.uploadFile(fileKey, file);
+                } else {
+                    // 중복된 이미지가 이미 존재하는 경우 해당 URL을 반환
+                    fileUrl = s3Service.getExistingFileUrl(fileKey);
                 }
-            } catch (Exception e) {
-                throw new ImageLoadException();
+                updateMenuListBuilder.imgUrl(fileUrl);
             }
+        } catch (Exception e) {
+            throw new ImageLoadException();
         }
 
-            if (request.getMenuFolderIcon() != null) {
-                updateMenuListBuilder.iconType(request.getMenuFolderIcon());
-            }
 
-            MenuList updateMenuList = updateMenuListBuilder.build();
+        if (request.getMenuFolderIcon() != null) {
+            updateMenuListBuilder.iconType(request.getMenuFolderIcon());
+        }
 
-            return menuListRepository.save(updateMenuList);
+        MenuList updateMenuList = updateMenuListBuilder.build();
+
+        return menuListRepository.save(updateMenuList);
     }
 
 

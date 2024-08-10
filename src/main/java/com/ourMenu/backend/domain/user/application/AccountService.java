@@ -40,7 +40,7 @@ public class AccountService {
 
     private LoginResponse makeLoginResponse(long id) {
         String GRANT_TYPE = "Bearer";
-        String accessToken = jwtProvider.createToken(id, 1);
+        String accessToken = jwtProvider.createToken(id, 24);
         String refreshToken = jwtProvider.createToken(id, 24 * 30);
 
         RefreshTokenEntity entity = new RefreshTokenEntity(id, refreshToken);
@@ -68,7 +68,7 @@ public class AccountService {
         MenuListRequestDTO menuListRequestDTO = MenuListRequestDTO.builder()
                 .menuFolderIcon("1")
                 .menuFolderTitle("기본 메뉴판")
-                .menuFolderImg(java.util.Optional.empty())
+                .menuFolderImg(null)
                 .menuIds(Collections.emptyList())
                 .build();
         menuListService.createMenuList(menuListRequestDTO, id);

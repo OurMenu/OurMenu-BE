@@ -13,7 +13,7 @@ public class MenuListRequestDTO {
 //    private String img;
 
     @Schema(description = "메뉴판 이미지 파일", nullable = true)
-    private Optional<MultipartFile> menuFolderImg;    //파일로 받아야 함
+    private MultipartFile menuFolderImg;    //파일로 받아야 함
 
     private String menuFolderTitle;
     private String menuFolderIcon;
