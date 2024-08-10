@@ -41,7 +41,7 @@ public class OnBoardingService {
     }
 
 
-    public List<MenuDto> findStoreByRandomTag(Long userId, DefaultTag randomTag) {
-        return menuService.getAllMenusByCriteria(null, randomTag.getTagName(), null, userId);
+    public List<Menu> findStoreByRandomTag(Long userId, DefaultTag randomTag) {
+        return menuService.getAllMenusByTagName(randomTag.getTagName(), userId);
     }
 }

@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.onboarding.api.response;
 
+import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class GetTagRecommends {
     private List<GetRecommend> menus;
 
 
-    public static GetTagRecommends toDto(List<MenuDto> menus, DefaultTag tag) {
+    public static GetTagRecommends toDto(List<Menu> menus, DefaultTag tag) {
         List<GetRecommend> recommandList = menus.stream().map(GetRecommend::toDto).toList();
         return GetTagRecommends.builder()
                 .tagName(tag.getTagMemo())

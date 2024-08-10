@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class MenuService {
 
 
     @Transactional(readOnly = true)
-    public Long findMaxGroupId(Long userId){
+    public Long findMaxGroupId(Long userId) {
         List<Menu> menus = menuRepository.findByUserId(userId);
 
         Long maxGroupId = null;
@@ -74,7 +75,6 @@ public class MenuService {
         // 최고 groupId가 null일 경우 1 반환
         return (maxGroupId != null) ? maxGroupId + 1 : 1L;
     }
-
 
 
     @Transactional
@@ -112,8 +112,6 @@ public class MenuService {
         }
 
 
-
-
         // 식당, 메뉴판 연관관계 설정
 
         for (Long menuFolderId : menuFolderIds) {
@@ -140,7 +138,6 @@ public class MenuService {
 
         return new PostMenuResponse(maxGroupId);
     }
-
 
 
     // 메뉴 태그 등록
@@ -226,10 +223,6 @@ public class MenuService {
     }
 
 
-
-
-
-
     @Transactional
     public String updateMenuImage(PatchMenuImage patchMenuImage, long id, long userId) {
 
@@ -239,7 +232,7 @@ public class MenuService {
         List<MultipartFile> imgs = patchMenuImage.getMenuImgs();
 
         List<String> fileUrls = new ArrayList<>();
-        if(imgs != null) {
+        if (imgs != null) {
             removeImages(menu);
 
             for (MultipartFile img : imgs) {
@@ -279,15 +272,14 @@ public class MenuService {
     }
 
     @Transactional
-    public void removeImages(Menu menu){
+    public void removeImages(Menu menu) {
         menu.removeImage();
         em.flush();
     }
 
 
-
     @Transactional
-    public String removeMenu(Menu menu){
+    public String removeMenu(Menu menu) {
 
         User user = menu.getUser();
         Place place = menu.getPlace();
@@ -305,11 +297,11 @@ public class MenuService {
     }
 
     @Transactional
-    public List<Menu> findMenuByPlace(Long placeId){
+    public List<Menu> findMenuByPlace(Long placeId) {
         List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
                 .orElseThrow(() -> new MenuNotFoundException());
 
-        if(menuList.isEmpty()){
+        if (menuList.isEmpty()) {
             throw new MenuNotFoundException();
         }
 
@@ -321,7 +313,7 @@ public class MenuService {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
-    
+
     @Transactional
     public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
         List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
@@ -338,7 +330,7 @@ public class MenuService {
 //    }
 
     @Transactional
-    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
+    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable) {
         // 메뉴를 페이징 처리하여 조회
 
         Integer tagCount = (tags != null && tags.length > 0) ? tags.length : null; // 태그가 없으면 null로 설정
@@ -350,8 +342,8 @@ public class MenuService {
             maxPrice = 999999; // 기본값: 무한대 (최대)
         }
 
-        log.info("가격은 " +minPrice);
-        log.info("가격은 " +maxPrice);
+        log.info("가격은 " + minPrice);
+        log.info("가격은 " + maxPrice);
         Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(title, tags, tagCount, menuFolderId, userId, minPrice, maxPrice, pageable);
 
 
@@ -377,5 +369,16 @@ public class MenuService {
         for (Menu menu : byUserIdAndGroupId) {
             removeMenu(menu);
         }
+    }
+
+    @Transactional
+    public List<Menu> getAllMenusByTagName(String tag, Long userId) {
+        String[] integers = {tag};
+        Pageable pageable = PageRequest.of(1, 5);
+        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId, 0, 100000000, pageable);
+//        List<Menu> menus = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId);
+        //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+        List<Menu> menuList = menuPage.getContent();
+        return menuList; // List<MenuDto> 반환
     }
 }
