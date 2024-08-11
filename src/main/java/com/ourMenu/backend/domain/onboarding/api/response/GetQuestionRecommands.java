@@ -14,14 +14,14 @@ import java.util.List;
 @Builder
 public class GetQuestionRecommands {
 
-    private String recommandImgUrl;
+    private String recommendImgUrl;
     private List<GetRecommend> menus;
 
     public static GetQuestionRecommands toDto(List<Menu> menus, int questionId, AnswerType answerType) {
         List<GetRecommend> recommandList = menus.stream().map(GetRecommend::toDto).toList();
         String recommandImgUrl = Question.getImgUrlByIdAndAnswerType(questionId, answerType);
         return GetQuestionRecommands.builder()
-                .recommandImgUrl(recommandImgUrl)
+                .recommendImgUrl(recommandImgUrl)
                 .menus(recommandList)
                 .build();
 
