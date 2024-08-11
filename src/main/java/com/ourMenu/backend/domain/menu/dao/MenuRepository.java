@@ -13,6 +13,9 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
+    Optional<Menu> findByUserIdAndMenuListIdAndGroupId(Long userId, Long menuFolderId, Long groupId);
+
+
     List<Menu> findByUserId(Long userId);
 
     List<Menu> findByUserIdAndGroupId(Long userId, Long groupId);
@@ -21,7 +24,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findByGroupIdWithFetch(@Param("groupId") Long groupId);
 
     @Query("SELECT m FROM Menu m WHERE m.place.id = :placeId AND m.status IN :status")
-    Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status")List<MenuStatus> statuses);
+    Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status") List<MenuStatus> statuses);
 
     Optional<Menu> findByIdAndUserId(Long menuId, Long userId);
 
@@ -33,7 +36,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "WHERE m.user.id = :userId " +
             "AND m.groupId = :groupId")
     List<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
-                                                     @Param("groupId") Long groupId);
+                                                 @Param("groupId") Long groupId);
 
 
     @Query("SELECT m FROM Menu m " +
@@ -49,24 +52,9 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("SELECT m FROM Menu m " +
             "JOIN FETCH m.place p " +         // 메뉴와 식당 조인
-            "JOIN FETCH m.images mi ")        // 메뉴와 메뉴 이미지 조인)           // 특정 메뉴 ID로 필터링
-     List<Menu> findMenuWithPlaceAndImages();
-
-
-
-//    @Query("SELECT DISTINCT m FROM Menu m " +
-//            "JOIN FETCH m.place p " +
-//            "LEFT JOIN FETCH m.images mi " +
-//            "JOIN m.tags mt " +
-//            "JOIN mt.tag t " +
-//            "WHERE m.user.id = :userId " +
-//            "AND (:title IS NULL OR m.title LIKE %:title%) " +
-//            "AND (:tag IS NULL OR t.name LIKE %:tag%) " +
-//            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId)") // groupId 필터 제거
-//    List<Menu> findingMenusByCriteria(@Param("title") String title,
-//                                   @Param("tag") String tag,
-//                                   @Param("menuFolderId") Integer menuFolderId,
-//                                   @Param("userId") Long userId);
+            "JOIN FETCH m.images mi ")
+        // 메뉴와 메뉴 이미지 조인)           // 특정 메뉴 ID로 필터링
+    List<Menu> findMenuWithPlaceAndImages();
 
     @Query("SELECT m FROM Menu m " +
             "JOIN m.tags mt " +
@@ -79,7 +67,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "AND (:tags IS NULL OR t.name IN :tags) " + // 태그 조건
             "GROUP BY m.id " +
             "HAVING (:tagCount IS NULL OR COUNT(DISTINCT t.name) = :tagCount) " + // tagCount가 null인 경우 조건 무시
-            "ORDER BY m.groupId ASC") // groupId를 기준으로 오름차순 정렬
+            "ORDER BY m.groupId ASC")
+        // groupId를 기준으로 오름차순 정렬
     Page<Menu> findingMenusByCriteria2(@Param("title") String title,
                                        @Param("tags") String[] tags, // 태그 배열
                                        @Param("tagCount") Integer tagCount, // 태그 개수
@@ -89,17 +78,10 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
                                        @Param("maxPrice") int maxPrice,
                                        Pageable pageable);
 
-
-
-
-
-
-
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
 
     @Query("SELECT m FROM Menu m WHERE m.id = :menuId AND m.user.id = :userId")
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
 
-    boolean existsByPlaceIdAndMenuListIdAndTitle(Long placeId, Long menuListId, String title);
 }
