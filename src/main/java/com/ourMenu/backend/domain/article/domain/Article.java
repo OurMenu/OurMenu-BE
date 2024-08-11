@@ -6,12 +6,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@ToString
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +24,9 @@ public class Article {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "article")
+    private List<ArticleMenu> articleMenuList = new ArrayList<>();
 
     private String title;
     private String content;
@@ -36,12 +42,16 @@ public class Article {
     private Long views = 0L;
 
     // 연관관계 메서드 //
-    public void confirmUser(User user){
+    public void confirmUser(User user) {
         this.user = user;
         user.addArticles(this);
     }
 
     public void addArticleMenu(ArticleMenu articleMenu) {
         this.addArticleMenu(articleMenu);
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
