@@ -5,6 +5,7 @@ import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
+import com.ourMenu.backend.domain.menu.dto.response.MenuIdDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -111,9 +112,6 @@ public class MenuService {
             throw new RuntimeException("해당 식당에 이미 동일한 메뉴명이 존재합니다. 메뉴판 ID: " + existingId + " (해당 메뉴판에서 확인해주세요.)");
         }
 
-
-
-
         // 식당, 메뉴판 연관관계 설정
 
         for (Long menuFolderId : menuFolderIds) {
@@ -124,6 +122,8 @@ public class MenuService {
                     .price(postMenuRequest.getMenuPrice())
                     .user(finduser)
                     .memo(postMenuRequest.getMenuMemo())
+                    .menuIconType(postMenuRequest.getMenuIconType())
+                    .memoTitle(postMenuRequest.getMenuMemoTitle())
                     .createdAt(LocalDateTime.now())
                     .modifiedAt(LocalDateTime.now())
                     .groupId(maxGroupId)
@@ -168,10 +168,10 @@ public class MenuService {
 
 
     @Transactional
-    public void createMenuImage(PostPhotoRequest request, long userId) {
+    public void createMenuImage(PostPhotoRequest request, long userId, long groupId) {
 
         List<MultipartFile> imgs = request.getMenuImgs();
-        long groupId = request.getMenuGroupId();
+
 
 
         List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(userId, groupId);
@@ -377,5 +377,11 @@ public class MenuService {
         for (Menu menu : byUserIdAndGroupId) {
             removeMenu(menu);
         }
+    }
+
+    public MenuIdDto getCertainMenuId(Long userId, Long menuFolderId, Long groupId) {
+        Menu menu = menuRepository.findByUserIdAndMenuListIdAndGroupId(userId, menuFolderId, groupId)
+                .orElseThrow(() -> new MenuNotFoundException("해당하는 메뉴가 없습니다"));
+        return MenuIdDto.toDto(menu);
     }
 }

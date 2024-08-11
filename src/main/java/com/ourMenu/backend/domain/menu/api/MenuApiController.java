@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.api;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.*;
+import com.ourMenu.backend.domain.menu.dto.request.PostMenuIdRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.PostPhotoRequest;
 import com.ourMenu.backend.domain.menu.dto.response.*;
@@ -44,16 +45,6 @@ public class MenuApiController {
         return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
     }
 
-    // 전체 조회
-//    @GetMapping("")
-//    public ApiResponse<List<MenuDto>> getAllMenu(@RequestParam(required = false) String title,
-//                                              @RequestParam(required = false) String tag,
-//                                              @RequestParam(required = false) Integer menuFolderId, @UserId Long userId) {
-//        List<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria(title, tag, menuFolderId, userId);
-//
-//        return ApiUtils.success(menusByCriteria);
-//    }
-
     @GetMapping("")
     public ApiResponse<List<MenuDto>> getAllMenu(
             @RequestParam(required = false) String title,
@@ -71,7 +62,6 @@ public class MenuApiController {
         // 서비스 호출
         Page<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria2(title, tags, menuFolderId, userId, minPrice, maxPrice, pageable);
 
-        log.info("난 하지 못해 이 것");
         // ApiResponse로 반환
         return ApiUtils.success(menusByCriteria.getContent());
     }
@@ -85,6 +75,16 @@ public class MenuApiController {
         return ApiUtils.success(certainMenu);
     }
 
+    // 부분 삭제용 특정 메뉴 아이디 조회
+    @PostMapping("/{groupId}")
+    public ApiResponse<MenuIdDto> getMenuId(@UserId Long userId, @PathVariable Long groupId, @RequestBody PostMenuIdRequest postMenuIdRequest) {
+        Long menuFolderId = postMenuIdRequest.getMenuFolderId();
+        MenuIdDto menuIdDto = menuService.getCertainMenuId(userId, menuFolderId, groupId);
+
+        return ApiUtils.success(menuIdDto);
+    }
+
+
     // 메뉴 생성
     @PostMapping("")
     public ApiResponse<PostMenuResponse> saveMenu(@RequestBody PostMenuRequest postMenuRequest, @UserId Long id) {
@@ -96,7 +96,7 @@ public class MenuApiController {
     @PostMapping(value = "/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> saveMenuImage(@ModelAttribute PostPhotoRequest photoRequest, @UserId Long userId) {
-        menuService.createMenuImage(photoRequest, userId);
+        menuService.createMenuImage(photoRequest, userId, photoRequest.getMenuGroupId());
         return ApiUtils.success("OK");
     }
 
@@ -115,7 +115,7 @@ public class MenuApiController {
     }
 
     @PatchMapping("/{groupId}")
-    public ApiResponse<String> updateMenu (@PathVariable Long groupId, @UserId Long userId, PostMenuRequest postMenuRequest){
+    public ApiResponse<String> updateMenu (@PathVariable Long groupId, @UserId Long userId, @RequestBody PostMenuRequest postMenuRequest){
         menuService.updateMenu(groupId, userId, postMenuRequest);       // Hard Delete
         return ApiUtils.success("OK");  //OK 반환
     }
@@ -126,7 +126,7 @@ public class MenuApiController {
     @PatchMapping(value = "/{groupId}/photo",
             consumes = MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> updateMenuImages(@PathVariable Long groupId, @UserId Long userId, @ModelAttribute PostPhotoRequest photoRequest){
-        menuService.createMenuImage(photoRequest, userId);
+        menuService.createMenuImage(photoRequest, userId, groupId);
 
         return ApiUtils.success("OK");
     }
@@ -141,7 +141,7 @@ public class MenuApiController {
                         .menuId(menu.getId())
                         .menuTitle(menu.getTitle())
                         .menuPrice(menu.getPrice())
-                        .menuIcon(menu.getIcon())
+                        .menuIcon(menu.getMenuIconType())
                         .menuTags(menu.getTags().stream().map(tag ->
                                 TagDTO.builder()
                                         .tagTitle(tag.getTag().getName())
