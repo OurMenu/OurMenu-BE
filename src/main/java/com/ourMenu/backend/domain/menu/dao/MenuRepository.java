@@ -23,6 +23,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m JOIN FETCH m.user u JOIN FETCH m.place p JOIN FETCH m.menuList ml WHERE m.groupId = :groupId")
     List<Menu> findByGroupIdWithFetch(@Param("groupId") Long groupId);
 
+    @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MAX(m2.id) FROM Menu m2 WHERE m2.place.id = :placeId AND m2.user.id = :userId AND m2.status IN :status GROUP BY m2.groupId)")
+    Optional<List<Menu>> findMenuByPlaceIdAndUserId(@Param("placeId") Long placeId, @Param("userId") Long userId, @Param("status")List<MenuStatus> statuses);
     @Query("SELECT m FROM Menu m WHERE m.place.id = :placeId AND m.status IN :status")
     Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status") List<MenuStatus> statuses);
 

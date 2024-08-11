@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,6 @@ public class MenuService {
     }
 
 
-
     @Transactional
     // 메뉴 등록 * (이미지 제외)
     public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
@@ -112,6 +112,7 @@ public class MenuService {
             throw new RuntimeException("해당 식당에 이미 동일한 메뉴명이 존재합니다. 메뉴판 ID: " + existingId + " (해당 메뉴판에서 확인해주세요.)");
         }
 
+
         // 식당, 메뉴판 연관관계 설정
 
         for (Long menuFolderId : menuFolderIds) {
@@ -140,7 +141,6 @@ public class MenuService {
 
         return new PostMenuResponse(maxGroupId);
     }
-
 
 
     // 메뉴 태그 등록
@@ -305,8 +305,8 @@ public class MenuService {
     }
 
     @Transactional
-    public List<Menu> findMenuByPlace(Long placeId){
-        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+    public List<Menu> findMenuByPlace(Long placeId, Long userId){
+        List<Menu> menuList = menuRepository.findMenuByPlaceIdAndUserId(placeId, userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
                 .orElseThrow(() -> new MenuNotFoundException());
 
         if(menuList.isEmpty()){
@@ -377,6 +377,23 @@ public class MenuService {
         for (Menu menu : byUserIdAndGroupId) {
             removeMenu(menu);
         }
+    }
+
+
+    @Transactional
+    public List<Menu> getAllMenusByTagName(String tag, Long userId){
+            String[] integers = {tag};
+            Pageable pageable = PageRequest.of(1, 5);
+            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId, 0, 100000000, pageable);
+//        List<Menu> menus = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId);
+            //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+            List<Menu> menuList = menuPage.getContent();
+            return menuList; // List<MenuDto> 반환
+        }
+    @Transactional(readOnly = true)
+    public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
+        return menuRepository.findByUserIdAndGroupId(userId, groupId);
+
     }
 
     public MenuIdDto getCertainMenuId(Long userId, Long menuFolderId, Long groupId) {

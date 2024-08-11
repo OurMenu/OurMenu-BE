@@ -1,8 +1,11 @@
 package com.ourMenu.backend.domain.onboarding.application;
 
+import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
+import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
 import com.ourMenu.backend.domain.onboarding.util.S3Util;
 import com.ourMenu.backend.domain.store.domain.Store;
@@ -17,6 +20,7 @@ import java.util.*;
 public class OnBoardingService {
 
     private final MenuRepository menuRepository;
+    private final MenuService menuService;
 
     public List<Question> getAllQuestion() {
         return Question.getAllQuestions();
@@ -37,4 +41,7 @@ public class OnBoardingService {
     }
 
 
+    public List<Menu> findStoreByRandomTag(Long userId, DefaultTag randomTag) {
+        return menuService.getAllMenusByTagName(randomTag.getTagName(), userId);
+    }
 }
