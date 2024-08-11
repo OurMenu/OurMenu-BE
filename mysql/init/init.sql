@@ -37,7 +37,6 @@ create table menu (
                       modified_at datetime(6),
                       place_id bigint,
                       user_id bigint,
-                      icon varchar(255),
                       memo varchar(255),
                       memo_title varchar(255),
                       menu_icon_type varchar(255),
