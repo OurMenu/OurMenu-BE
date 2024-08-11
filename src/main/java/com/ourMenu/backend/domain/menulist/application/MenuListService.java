@@ -16,7 +16,6 @@ import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.domain.user.exception.UserException;
 import com.ourMenu.backend.global.common.Status;
-import com.ourMenu.backend.global.exception.ErrorCode;
 import com.ourMenu.backend.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -134,7 +133,7 @@ public class MenuListService {
                         .createdAt(menu.getCreatedAt())
                         .modifiedAt(menu.getModifiedAt())
                         .memo(menu.getMemo())
-                        .icon(menu.getIcon())
+                        .menuIconType(menu.getMenuIconType())
                         .user(user)
                         .images(new ArrayList<>(menu.getImages().stream()
                                 .map(image -> MenuImage.builder()
