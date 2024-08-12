@@ -26,6 +26,7 @@ public class Article {
     private User user;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "article")
+    @Builder.Default
     private List<ArticleMenu> articleMenuList = new ArrayList<>();
 
     private String title;
@@ -53,7 +54,7 @@ public class Article {
     }
 
     public void addArticleMenu(ArticleMenu articleMenu) {
-        this.addArticleMenu(articleMenu);
+        this.articleMenuList.add(articleMenu);
     }
 
     public void setStatus(Status status) {

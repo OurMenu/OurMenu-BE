@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(of = {"id", "title", "price","placeTitle","address","menuImage"})
 public class ArticleMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
