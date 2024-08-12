@@ -10,9 +10,12 @@ import com.ourMenu.backend.global.util.ApiUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.awt.*;
 
 import static com.ourMenu.backend.global.util.BindingResultUtils.getErrorMessages;
 
@@ -46,7 +49,7 @@ public class UserController {
         return ApiUtils.success(userService.getUserInfo(userId));
     }
 
-    @PatchMapping("/image")
+    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Object> uploadProfileImg(@UserId Long userId, @RequestParam("imgFile") MultipartFile file) {
         userService.uploadProfileImg(userId, file);
         return ApiUtils.success(null);
