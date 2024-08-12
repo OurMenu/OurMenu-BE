@@ -154,7 +154,7 @@ public class MenuApiController {
                         .groupId(menu.getGroupId())
                         .menuTitle(menu.getTitle())
                         .menuPrice(menu.getPrice())
-                        .menuIcon(menu.getMenuIconType())
+                        .menuIconType(menu.getMenuIconType())
                         .menuTags(menu.getTags().stream().map(tag ->
                                 TagDTO.builder()
                                         .tagTitle(tag.getTag().getName())
