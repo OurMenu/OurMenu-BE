@@ -70,6 +70,7 @@ public class ArticleService {
 
     /**
      * 게시글 조회
+     *
      * @param id
      * @return
      * @throws NoSuchArticleException id 값을 가진 article이 존재하지 않는 경우
@@ -82,6 +83,7 @@ public class ArticleService {
 
     /**
      * 게시글 메뉴조회 (test를 위해 필요)
+     *
      * @param id 게시글 id
      * @return 게시글
      */
@@ -93,16 +95,16 @@ public class ArticleService {
 
     /**
      * article을 groupIds와 userId 바탕으로 저장한다.
+     *
      * @param article
      * @param groupIds
      * @param userId
      * @return 저장한 article
      */
     @Transactional
-    public Article saveArticleWithMenu(Article article, List<Long> groupIds, Long userId){
+    public Article saveArticleWithMenu(Article article, List<Long> groupIds, Long userId) {
         User user = userService.getUserById(userId).get();
         article.confirmUser(user);
-        Article saveArticle = save(article);
         for (Long groupId : groupIds) {
             Menu menu = menuService.getAllMenusByGroupIdAndUserId(groupId, userId).get(0);
             ArticleMenu articleMenu = ArticleMenu.builder()
@@ -111,11 +113,11 @@ public class ArticleService {
                     .price(menu.getPrice())
                     .placeTitle(menu.getPlace().getTitle())
                     .address(menu.getPlace().getAddress())
-                    .menuImage(menu.getImages().get(0))
+                    .menuImage(menu.getImages().isEmpty() ? null : menu.getImages().get(0))
                     .build();
             article.addArticleMenu(articleMenu);
-            articleMenuService.save(articleMenu);
+//            articleMenuService.save(articleMenu);
         }
-        return article;
+        return save(article);
     }
 }
