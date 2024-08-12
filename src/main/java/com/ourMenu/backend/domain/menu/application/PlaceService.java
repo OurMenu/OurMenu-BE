@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -117,18 +115,12 @@ public class PlaceService {
 //                    .orElseThrow(() -> new MenuNotFoundException()));
 //        }
         List<Menu> result = menuRepository.findMenuByTitle(title, userId).orElseThrow(() -> new MenuNotFoundException());
-
-        for (Menu menu : result) {
-            menu.updateModifiedAt();
-        }
-
         return result;
     }
 
-    public List<Menu> findSearchHistory(Long userId){
+    public List<Menu> findSearchHistory(Long userId) {
         Pageable pageable = PageRequest.of(0, 15, Sort.by("modifiedAt").descending());
-        Page<Menu> menus = menuRepository.findByUserIdOrderByModifiedAt(userId, pageable);
-        List<Menu> recentMenus = menus.getContent();
-        return recentMenus;
+        List<Menu> menus = menuRepository.findDistinctByUserIdOrderByModifiedAtDesc(userId, pageable);
+        return menus;
     }
 }

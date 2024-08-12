@@ -97,5 +97,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "GROUP BY m2.groupId)")
     Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
 
-    Page<Menu> findByUserIdOrderByModifiedAt(Long userId, Pageable pageable);
+//    Page<Menu> findByUserIdOrderByModifiedAt(Long userId, Pageable pageable);
+
+    @Query("SELECT m FROM Menu m WHERE m.user.id = :userId AND m.modifiedAt = (" +
+            "SELECT MAX(subM.modifiedAt) FROM Menu subM WHERE subM.groupId = m.groupId AND subM.user.id = :userId" +
+            ") ORDER BY m.modifiedAt DESC")
+    List<Menu> findDistinctByUserIdOrderByModifiedAtDesc(@Param("userId") Long userId, Pageable pageable);
+
 }
