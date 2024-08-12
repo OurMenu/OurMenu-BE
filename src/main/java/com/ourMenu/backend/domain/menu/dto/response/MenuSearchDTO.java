@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class MenuSearchDTO {
-    private Long menuId;
-    private Long menuTitle;
-    private Long placeTitle;
+    private Long groupId;
+    private String menuTitle;
+    private String placeTitle;
     private String placeAddress;
 }
