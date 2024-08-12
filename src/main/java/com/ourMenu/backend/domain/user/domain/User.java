@@ -2,10 +2,11 @@ package com.ourMenu.backend.domain.user.domain;
 
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
-import com.ourMenu.backend.domain.place.domain.Place;
+import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,12 +25,15 @@ public class User {
     private String nickname;
     private String password;
 
+    @Column(name = "created_at", updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
+    @Column(name = "modified_at", insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime modifiedAt;
 
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('CREATED', 'DELETED', 'UPDATED') DEFAULT 'CREATED'")
     @Builder.Default
     private Status status = Status.CREATED;
 
@@ -55,5 +59,9 @@ public class User {
 
     public void addArticles(Article article){
         articles.add(article);
+    }
+
+    public void removeMenuList(MenuList menuList) {
+        menuLists.remove(menuList);
     }
 }

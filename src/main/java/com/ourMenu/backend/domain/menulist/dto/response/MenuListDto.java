@@ -1,7 +1,7 @@
 package com.ourMenu.backend.domain.menulist.dto.response;
 
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
-import com.ourMenu.backend.domain.menulist.domain.MenuListStatus;
+import com.ourMenu.backend.global.common.Status;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +14,7 @@ public class MenuListDto {
 
     private Long id;
 
-    private MenuListStatus status;
+    private Status status;
 
     private LocalDateTime createdAt;
 

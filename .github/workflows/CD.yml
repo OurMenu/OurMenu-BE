@@ -32,6 +32,17 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      # Setup Redis
+      - name: Setup Redis
+        uses: shogo82148/actions-setup-redis@v1.30.1
+        with:
+          redis-version: 6.2.0
+          redis-port: 6379
+          auto-start: true
+          redis-password: 12345678
+      # Redis Health Check
+      - name: Redis Health Check
+        run: redis-cli -h 127.0.0.1 -p 6379 -a 12345678 ping
 
         # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
         # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
@@ -47,6 +58,21 @@ jobs:
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: testdb
           SPRING_DATA_MONGODB_URL: ${{ secrets.MONGODB_URL }}
+
+          #auth
+          JWT_SECRET_KEY: asdfasdfkjalsdfjkalsdjfkljaskdlfjjaklsdjfklajdskfjaklsdjfklasdjkflajsdklfajklsdfjkalsdjfklajsdklfajkl
+          SPRINT_REDIS_HOST: localhost
+          REDIS_PASSWORD: 12345678
+          GMAIL_ADDRESS: qwer@naver.com
+          GMAIL_PASSWORD: 12423423
+
+          #S3
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          #ddl
+          SPRING_JPA_HIBERNATE_DDL_AUTO: update
         run: ./gradlew build --stacktrace
 
       # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push
