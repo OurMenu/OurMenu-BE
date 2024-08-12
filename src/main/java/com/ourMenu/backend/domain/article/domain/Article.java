@@ -31,14 +31,19 @@ public class Article {
     private String title;
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime modifiedAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.CREATED;
 
     private String thumbnail;
+
+    @Builder.Default
     private Long views = 0L;
 
     // 연관관계 메서드 //
