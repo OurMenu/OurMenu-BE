@@ -42,7 +42,7 @@ public class PlaceController {
                         .menuTitle(menu.getTitle())
                         .groupId(menu.getGroupId())
                         .placeId(menu.getPlace().getId())
-                        .menuIcon(menu.getIcon())
+                        .menuIconType(menu.getMenuIconType())
                         .longitude(menu.getPlace().getLongitude())
                         .latitude(menu.getPlace().getLatitude())
                         .build()

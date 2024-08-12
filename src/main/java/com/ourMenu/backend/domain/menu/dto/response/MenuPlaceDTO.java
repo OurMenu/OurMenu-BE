@@ -9,7 +9,7 @@ public class MenuPlaceDTO {
     private Long groupId;
     private Long placeId;
     private String menuTitle;
-    private String menuIcon;
+    private String menuIconType;
     private Double latitude;
     private Double longitude;
 }
