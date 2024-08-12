@@ -27,12 +27,13 @@ public class PlaceController {
     private final PlaceService placeService;
     private final MenuService menuService;
 
-    @GetMapping("/place")
-    public ApiResponse<List<GetPlaceResponse>> GetPlace(@UserId Long userId){
-        List<Place> placeList = placeService.findPlacesByUserId(userId);
-        List<GetPlaceResponse> getPlaceResponseList = placeList.stream().map(GetPlaceResponse::toDto).toList();
-        return ApiUtils.success(getPlaceResponseList);
-    }
+    // "/map" 으로 변경
+//    @GetMapping("/place")
+//    public ApiResponse<List<GetPlaceResponse>> GetPlace(@UserId Long userId){
+//        List<Place> placeList = placeService.findPlacesByUserId(userId);
+//        List<GetPlaceResponse> getPlaceResponseList = placeList.stream().map(GetPlaceResponse::toDto).toList();
+//        return ApiUtils.success(getPlaceResponseList);
+//    }
 
     @GetMapping("")
     public ApiResponse<List<MenuPlaceDTO>> getPlaceMenu(@UserId Long userId){
