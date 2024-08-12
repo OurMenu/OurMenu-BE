@@ -100,4 +100,18 @@ public class PlaceService {
         log.info(menuList.toString());
         return menuList;
     }
+
+    public List<Menu> findMenuByTitle(String title, Long userId){
+        List<Menu> result = new ArrayList<>();
+        List<Menu> menus = menuRepository.findMenuByTitle(title, userId).orElseThrow(() -> new MenuNotFoundException());
+        result.addAll(menus);
+
+        List<Place> places = placeRepository.findPlaceByTitle(title, userId).orElseThrow(() -> new RuntimeException());
+        for (Place place : places) {
+            result.addAll(menuRepository.findMenuByPlaceIdAndUserId(place.getId(), userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+                    .orElseThrow(() -> new MenuNotFoundException()));
+        }
+
+        return result;
+    }
 }

@@ -90,12 +90,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
                                        @Param("maxPrice") int maxPrice,
                                        Pageable pageable);
 
-
-
-
-
-
-
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
 
@@ -103,4 +97,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
 
     boolean existsByPlaceIdAndMenuListIdAndTitle(Long placeId, Long menuListId, String title);
+
+    @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MIN(m2.id) FROM Menu m2 WHERE m2.title LIKE %:title% AND m2.user.id = :userId GROUP BY m2.groupId)")
+    Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
 }

@@ -50,5 +50,18 @@ public class PlaceController {
         return ApiUtils.success(response);
     }
 
+    @GetMapping("/search")
+    public ApiResponse<List<MenuSearchDTO>> getSearchResult(@RequestParam String title, @UserId Long userId){
+        List<Menu> menuByTitle = placeService.findMenuByTitle(title, userId);
+        List<MenuSearchDTO> response = menuByTitle.stream().map(menu ->
+                MenuSearchDTO.builder()
+                        .groupId(menu.getGroupId())
+                        .menuTitle(menu.getTitle())
+                        .placeTitle(menu.getPlace().getTitle())
+                        .placeAddress(menu.getPlace().getAddress())
+                        .build()
+                ).collect(Collectors.toList());
 
+        return ApiUtils.success(response);
+    }
 }
