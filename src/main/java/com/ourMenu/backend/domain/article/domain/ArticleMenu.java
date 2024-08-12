@@ -25,9 +25,7 @@ public class ArticleMenu {
 
     private String title;
 
-    private Long price;
-
-    private String image;
+    private int price;
 
     private String placeTitle;
 

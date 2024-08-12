@@ -6,11 +6,17 @@ import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
+import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
+import com.ourMenu.backend.domain.user.application.UserService;
+import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -20,6 +26,9 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final ArticleMenuRepository articleMenuRepository;
+    private final UserService userService;
+    private final MenuService menuService;
+    private final ArticleMenuService articleMenuService;
 
     /**
      * 게시글을 저장한다.
@@ -80,5 +89,33 @@ public class ArticleService {
     public ArticleMenu findArticleMenu(Long id) {
         return articleMenuRepository.findById(id)
                 .orElseThrow(NoSuchArticleMenuException::new);
+    }
+
+    /**
+     * article을 groupIds와 userId 바탕으로 저장한다.
+     * @param article
+     * @param groupIds
+     * @param userId
+     * @return 저장한 article
+     */
+    @Transactional
+    public Article saveArticleWithMenu(Article article, List<Long> groupIds, Long userId){
+        User user = userService.getUserById(userId).get();
+        article.confirmUser(user);
+        Article saveArticle = save(article);
+        for (Long groupId : groupIds) {
+            Menu menu = menuService.getAllMenusByGroupIdAndUserId(groupId, userId).get(0);
+            ArticleMenu articleMenu = ArticleMenu.builder()
+                    .article(article)
+                    .title(menu.getTitle())
+                    .price(menu.getPrice())
+                    .placeTitle(menu.getPlace().getTitle())
+                    .address(menu.getPlace().getAddress())
+                    .menuImage(menu.getImages().get(0))
+                    .build();
+            article.addArticleMenu(articleMenu);
+            articleMenuService.save(articleMenu);
+        }
+        return article;
     }
 }
