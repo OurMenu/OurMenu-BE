@@ -98,6 +98,13 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     boolean existsByPlaceIdAndMenuListIdAndTitle(Long placeId, Long menuListId, String title);
 
-    @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MIN(m2.id) FROM Menu m2 WHERE m2.title LIKE %:title% AND m2.user.id = :userId GROUP BY m2.groupId)")
+//    @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MIN(m2.id) FROM Menu m2 WHERE m2.title LIKE %:title% AND m2.user.id = :userId GROUP BY m2.groupId)")
+//    Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
+
+    @Query("SELECT m FROM Menu m WHERE m.id IN " +
+            "(SELECT MIN(m2.id) FROM Menu m2 JOIN m2.place p " +
+            "WHERE (m2.title LIKE %:title% OR p.title LIKE %:title%) AND m2.user.id = :userId " +
+            "GROUP BY m2.groupId)")
     Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
+
 }
