@@ -14,8 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PutArticleRequest {
 
-    private Long articleId;
-
     private String articleTitle;
 
     private String articleContent;

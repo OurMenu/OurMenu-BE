@@ -34,11 +34,13 @@ public class ArticleController {
         return ApiUtils.success(ArticleResponse.toDto(article));
     }
 
-    @PutMapping("/article")
-    public ApiResponse<ArticleResponse> putArticle(@RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
+    @PutMapping("/article/{articleId")
+    public ApiResponse<ArticleResponse> putArticle(@PathVariable Long articleId, @RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
         Article article = PutArticleRequest.toEntity(putArticleRequest);
         List<Long> menuGroupIds = putArticleRequest.getGroupIds();
-        Article saveArticle = articleService.updateArticleWithMenu(putArticleRequest.getArticleId(), article, menuGroupIds, userId);
+        Article saveArticle = articleService.updateArticleWithMenu(articleId, article, menuGroupIds, userId);
         return ApiUtils.success(ArticleResponse.toDto(saveArticle));
     }
+
+
 }
