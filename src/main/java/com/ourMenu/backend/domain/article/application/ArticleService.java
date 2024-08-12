@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -114,10 +112,33 @@ public class ArticleService {
                     .placeTitle(menu.getPlace().getTitle())
                     .address(menu.getPlace().getAddress())
                     .menuImage(menu.getImages().isEmpty() ? null : menu.getImages().get(0))
+                    .groupId(menu.getGroupId())
                     .build();
             article.addArticleMenu(articleMenu);
-//            articleMenuService.save(articleMenu);
         }
         return save(article);
+    }
+
+    @Transactional
+    public Article updateArticleWithMenu(Long articleId, Article article, List<Long> groupIds, Long userId) {
+
+        User user = userService.getUserById(userId).get();
+        Article findArticle = findOne(articleId);
+
+
+        for (Long groupId : groupIds) {
+            Menu menu = menuService.getAllMenusByGroupIdAndUserId(groupId, userId).get(0);
+            ArticleMenu articleMenu = ArticleMenu.builder()
+                    .article(findArticle)
+                    .title(menu.getTitle())
+                    .price(menu.getPrice())
+                    .placeTitle(menu.getPlace().getTitle())
+                    .address(menu.getPlace().getAddress())
+                    .menuImage(menu.getImages().isEmpty() ? null : menu.getImages().get(0))
+                    .build();
+            findArticle.addArticleMenu(articleMenu);
+        }
+        findArticle.update(article);
+        return findArticle;
     }
 }

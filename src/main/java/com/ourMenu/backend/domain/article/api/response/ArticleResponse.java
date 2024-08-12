@@ -31,7 +31,7 @@ public class ArticleResponse {
                 .userImgUrl(article.getUser().getImgUrl())
                 .createdBy(article.getCreatedAt())
                 .articleContent(article.getContent())
-                .articleThumbnail(article.getThumbnail())
+                .articleThumbnail(article.getArticleMenuList().isEmpty() ? null : article.getArticleMenuList().get(0).getMenuImage().getUrl())
                 .articleViews(article.getViews())
                 .articleMenus(article.getArticleMenuList().stream().map(ArticleMenuResponse::toDto).toList())
                 .build();

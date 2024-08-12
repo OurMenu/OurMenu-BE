@@ -34,6 +34,8 @@ public class ArticleMenu {
     @OneToOne(fetch = FetchType.LAZY)
     private MenuImage menuImage;
 
+    private Long groupId;
+
     public void confirmArticle(Article article){
         this.article = article;
         article.addArticleMenu(this);

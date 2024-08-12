@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.api;
 
 import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
+import com.ourMenu.backend.domain.article.api.request.PutArticleRequest;
 import com.ourMenu.backend.domain.article.api.response.ArticleResponse;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.domain.Article;
@@ -33,4 +34,11 @@ public class ArticleController {
         return ApiUtils.success(ArticleResponse.toDto(article));
     }
 
+    @PutMapping("/article")
+    public ApiResponse<ArticleResponse> putArticle(@RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
+        Article article = PutArticleRequest.toEntity(putArticleRequest);
+        List<Long> menuGroupIds = putArticleRequest.getGroupIds();
+        Article saveArticle = articleService.updateArticleWithMenu(putArticleRequest.getArticleId(), article, menuGroupIds, userId);
+        return ApiUtils.success(ArticleResponse.toDto(saveArticle));
+    }
 }

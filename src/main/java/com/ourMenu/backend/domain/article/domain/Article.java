@@ -42,7 +42,6 @@ public class Article {
     @Builder.Default
     private Status status = Status.CREATED;
 
-    private String thumbnail;
 
     @Builder.Default
     private int views = 0;
@@ -59,5 +58,12 @@ public class Article {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void update(Article article){
+        this.title=article.getTitle();
+        this.content=article.getContent();
+        this.modifiedAt=LocalDateTime.now();
+        this.status=Status.UPDATED;
     }
 }
