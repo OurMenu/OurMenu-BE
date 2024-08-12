@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.menu.dao;
 import com.ourMenu.backend.domain.menu.domain.Place;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +13,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @EntityGraph(attributePaths = "menu")
     List<Place> findAllByUserId(Long userId);
+
+    @Query("SELECT p FROM Place p WHERE p.user.id = :userId")
+    Optional<List<Place>> findPlacesByUserId(Long userId);
 }

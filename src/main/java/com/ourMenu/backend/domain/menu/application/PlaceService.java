@@ -1,8 +1,12 @@
 package com.ourMenu.backend.domain.menu.application;
 
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dao.PlaceRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,6 +26,7 @@ public class PlaceService {
 
     private final PlaceRepository placeRepository;
     private final UserService userService;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public Place createPlace(StoreRequestDTO storeInfo, Long userId) {
@@ -73,5 +80,24 @@ public class PlaceService {
      */
     public List<Place> findPlacesByUserId(Long userId){
         return placeRepository.findAllByUserId(userId);
+    }
+
+    public List<Menu> findMenuInPlaceByUserId(Long userId){
+        List<Place> places = placeRepository.findPlacesByUserId(userId).orElseThrow(() -> new RuntimeException());
+        List<Menu> menuList = new ArrayList<>();
+
+        log.info(places.toString());
+
+        for (Place place : places) {
+            List<Menu> menus = menuRepository.findMenuByPlaceIdAndUserId(
+                    place.getId(),
+                    userId,
+                    Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED)
+            ).orElseThrow(() -> new MenuNotFoundException());
+            menuList.addAll(menus);
+        }
+
+        log.info(menuList.toString());
+        return menuList;
     }
 }
