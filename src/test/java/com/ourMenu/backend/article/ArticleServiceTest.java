@@ -25,14 +25,12 @@ public class ArticleServiceTest {
     @Autowired
     ArticleService articleService;
     ArticleMenu articleMenu1 = ArticleMenu.builder()
-            .image("image1")
             .title("제목1")
-            .price(1000L)
+            .price(1000)
             .build();
     ArticleMenu articleMenu2 = ArticleMenu.builder()
-            .image("image2")
             .title("제목2")
-            .price(2000L)
+            .price(2000)
             .build();
 
     @DisplayName("save 로직에서 발생하는 쿼리수릃 확인한다.")
