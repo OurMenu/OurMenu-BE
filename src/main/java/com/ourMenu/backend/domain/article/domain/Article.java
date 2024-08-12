@@ -45,7 +45,7 @@ public class Article {
     private String thumbnail;
 
     @Builder.Default
-    private Long views = 0L;
+    private int views = 0;
 
     // 연관관계 메서드 //
     public void confirmUser(User user) {
