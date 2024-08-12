@@ -79,6 +79,13 @@ public class ArticleService {
                 .orElseThrow(NoSuchArticleException::new);
     }
 
+    @Transactional
+    public Article visitArticleById(Long id){
+        Article article = findOne(id);
+        article.visit();
+        return article;
+    }
+
     /**
      * 게시글 메뉴조회 (test를 위해 필요)
      *

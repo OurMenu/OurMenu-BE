@@ -30,7 +30,7 @@ public class ArticleController {
 
     @GetMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> getArticle(@PathVariable Long articleId) {
-        Article article = articleService.findOne(articleId);
+        Article article = articleService.visitArticleById(articleId);
         return ApiUtils.success(ArticleResponse.toDto(article));
     }
 

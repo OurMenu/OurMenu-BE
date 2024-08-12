@@ -66,4 +66,8 @@ public class Article {
         this.modifiedAt=LocalDateTime.now();
         this.status=Status.UPDATED;
     }
+
+    public void visit(){
+        this.views++;
+    }
 }
