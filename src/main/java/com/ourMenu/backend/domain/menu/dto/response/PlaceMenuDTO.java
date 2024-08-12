@@ -12,7 +12,7 @@ public class PlaceMenuDTO {
     private Long groupId;
     private String menuTitle;
     private int menuPrice;
-    private String menuIcon;
+    private String menuIconType;
     private List<TagDTO> menuTags;
     private List<MenuImageDto> menuImgsUrl;
     private List<PlaceMenuFolderDTO> menuFolders;
