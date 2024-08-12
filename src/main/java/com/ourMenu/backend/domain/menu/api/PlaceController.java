@@ -64,4 +64,19 @@ public class PlaceController {
 
         return ApiUtils.success(response);
     }
+
+    @GetMapping("/search-history")
+    public ApiResponse<List<MenuSearchDTO>> getSearchHistory(@UserId Long userId){
+        List<Menu> searchHistory = placeService.findSearchHistory(userId);
+        List<MenuSearchDTO> response = searchHistory.stream().map(menu ->
+                MenuSearchDTO.builder()
+                        .groupId(menu.getGroupId())
+                        .menuTitle(menu.getTitle())
+                        .placeTitle(menu.getPlace().getTitle())
+                        .placeAddress(menu.getPlace().getAddress())
+                        .build()
+        ).collect(Collectors.toList());
+
+        return ApiUtils.success(response);
+    }
 }

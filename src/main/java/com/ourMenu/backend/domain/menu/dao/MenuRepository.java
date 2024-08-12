@@ -97,4 +97,5 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "GROUP BY m2.groupId)")
     Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
 
+    Page<Menu> findByUserIdOrderByModifiedAt(Long userId, Pageable pageable);
 }
