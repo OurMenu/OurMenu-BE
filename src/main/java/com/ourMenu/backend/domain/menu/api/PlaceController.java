@@ -78,9 +78,14 @@ public class PlaceController {
     @GetMapping("/{groupId}")
     public ApiResponse<MapMenuDTO> getMenuInfo(@PathVariable Long groupId, @UserId Long userId){
         List<Menu> menus = menuService.getAllMenusByGroupIdAndUserId(groupId, userId);
-        Menu menu = menus.get(0);
 
-        int menuFolderCount = (int) menus.stream().count() - 1;
+        // "기본 메뉴판"이 아닌 첫 번째 메뉴를 찾기
+        Menu menu = menus.stream()
+                .filter(m -> !"기본 메뉴판".equals(m.getTitle()))
+                .findFirst()
+                .orElse(menus.get(0)); // "기본 메뉴판"이 아닌 메뉴가 없으면 첫 번째 메뉴 사용
+
+        int menuFolderCount = menus.size() - 1;
 
 //        List<PlaceMenuFolderDTO> menuFolders = new ArrayList<>();
 //        for (Menu menu : menus) {

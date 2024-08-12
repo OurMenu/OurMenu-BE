@@ -139,8 +139,15 @@ public class MenuApiController {
 
 
         List<MapMenuDTO> response = menus.stream().map(menu ->{
-                int menuFolderCount = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).size() - 1;
+//                int menuFolderCount = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).size() - 1;
+            List<Menu> menuByGroupId = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId);
 
+            Menu filteredMenu = menus.stream()
+                    .filter(m -> !"기본 메뉴판".equals(m.getTitle()))
+                    .findFirst()
+                    .orElse(menus.get(0)); // "기본 메뉴판"이 아닌 메뉴가 없으면 첫 번째 메뉴 사용
+
+            int menuFolderCount = menuByGroupId.size() -1;
 
                 return MapMenuDTO.builder()
 //                        .menuId(menu.getId())
