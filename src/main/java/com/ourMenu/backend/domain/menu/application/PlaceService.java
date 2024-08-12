@@ -11,13 +11,15 @@ import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -113,7 +115,12 @@ public class PlaceService {
 //                    .orElseThrow(() -> new MenuNotFoundException()));
 //        }
         List<Menu> result = menuRepository.findMenuByTitle(title, userId).orElseThrow(() -> new MenuNotFoundException());
-
         return result;
+    }
+
+    public List<Menu> findSearchHistory(Long userId) {
+        Pageable pageable = PageRequest.of(0, 15, Sort.by("modifiedAt").descending());
+        List<Menu> menus = menuRepository.findDistinctByUserIdOrderByModifiedAtDesc(userId, pageable);
+        return menus;
     }
 }

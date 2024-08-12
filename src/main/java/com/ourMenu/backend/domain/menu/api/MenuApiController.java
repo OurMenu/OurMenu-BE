@@ -134,27 +134,30 @@ public class MenuApiController {
 
 
     @GetMapping("/place/{placeId}")
-    public ApiResponse<List<PlaceMenuDTO>> findMenuByPlace(@PathVariable Long placeId, @UserId Long userId) {
+    public ApiResponse<List<MapMenuDTO>> findMenuByPlace(@PathVariable Long placeId, @UserId Long userId) {
         List<Menu> menus = menuService.findMenuByPlace(placeId, userId);
 
-        int menuFolderCount = 0;
 
+        List<MapMenuDTO> response = menus.stream().map(menu ->{
+//                int menuFolderCount = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).size() - 1;
+            List<Menu> menuByGroupId = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId);
 
-        List<PlaceMenuDTO> response = menus.stream().map(menu ->{
-                List<PlaceMenuFolderDTO> menuFolders = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).stream().map(m ->
-                    PlaceMenuFolderDTO.builder()
-                            .menuFolderTitle(m.getMenuList().getTitle())
-                            .menuFolderIcon(m.getMenuList().getIconType())
-                            .build()
-                      ).collect(Collectors.toList());
+            Menu filteredMenu = menus.stream()
+                    .filter(m -> !"기본 메뉴판".equals(m.getTitle()))
+                    .findFirst()
+                    .orElse(menus.get(0)); // "기본 메뉴판"이 아닌 메뉴가 없으면 첫 번째 메뉴 사용
 
+            int menuFolderCount = menuByGroupId.size() -1;
 
-                return PlaceMenuDTO.builder()
+                return MapMenuDTO.builder()
 //                        .menuId(menu.getId())
                         .groupId(menu.getGroupId())
                         .menuTitle(menu.getTitle())
                         .menuPrice(menu.getPrice())
                         .menuIconType(menu.getMenuIconType())
+                        .placeTitle(menu.getPlace().getTitle())
+                        .latitude(menu.getPlace().getLatitude())
+                        .longitude(menu.getPlace().getLongitude())
                         .menuTags(menu.getTags().stream().map(tag ->
                                 TagDTO.builder()
                                         .tagTitle(tag.getTag().getName())
@@ -168,8 +171,13 @@ public class MenuApiController {
                                                 .build())
                                 .collect(Collectors.toList())
                         )
-                        .menuFolders(menuFolders)
-                        .menuFolderCount(menuFolders.size() - 1)
+                        .menuFolder(
+                                MapMenuFolderDTO.builder()
+                                        .menuFolderTitle(menu.getMenuList().getTitle())
+                                        .menuFolderIcon(menu.getMenuList().getIconType())
+                                        .menuFolderCount(menuFolderCount)
+                                        .build()
+                        )
                         .build();
         }).collect(Collectors.toList());
 
