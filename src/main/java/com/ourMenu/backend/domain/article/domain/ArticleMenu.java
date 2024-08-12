@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.domain;
 
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -23,9 +24,17 @@ public class ArticleMenu {
     private Article article;
 
     private String title;
+
     private Long price;
 
     private String image;
+
+    private String placeTitle;
+
+    private String address;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private MenuImage menuImage;
 
     public void confirmArticle(Article article){
         this.article = article;
