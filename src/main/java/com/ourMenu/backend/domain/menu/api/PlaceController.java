@@ -17,7 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaceController {
 
-    private PlaceService placeService;
+    private final PlaceService placeService;
+    private final MenuService menuService;
 
     @GetMapping("/place")
     public ApiResponse<List<GetPlaceResponse>> GetPlace(@UserId Long userId){
