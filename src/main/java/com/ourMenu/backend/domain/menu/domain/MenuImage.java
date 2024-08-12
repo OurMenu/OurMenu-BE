@@ -16,6 +16,7 @@ public class MenuImage {
 
     @ManyToOne
     @JoinColumn(name = "menu_id")
+    //TODO 일부러 EAGER?
     private Menu menu;
 
     private String url;
