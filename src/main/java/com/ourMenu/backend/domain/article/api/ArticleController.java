@@ -8,10 +8,7 @@ import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +25,12 @@ public class ArticleController {
         List<Long> menuGroupIds = postArticleRequest.getGroupIds();
         Article saveArticle = articleService.saveArticleWithMenu(article, menuGroupIds, userId);
         return ApiUtils.success(ArticleResponse.toDto(saveArticle));
+    }
+
+    @GetMapping("/article/{articleId}")
+    public ApiResponse<ArticleResponse> getArticle(@PathVariable Long articleId) {
+        Article article = articleService.findOne(articleId);
+        return ApiUtils.success(ArticleResponse.toDto(article));
     }
 
 }
