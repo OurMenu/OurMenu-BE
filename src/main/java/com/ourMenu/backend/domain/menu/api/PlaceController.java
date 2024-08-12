@@ -1,20 +1,14 @@
 package com.ourMenu.backend.domain.menu.api;
 
-import com.ourMenu.backend.domain.menu.api.response.GetPlaceResponse;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.application.PlaceService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.menu.domain.Place;
-import com.ourMenu.backend.domain.menu.dto.response.MenuPlaceDTO;
-import com.ourMenu.backend.domain.menu.dto.response.MenuSearchDTO;
+import com.ourMenu.backend.domain.menu.dto.response.*;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,6 +71,59 @@ public class PlaceController {
                         .placeAddress(menu.getPlace().getAddress())
                         .build()
         ).collect(Collectors.toList());
+
+        return ApiUtils.success(response);
+    }
+
+    @GetMapping("/{groupId}")
+    public ApiResponse<MapMenuDTO> getMenuInfo(@PathVariable Long groupId, @UserId Long userId){
+        List<Menu> menus = menuService.getAllMenusByGroupIdAndUserId(groupId, userId);
+        Menu menu = menus.get(0);
+
+        int menuFolderCount = (int) menus.stream().count() - 1;
+
+//        List<PlaceMenuFolderDTO> menuFolders = new ArrayList<>();
+//        for (Menu menu : menus) {
+//            menuFolders = menuService.getAllMenusByGroupIdAndUserId(menu.getGroupId(), userId).stream().map(m ->
+//                    PlaceMenuFolderDTO.builder()
+//                            .menuFolderTitle(m.getMenuList().getTitle())
+//                            .menuFolderIcon(m.getMenuList().getIconType())
+//                            .build()
+//            ).collect(Collectors.toList());
+//        }
+
+
+//        Menu menu = placeService.findMenuByGroupIdAndUserId(groupId, userId);
+
+
+        MapMenuDTO response = MapMenuDTO.builder()
+                    .groupId(menu.getGroupId())
+                    .menuTitle(menu.getTitle())
+                    .menuPrice(menu.getPrice())
+                    .menuIconType(menu.getMenuIconType())
+                .placeTitle(menu.getPlace().getTitle())
+                .latitude(menu.getPlace().getLatitude())
+                .longitude(menu.getPlace().getLongitude())
+                    .menuTags(menu.getTags().stream().map(tag ->
+                                    TagDTO.builder()
+                                            .tagTitle(tag.getTag().getName())
+                                            .isCustom(tag.getTag().getIsCustom())
+                                            .build())
+                            .collect(Collectors.toList())
+                    )
+                    .menuImgsUrl(menu.getImages().stream().map(image ->
+                                    MenuImageDto.builder() // ImageDTO 클래스에 맞게 수정
+                                            .menuImgUrl(image.getUrl()) // 이미지 URL 필드 예시
+                                            .build())
+                            .collect(Collectors.toList())
+                    )
+                    .menuFolder(
+                            MapMenuFolderDTO.builder()
+                                    .menuFolderTitle(menu.getMenuList().getTitle())
+                                    .menuFolderIcon(menu.getMenuList().getIconType())
+                                    .menuFolderCount(menuFolderCount)
+                                    .build()
+                    ).build();
 
         return ApiUtils.success(response);
     }
