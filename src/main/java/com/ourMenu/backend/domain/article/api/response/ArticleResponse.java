@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.api.response;
 
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,9 +28,9 @@ public class ArticleResponse {
 
     public static ArticleResponse toDto(Article article) {
         String menuImg = null;
-        for (ArticleMenuResponse articleMenu : builder().articleMenus) {
-            if (articleMenu.getMenuImgUrl() != null) {
-                menuImg = articleMenu.getMenuImgUrl();
+        for (ArticleMenu articleMenu : article.getArticleMenuList()) {
+            if (articleMenu.getImgUrl() != null) {
+                menuImg = articleMenu.getImgUrl();
                 break;
             }
         }
