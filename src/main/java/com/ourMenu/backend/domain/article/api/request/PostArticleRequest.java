@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.api.request;
 
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +22,11 @@ public class PostArticleRequest {
     private List<ArticleMenuRequest> articleMenus;
 
     public static Article toEntity(PostArticleRequest postArticleRequest){
+        List<ArticleMenu> articleMenuList = postArticleRequest.getArticleMenus().stream().map(ArticleMenuRequest::toEntity).toList();
         return Article.builder()
                 .title(postArticleRequest.articleTitle)
                 .content(postArticleRequest.articleContent)
+                .articleMenuList(articleMenuList)
                 .build();
     }
 }
