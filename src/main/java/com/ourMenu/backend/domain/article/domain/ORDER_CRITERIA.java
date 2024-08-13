@@ -10,10 +10,8 @@ public enum ORDER_CRITERIA {
     CREATED_AT_DESC(Sort.Direction.DESC,"createdAt"),
     //오래된 순
     CREATED_AT_ASC(Sort.Direction.ASC,"createdAt"),
-    //오래된 순
     // 조회수 많은 순
     VIEWS_DESC(Sort.Direction.DESC, "views"),
-
     // 조회수 적은 순
     VIEWS_ASC(Sort.Direction.ASC, "views");
 

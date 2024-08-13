@@ -19,12 +19,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @EntityGraph(attributePaths = {"articleMenuList"})
     Optional<Article> findById(Long id);
 
+    @EntityGraph(attributePaths = {"articleMenuList"})
     @Query("SELECT m FROM Article m " +
-            "JOIN FETCH ArticleMenu " +
-            "WHERE m.user.id = :userId " +
-            "AND (:title IS NULL OR m.title LIKE %:title%) ")
-        // groupId를 기준으로 오름차순 정렬
-    Page<Article> findAllByUserAndTitleContaining(@Param("title") String title,
-                                               @Param("userId") Long userId,
-                                               Pageable pageable);
+            "WHERE (:title IS NULL OR m.title LIKE %:title%)")
+    Page<Article> findAllByUserAndTitleContaining(@Param("title") String title, Pageable pageable);
 }

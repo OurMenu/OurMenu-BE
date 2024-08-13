@@ -141,13 +141,12 @@ public class ArticleService {
      * @param page 페이지
      * @param size 페이지 크기
      * @param orderCriteria 정렬 기준
-     * @param userId 유저 Id
      * @return 조회된 게시글들
      */
     @Transactional
-    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria, Long userId){
+    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria){
         Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
-        Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, userId, pageable);
+        Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable);
         return menuPage.getContent();
     }
 }

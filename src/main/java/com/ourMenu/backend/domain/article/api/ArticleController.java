@@ -46,9 +46,8 @@ public class ArticleController {
     public ApiResponse<List<CommunityArticle>> getArticleList(@RequestParam(required = false) String title,//검색어
                                  @RequestParam(defaultValue = "0") int page, // 페이지 번호, 기본값은 0
                                  @RequestParam(defaultValue = "5") int size, // 페이지 크기, 기본값은 5
-                                 @RequestParam(value = "orderCriteria", defaultValue = "title") ORDER_CRITERIA orderCriteria,
-                                 @UserId Long userId){
-        List<Article> articleList = articleService.findArticleByUserIdAndOrderAndPage(title, page, size, orderCriteria, userId);
+                                 @RequestParam(value = "orderCriteria", defaultValue = "CREATED_AT_DESC") ORDER_CRITERIA orderCriteria){
+        List<Article> articleList = articleService.findArticleByUserIdAndOrderAndPage(title, page, size, orderCriteria);
         List<CommunityArticle> communityArticleList = articleList.stream().map(CommunityArticle::toDto).toList();
         return ApiUtils.success(communityArticleList);
     }
