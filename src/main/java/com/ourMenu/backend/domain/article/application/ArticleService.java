@@ -114,23 +114,13 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article updateArticleWithMenu(Long articleId, Article article, List<Long> groupIds, Long userId) {
+    public Article updateArticleWithMenu(Long articleId, Article article, Long userId) {
 
         User user = userService.getUserById(userId).get();
         Article findArticle = findOne(articleId);
-
-
-        for (Long groupId : groupIds) {
-            Menu menu = menuService.getAllMenusByGroupIdAndUserId(groupId, userId).get(0);
-            ArticleMenu articleMenu = ArticleMenu.builder()
-                    .article(findArticle)
-                    .title(menu.getTitle())
-                    .price(menu.getPrice())
-                    .placeTitle(menu.getPlace().getTitle())
-                    .address(menu.getPlace().getAddress())
-                    .menuImage(menu.getImages().isEmpty() ? null : menu.getImages().get(0))
-                    .build();
-            findArticle.addArticleMenu(articleMenu);
+        findArticle.deleteAllArticleMenus();
+        for (ArticleMenu articleMenu : article.getArticleMenuList()) {
+            article.addArticleMenu(articleMenu);
         }
         findArticle.update(article);
         return findArticle;
