@@ -34,7 +34,7 @@ public class ArticleController {
         return ApiUtils.success(ArticleResponse.toDto(article));
     }
 
-    @PutMapping("/article/{articleId")
+    @PutMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> putArticle(@PathVariable Long articleId, @RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
         Article article = PutArticleRequest.toEntity(putArticleRequest);
         List<Long> menuGroupIds = putArticleRequest.getGroupIds();
