@@ -260,7 +260,7 @@ public class ArticleServiceTest {
                 .articleMenus(List.of(articleMenuRequest1,articleMenuRequest2))
                 .build();
         Article article = PostArticleRequest.toEntity(postArticleRequest);
-        Article saveArticle = articleService.saveArticleWithMenu(article);
+        Article saveArticle = articleService.saveArticleWithMenu(article,userId);
         //then
         System.out.println("saveArticle.toString() = " + saveArticle.toString());
 

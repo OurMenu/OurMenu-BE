@@ -110,7 +110,9 @@ public class ArticleService {
      * @return 저장한 article
      */
     @Transactional
-    public Article saveArticleWithMenu(Article article) {
+    public Article saveArticleWithMenu(Article article, Long userId) {
+        User user = userService.getUserById(userId).get();
+        article.confirmUser(user);
         Article saveArticle = save(article);
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
             articleMenuService.save(articleMenu);
@@ -125,7 +127,9 @@ public class ArticleService {
         Article findArticle = findOne(articleId);
         findArticle.deleteAllArticleMenus();
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
-            article.addArticleMenu(articleMenu);
+            ArticleMenu saveArticleMenu = articleMenuService.save(articleMenu);
+            findArticle.addArticleMenu(saveArticleMenu);
+            saveArticleMenu.confirmArticle(findArticle);
         }
         findArticle.update(article);
         return findArticle;

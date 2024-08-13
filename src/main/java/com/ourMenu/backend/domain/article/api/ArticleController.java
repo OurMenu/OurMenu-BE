@@ -25,7 +25,7 @@ public class ArticleController {
     @PostMapping("/article")
     public ApiResponse<ArticleResponse> postArticle(@RequestBody PostArticleRequest postArticleRequest, @UserId Long userId) {
         Article article = PostArticleRequest.toEntity(postArticleRequest);
-        Article saveArticle = articleService.saveArticleWithMenu(article);
+        Article saveArticle = articleService.saveArticleWithMenu(article,userId);
         return ApiUtils.success(ArticleResponse.toDto(saveArticle));
     }
 
