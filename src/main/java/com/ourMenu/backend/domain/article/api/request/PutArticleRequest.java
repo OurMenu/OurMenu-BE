@@ -18,7 +18,7 @@ public class PutArticleRequest {
 
     private String articleContent;
 
-    private List<Long> groupIds;
+    private List<ArticleMenuRequest> articleMenus;
 
     public static Article toEntity(PutArticleRequest putArticleRequest){
         return Article.builder()

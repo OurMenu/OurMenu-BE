@@ -18,7 +18,7 @@ public class PostArticleRequest {
 
     private String articleContent;
 
-    private List<Long> groupIds;
+    private List<ArticleMenuRequest> articleMenus;
 
     public static Article toEntity(PostArticleRequest postArticleRequest){
         return Article.builder()
