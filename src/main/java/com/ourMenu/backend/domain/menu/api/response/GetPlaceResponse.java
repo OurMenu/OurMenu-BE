@@ -20,7 +20,7 @@ public class GetPlaceResponse {
         return GetPlaceResponse.builder()
                 .placeId(place.getId())
                 .placeTitle(place.getTitle())
-                .menuIcon(place.getMenus().get(0).getIcon())
+                .menuIcon(place.getMenus().get(0).getMenuIconType())
                 .latitude(place.getLatitude())
                 .longitude(place.getLongitude())
                 .build();

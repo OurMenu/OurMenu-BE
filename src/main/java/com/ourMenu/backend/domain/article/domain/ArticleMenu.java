@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.domain;
 
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.menu.domain.MenuImage;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(of = {"id", "title", "price","placeTitle","address","menuImage"})
 public class ArticleMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +24,17 @@ public class ArticleMenu {
     private Article article;
 
     private String title;
-    private Long price;
 
-    private String image;
+    private int price;
+
+    private String placeTitle;
+
+    private String address;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private MenuImage menuImage;
+
+    private Long groupId;
 
     public void confirmArticle(Article article){
         this.article = article;

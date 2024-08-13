@@ -5,6 +5,7 @@ import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
+import com.ourMenu.backend.domain.menu.dto.response.MenuIdDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -58,7 +59,7 @@ public class MenuService {
 
 
     @Transactional(readOnly = true)
-    public Long findMaxGroupId(Long userId) {
+    public Long findMaxGroupId(Long userId){
         List<Menu> menus = menuRepository.findByUserId(userId);
 
         Long maxGroupId = null;
@@ -122,6 +123,8 @@ public class MenuService {
                     .price(postMenuRequest.getMenuPrice())
                     .user(finduser)
                     .memo(postMenuRequest.getMenuMemo())
+                    .menuIconType(postMenuRequest.getMenuIconType())
+                    .memoTitle(postMenuRequest.getMenuMemoTitle())
                     .createdAt(LocalDateTime.now())
                     .modifiedAt(LocalDateTime.now())
                     .groupId(maxGroupId)
@@ -165,10 +168,10 @@ public class MenuService {
 
 
     @Transactional
-    public void createMenuImage(PostPhotoRequest request, long userId) {
+    public void createMenuImage(PostPhotoRequest request, long userId, long groupId) {
 
         List<MultipartFile> imgs = request.getMenuImgs();
-        long groupId = request.getMenuGroupId();
+
 
 
         List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(userId, groupId);
@@ -223,6 +226,10 @@ public class MenuService {
     }
 
 
+
+
+
+
     @Transactional
     public String updateMenuImage(PatchMenuImage patchMenuImage, long id, long userId) {
 
@@ -232,7 +239,7 @@ public class MenuService {
         List<MultipartFile> imgs = patchMenuImage.getMenuImgs();
 
         List<String> fileUrls = new ArrayList<>();
-        if (imgs != null) {
+        if(imgs != null) {
             removeImages(menu);
 
             for (MultipartFile img : imgs) {
@@ -272,14 +279,15 @@ public class MenuService {
     }
 
     @Transactional
-    public void removeImages(Menu menu) {
+    public void removeImages(Menu menu){
         menu.removeImage();
         em.flush();
     }
 
 
+
     @Transactional
-    public String removeMenu(Menu menu) {
+    public String removeMenu(Menu menu){
 
         User user = menu.getUser();
         Place place = menu.getPlace();
@@ -296,16 +304,12 @@ public class MenuService {
         return "OK";
     }
 
-/*    @Transactional
-    public List<Menu> findMenuByPlace(Long placeId) {
-        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED));
-    }*/
+    @Transactional
     public List<Menu> findMenuByPlace(Long placeId, Long userId){
         List<Menu> menuList = menuRepository.findMenuByPlaceIdAndUserId(placeId, userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
-
                 .orElseThrow(() -> new MenuNotFoundException());
 
-        if (menuList.isEmpty()) {
+        if(menuList.isEmpty()){
             throw new MenuNotFoundException();
         }
 
@@ -317,7 +321,7 @@ public class MenuService {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
-
+    
     @Transactional
     public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
         List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
@@ -334,7 +338,7 @@ public class MenuService {
 //    }
 
     @Transactional
-    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable) {
+    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
         // 메뉴를 페이징 처리하여 조회
 
         Integer tagCount = (tags != null && tags.length > 0) ? tags.length : null; // 태그가 없으면 null로 설정
@@ -346,8 +350,8 @@ public class MenuService {
             maxPrice = 999999; // 기본값: 무한대 (최대)
         }
 
-        log.info("가격은 " + minPrice);
-        log.info("가격은 " + maxPrice);
+        log.info("가격은 " +minPrice);
+        log.info("가격은 " +maxPrice);
         Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(title, tags, tagCount, menuFolderId, userId, minPrice, maxPrice, pageable);
 
 
@@ -390,5 +394,11 @@ public class MenuService {
     public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
         return menuRepository.findByUserIdAndGroupId(userId, groupId);
 
+    }
+
+    public MenuIdDto getCertainMenuId(Long userId, Long menuFolderId, Long groupId) {
+        Menu menu = menuRepository.findByUserIdAndMenuListIdAndGroupId(userId, menuFolderId, groupId)
+                .orElseThrow(() -> new MenuNotFoundException("해당하는 메뉴가 없습니다"));
+        return MenuIdDto.toDto(menu);
     }
 }

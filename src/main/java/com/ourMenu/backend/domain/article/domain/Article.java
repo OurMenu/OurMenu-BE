@@ -26,20 +26,25 @@ public class Article {
     private User user;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "article")
+    @Builder.Default
     private List<ArticleMenu> articleMenuList = new ArrayList<>();
 
     private String title;
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime modifiedAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.CREATED;
 
-    private String thumbnail;
-    private Long views = 0L;
+
+    @Builder.Default
+    private int views = 0;
 
     // 연관관계 메서드 //
     public void confirmUser(User user) {
@@ -48,10 +53,21 @@ public class Article {
     }
 
     public void addArticleMenu(ArticleMenu articleMenu) {
-        this.addArticleMenu(articleMenu);
+        this.articleMenuList.add(articleMenu);
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void update(Article article){
+        this.title=article.getTitle();
+        this.content=article.getContent();
+        this.modifiedAt=LocalDateTime.now();
+        this.status=Status.UPDATED;
+    }
+
+    public void visit(){
+        this.views++;
     }
 }

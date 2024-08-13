@@ -16,7 +16,10 @@ public class PostMenuRequest {
     private String menuTitle;
     private int menuPrice;
     private String menuMemo;
-    private String menuIcon;
+
+    private String menuMemoTitle;
+
+    private String menuIconType;
     //private String menuFolderTitle;
 
     // 식당 관련 정보
@@ -26,6 +29,4 @@ public class PostMenuRequest {
     private List<TagRequestDto> tagInfo;
 
     private List<Long> menuFolderIds;
-
-
 }

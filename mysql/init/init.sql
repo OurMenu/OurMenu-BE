@@ -37,12 +37,13 @@ create table menu (
                       modified_at datetime(6),
                       place_id bigint,
                       user_id bigint,
-                      icon varchar(255),
                       memo varchar(255),
+                      memo_title varchar(255),
+                      menu_icon_type varchar(255),
                       title varchar(255),
                       status enum ('CREATED','DELETED','UPDATED'),
                       primary key (menu_id)
-) engine=InnoDB;
+) engine=InnoDB
 
 create table menu_image (
                             menu_id bigint,

@@ -1,7 +1,6 @@
-package com.ourMenu.backend;
+package com.ourMenu.backend.menu;
 
 import com.ourMenu.backend.domain.menu.application.MenuService;
-import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.dto.request.TagRequestDto;
@@ -10,9 +9,6 @@ import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
 import com.ourMenu.backend.domain.onboarding.application.OnBoardingService;
-import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
-import com.ourMenu.backend.domain.onboarding.domain.Question;
-import com.ourMenu.backend.domain.onboarding.util.S3Util;
 import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
 import com.ourMenu.backend.domain.user.application.AccountService;
 import com.ourMenu.backend.domain.user.dao.UserDao;
@@ -27,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @SpringBootTest
-public class MenuController {
+public class MenuControllerTest {
 
     @Autowired
     OnBoardingService onBoardingService;
@@ -84,7 +80,7 @@ public class MenuController {
                 .menuTitle("메뉴1")
                 .menuPrice(1000)
                 .menuMemo("메모")
-                .menuIcon("1")
+                .menuIconType("1")
                 .menuFolderIds(List.of(menuList1.getId()))
                 .storeInfo(storeRequestDTO)
                 .tagInfo(tagRequestDtoList)
@@ -134,7 +130,7 @@ public class MenuController {
                 .menuTitle("메뉴1")
                 .menuPrice(1000)
                 .menuMemo("메모")
-                .menuIcon("1")
+                .menuIconType("1")
                 .menuFolderIds(List.of(menuList1.getId(),menuList2.getId()))
                 .storeInfo(storeRequestDTO)
                 .tagInfo(tagRequestDtoList)
