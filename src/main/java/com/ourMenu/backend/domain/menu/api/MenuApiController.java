@@ -47,7 +47,7 @@ public class MenuApiController {
 
     @GetMapping("")
     public ApiResponse<List<MenuDto>> getAllMenu(
-            @RequestParam(required = false) String title,
+
             @RequestParam(required = false) String[] tags, // 태그를 배열로 받도록 수정
             @RequestParam(required = false) Integer menuFolderId,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호, 기본값은 0
@@ -60,7 +60,7 @@ public class MenuApiController {
         Pageable pageable = PageRequest.of(page, size);
 
         // 서비스 호출
-        Page<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria2(title, tags, menuFolderId, userId, minPrice, maxPrice, pageable);
+        Page<MenuDto> menusByCriteria = menuService.getAllMenusByCriteria2(tags, menuFolderId, userId, minPrice, maxPrice, pageable);
 
         // ApiResponse로 반환
         return ApiUtils.success(menusByCriteria.getContent());
