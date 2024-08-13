@@ -25,6 +25,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MAX(m2.id) FROM Menu m2 WHERE m2.place.id = :placeId AND m2.user.id = :userId AND m2.status IN :status GROUP BY m2.groupId)")
     Optional<List<Menu>> findMenuByPlaceIdAndUserId(@Param("placeId") Long placeId, @Param("userId") Long userId, @Param("status")List<MenuStatus> statuses);
+
+    @Query("SELECT m FROM Menu m WHERE m.user.id = :userId AND m.place.id = :placeId AND m.createdAt = (" +
+            "SELECT MAX(subM.createdAt) FROM Menu subM WHERE subM.place.id = m.place.id AND subM.user.id = :userId" +
+            ") ORDER BY m.createdAt DESC")
+    Optional<Menu> findDistinctByUserIdOrderByCreatedAtDesc(@Param("placeId") Long placeId, @Param("userId") Long userId);
     @Query("SELECT m FROM Menu m WHERE m.place.id = :placeId AND m.status IN :status")
     Optional<List<Menu>> findMenuByPlaceId(@Param("placeId") Long placeId, @Param("status") List<MenuStatus> statuses);
 
@@ -85,5 +90,23 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("SELECT m FROM Menu m WHERE m.id = :menuId AND m.user.id = :userId")
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
+
+    boolean existsByPlaceIdAndMenuListIdAndTitle(Long placeId, Long menuListId, String title);
+
+//    @Query("SELECT m FROM Menu m WHERE m.id IN (SELECT MIN(m2.id) FROM Menu m2 WHERE m2.title LIKE %:title% AND m2.user.id = :userId GROUP BY m2.groupId)")
+//    Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
+
+    @Query("SELECT m FROM Menu m WHERE m.id IN " +
+            "(SELECT MIN(m2.id) FROM Menu m2 JOIN m2.place p " +
+            "WHERE (m2.title LIKE %:title% OR p.title LIKE %:title%) AND m2.user.id = :userId " +
+            "GROUP BY m2.groupId)")
+    Optional<List<Menu>> findMenuByTitle(@Param("title") String title, @Param("userId") Long userId);
+
+//    Page<Menu> findByUserIdOrderByModifiedAt(Long userId, Pageable pageable);
+
+    @Query("SELECT m FROM Menu m WHERE m.user.id = :userId AND m.modifiedAt = (" +
+            "SELECT MAX(subM.modifiedAt) FROM Menu subM WHERE subM.groupId = m.groupId AND subM.user.id = :userId" +
+            ") ORDER BY m.modifiedAt DESC")
+    List<Menu> findDistinctByUserIdOrderByModifiedAtDesc(@Param("userId") Long userId, Pageable pageable);
 
 }

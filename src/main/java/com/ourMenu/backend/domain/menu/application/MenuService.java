@@ -390,9 +390,14 @@ public class MenuService {
             List<Menu> menuList = menuPage.getContent();
             return menuList; // List<MenuDto> 반환
         }
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
-        return menuRepository.findByUserIdAndGroupId(userId, groupId);
+        List<Menu> menuList = menuRepository.findByUserIdAndGroupId(userId, groupId);
+        for (Menu menu : menuList) {
+            menu.updateModifiedAt();
+            menuRepository.save(menu);
+        }
+        return menuList;
 
     }
 
@@ -400,5 +405,9 @@ public class MenuService {
         Menu menu = menuRepository.findByUserIdAndMenuListIdAndGroupId(userId, menuFolderId, groupId)
                 .orElseThrow(() -> new MenuNotFoundException("해당하는 메뉴가 없습니다"));
         return MenuIdDto.toDto(menu);
+    }
+
+    public void updateModifiedAt(Menu menu){
+        menu.updateModifiedAt();
     }
 }

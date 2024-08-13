@@ -38,6 +38,9 @@ public enum ErrorCode {
     //S3 image
     IMAGE_NOT_LOADED_ERROR(HttpStatus.BAD_REQUEST, "I400", "이미지 업로드에 실패하였습니다."),
 
+    //place
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "P401", "식당을 찾을 수 없습니다.");
+
     ;
 
     private final HttpStatus status;

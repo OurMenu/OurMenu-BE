@@ -72,10 +72,10 @@ public class Menu {
 //        this.status = (this.status == null) ? MenuStatus.CREATED : this.status;
 //    }
 
-    @PreUpdate
-    public void preUpdate() {
-        this.modifiedAt = LocalDateTime.now();
-    }
+//    @PreUpdate
+//    public void preUpdate() {
+//        this.modifiedAt = LocalDateTime.now();
+//    }
 
     public void addMenuImage(MenuImage menuImage) {
         //System.out.println("menuImage = " + menuImage);
@@ -145,5 +145,9 @@ public class Menu {
 
     public void changeIcon(String icon) {
         this.menuIconType = icon;
+    }
+
+    public void updateModifiedAt(){
+        this.modifiedAt = LocalDateTime.now();
     }
 }

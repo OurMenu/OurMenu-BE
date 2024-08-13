@@ -1,17 +1,26 @@
 package com.ourMenu.backend.domain.menu.application;
 
+import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dao.PlaceRepository;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
+import com.ourMenu.backend.domain.menu.exception.PlaceNotFoundException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +29,7 @@ public class PlaceService {
 
     private final PlaceRepository placeRepository;
     private final UserService userService;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public Place createPlace(StoreRequestDTO storeInfo, Long userId) {
@@ -73,5 +83,44 @@ public class PlaceService {
      */
     public List<Place> findPlacesByUserId(Long userId){
         return placeRepository.findAllByUserId(userId);
+    }
+
+    public List<Menu> findMenuInPlaceByUserId(Long userId){
+        List<Place> places = placeRepository.findPlacesByUserId(userId).orElseThrow(() -> new PlaceNotFoundException());
+        List<Menu> menuList = new ArrayList<>();
+
+        log.info(places.toString());
+
+        for (Place place : places) {
+            Menu menu = menuRepository.findDistinctByUserIdOrderByCreatedAtDesc(
+                    place.getId(),
+                    userId
+            ).orElseThrow(() -> new MenuNotFoundException());
+            menuList.add(menu);
+        }
+
+        log.info(menuList.toString());
+        return menuList;
+    }
+
+    public List<Menu> findMenuByTitle(String title, Long userId){
+//        List<Menu> result = new ArrayList<>();
+//        List<Menu> menus = menuRepository.findMenuByTitle(title, userId).orElseThrow(() -> new MenuNotFoundException());
+//        result.addAll(menus);
+//
+//        List<Place> places = placeRepository.findPlaceByTitle(title, userId).orElseThrow(() -> new RuntimeException());
+//
+//        for (Place place : places) {
+//            result.addAll(menuRepository.findMenuByPlaceIdAndUserId(place.getId(), userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+//                    .orElseThrow(() -> new MenuNotFoundException()));
+//        }
+        List<Menu> result = menuRepository.findMenuByTitle(title, userId).orElseThrow(() -> new MenuNotFoundException());
+        return result;
+    }
+
+    public List<Menu> findSearchHistory(Long userId) {
+        Pageable pageable = PageRequest.of(0, 15, Sort.by("modifiedAt").descending());
+        List<Menu> menus = menuRepository.findDistinctByUserIdOrderByModifiedAtDesc(userId, pageable);
+        return menus;
     }
 }
