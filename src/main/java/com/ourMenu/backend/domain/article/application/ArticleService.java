@@ -99,31 +99,18 @@ public class ArticleService {
     }
 
     /**
-     * article을 groupIds와 userId 바탕으로 저장한다.
+     * article을 articleMenu와 함께 저장한다.
      *
      * @param article
-     * @param groupIds
-     * @param userId
      * @return 저장한 article
      */
     @Transactional
-    public Article saveArticleWithMenu(Article article, List<Long> groupIds, Long userId) {
-        User user = userService.getUserById(userId).get();
-        article.confirmUser(user);
-        for (Long groupId : groupIds) {
-            Menu menu = menuService.getAllMenusByGroupIdAndUserId(groupId, userId).get(0);
-            ArticleMenu articleMenu = ArticleMenu.builder()
-                    .article(article)
-                    .title(menu.getTitle())
-                    .price(menu.getPrice())
-                    .placeTitle(menu.getPlace().getTitle())
-                    .address(menu.getPlace().getAddress())
-                    .menuImage(menu.getImages().isEmpty() ? null : menu.getImages().get(0))
-                    .groupId(menu.getGroupId())
-                    .build();
-            article.addArticleMenu(articleMenu);
+    public Article saveArticleWithMenu(Article article) {
+        Article saveArticle = save(article);
+        for (ArticleMenu articleMenu : article.getArticleMenuList()) {
+            articleMenuService.save(articleMenu);
         }
-        return save(article);
+        return saveArticle;
     }
 
     @Transactional
