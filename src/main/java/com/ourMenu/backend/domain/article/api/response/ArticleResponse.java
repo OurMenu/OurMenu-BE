@@ -16,6 +16,7 @@ import java.util.List;
 public class ArticleResponse {
 
     private Long articleId;
+    private String articleTitle;
     private String userNickname;
     private String userImgUrl;
     private LocalDateTime createdBy;
@@ -34,6 +35,7 @@ public class ArticleResponse {
         }
         return ArticleResponse.builder()
                 .articleId(article.getId())
+                .articleTitle(article.getTitle())
                 .userNickname(article.getUser().getNickname())
                 .userImgUrl(article.getUser().getImgUrl())
                 .createdBy(article.getCreatedAt())
