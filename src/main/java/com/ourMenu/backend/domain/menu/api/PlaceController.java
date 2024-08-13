@@ -4,10 +4,15 @@ import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.application.PlaceService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.response.*;
+import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
+import com.ourMenu.backend.domain.menu.exception.PlaceNotFoundException;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
+import com.ourMenu.backend.global.exception.ErrorCode;
+import com.ourMenu.backend.global.exception.ErrorResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +25,16 @@ public class PlaceController {
 
     private final PlaceService placeService;
     private final MenuService menuService;
+
+    @ExceptionHandler(MenuNotFoundException.class)
+    public ResponseEntity<?> menuNotFoundException(MenuNotFoundException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.MENU_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(PlaceNotFoundException.class)
+    public ResponseEntity<?> placeNotFountException(PlaceNotFoundException e){
+        return ApiUtils.error(ErrorResponse.of(ErrorCode.PLACE_NOT_FOUND, e.getMessage()));
+    }
 
     // "/map" 으로 변경
 //    @GetMapping("/place")

@@ -7,6 +7,7 @@ import com.ourMenu.backend.domain.menu.domain.MenuStatus;
 import com.ourMenu.backend.domain.menu.domain.Place;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
+import com.ourMenu.backend.domain.menu.exception.PlaceNotFoundException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -85,18 +86,17 @@ public class PlaceService {
     }
 
     public List<Menu> findMenuInPlaceByUserId(Long userId){
-        List<Place> places = placeRepository.findPlacesByUserId(userId).orElseThrow(() -> new RuntimeException());
+        List<Place> places = placeRepository.findPlacesByUserId(userId).orElseThrow(() -> new PlaceNotFoundException());
         List<Menu> menuList = new ArrayList<>();
 
         log.info(places.toString());
 
         for (Place place : places) {
-            List<Menu> menus = menuRepository.findMenuByPlaceIdAndUserId(
+            Menu menu = menuRepository.findDistinctByUserIdOrderByCreatedAtDesc(
                     place.getId(),
-                    userId,
-                    Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED)
+                    userId
             ).orElseThrow(() -> new MenuNotFoundException());
-            menuList.addAll(menus);
+            menuList.add(menu);
         }
 
         log.info(menuList.toString());
