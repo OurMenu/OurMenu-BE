@@ -70,4 +70,8 @@ public class Article {
     public void visit(){
         this.views++;
     }
+
+    public void deleteAllArticleMenus(){
+        this.articleMenuList= new ArrayList<>();
+    }
 }
