@@ -1,5 +1,6 @@
 package com.ourMenu.backend.article;
 
+import com.ourMenu.backend.domain.article.api.request.ArticleMenuRequest;
 import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
@@ -238,16 +239,30 @@ public class ArticleServiceTest {
 
 
         //when
+        ArticleMenuRequest articleMenuRequest1=ArticleMenuRequest.builder()
+                .menuAddress("주소1")
+                .menuImgUrl("url1")
+                .menuPrice(1000)
+                .menuTitle("메뉴이름1")
+                .placeTitle("장소1")
+                .build();
+        //의도적으로 articleMenuRequest2는 이미지가 없다.
+        ArticleMenuRequest articleMenuRequest2=ArticleMenuRequest.builder()
+                .menuAddress("주소2")
+                .menuPrice(1000)
+                .menuTitle("메뉴이름1")
+                .placeTitle("장소1")
+                .build();
+
         PostArticleRequest postArticleRequest = PostArticleRequest.builder()
                 .articleTitle("게시글 제목")
                 .articleContent("게시글 내용")
-                .groupIds(List.of(postMenuResponse.getMenuGroupId()))
+                .articleMenus(List.of(articleMenuRequest1,articleMenuRequest2))
                 .build();
         Article article = PostArticleRequest.toEntity(postArticleRequest);
-        Article saveArticle = articleService.saveArticleWithMenu(article, List.of(postMenuResponse.getMenuGroupId()), userId);
+        Article saveArticle = articleService.saveArticleWithMenu(article);
         //then
         System.out.println("saveArticle.toString() = " + saveArticle.toString());
-
 
     }
 }
