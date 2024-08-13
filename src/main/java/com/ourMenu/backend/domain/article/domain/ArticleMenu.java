@@ -31,8 +31,7 @@ public class ArticleMenu {
 
     private String address;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private MenuImage menuImage;
+    private String imgUrl;
 
     private Long groupId;
 
