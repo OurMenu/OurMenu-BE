@@ -4,6 +4,7 @@ import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.article.domain.ArticleMenu;
+import com.ourMenu.backend.domain.article.domain.ORDER_CRITERIA;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
 import com.ourMenu.backend.domain.menu.application.MenuService;
@@ -13,6 +14,10 @@ import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,5 +129,21 @@ public class ArticleService {
         }
         findArticle.update(article);
         return findArticle;
+    }
+
+    /**
+     * 조건에 맞는 게시글을 조회한다
+     * @param title 검색어
+     * @param page 페이지
+     * @param size 페이지 크기
+     * @param orderCriteria 정렬 기준
+     * @param userId 유저 Id
+     * @return 조회된 게시글들
+     */
+    @Transactional
+    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria, Long userId){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
+        Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, userId, pageable);
+        return menuPage.getContent();
     }
 }
