@@ -31,7 +31,10 @@ public enum ErrorCode {
     PRIORITY_NOT_VALID(HttpStatus.BAD_REQUEST, "M403", "유효하지 않은 우선순위입니다."),
 
     //S3 image
-    IMAGE_NOT_LOADED_ERROR(HttpStatus.BAD_REQUEST, "I400", "이미지 업로드에 실패하였습니다.");
+    IMAGE_NOT_LOADED_ERROR(HttpStatus.BAD_REQUEST, "I400", "이미지 업로드에 실패하였습니다."),
+
+    //place
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "P401", "식당을 찾을 수 없습니다.");
 
 
     private final HttpStatus status;
