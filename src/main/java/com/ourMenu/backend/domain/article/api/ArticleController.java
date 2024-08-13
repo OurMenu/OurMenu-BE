@@ -23,8 +23,7 @@ public class ArticleController {
     @PostMapping("/article")
     public ApiResponse<ArticleResponse> postArticle(@RequestBody PostArticleRequest postArticleRequest, @UserId Long userId) {
         Article article = PostArticleRequest.toEntity(postArticleRequest);
-        List<Long> menuGroupIds = postArticleRequest.getGroupIds();
-        Article saveArticle = articleService.saveArticleWithMenu(article, menuGroupIds, userId);
+        Article saveArticle = articleService.saveArticleWithMenu(article);
         return ApiUtils.success(ArticleResponse.toDto(saveArticle));
     }
 
@@ -37,8 +36,7 @@ public class ArticleController {
     @PutMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> putArticle(@PathVariable Long articleId, @RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
         Article article = PutArticleRequest.toEntity(putArticleRequest);
-        List<Long> menuGroupIds = putArticleRequest.getGroupIds();
-        Article saveArticle = articleService.updateArticleWithMenu(articleId, article, menuGroupIds, userId);
+        Article saveArticle = articleService.updateArticleWithMenu(articleId, article, userId);
         return ApiUtils.success(ArticleResponse.toDto(saveArticle));
     }
 
