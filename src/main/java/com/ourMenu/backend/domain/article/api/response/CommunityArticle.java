@@ -40,7 +40,7 @@ public class CommunityArticle {
                 .userNickname(article.getUser().getNickname())
                 .userImgUrl(article.getUser().getImgUrl())
                 .createdBy(article.getCreatedAt())
-                .menusCount(-1)//TODO
+                .menusCount(article.getMenuCount())
                 .articleViews(article.getViews())
                 .articleThumbnail(menuImg)
                 .build();
