@@ -26,10 +26,6 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "G5004", "유저가 존재하지 않습니다."),
 
 
-    NO_SUCH_ELEMENT(HttpStatus.NOT_FOUND,"A404","해당하는 요소가 없습니다"),
-
-
-
     //search
     SEARCH_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND,"S404","검색 결과가 없습니다"),
 
