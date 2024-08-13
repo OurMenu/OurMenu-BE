@@ -25,13 +25,20 @@ public class ArticleResponse {
     List<ArticleMenuResponse> articleMenus;
 
     public static ArticleResponse toDto(Article article) {
+        String menuImg = null;
+        for (ArticleMenuResponse articleMenu : builder().articleMenus) {
+            if (articleMenu.getMenuImgUrl() != null) {
+                menuImg = articleMenu.getMenuImgUrl();
+                break;
+            }
+        }
         return ArticleResponse.builder()
                 .articleId(article.getId())
                 .userNickname(article.getUser().getNickname())
                 .userImgUrl(article.getUser().getImgUrl())
                 .createdBy(article.getCreatedAt())
                 .articleContent(article.getContent())
-                .articleThumbnail(article.getArticleMenuList().isEmpty() ? null : article.getArticleMenuList().get(0).getMenuImage().getUrl())
+                .articleThumbnail(menuImg)
                 .articleViews(article.getViews())
                 .articleMenus(article.getArticleMenuList().stream().map(ArticleMenuResponse::toDto).toList())
                 .build();

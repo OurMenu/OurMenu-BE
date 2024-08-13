@@ -21,7 +21,7 @@ public class ArticleMenuResponse {
         return ArticleMenuResponse.builder()
                 .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
-                .menuImgUrl(articleMenu.getMenuImage().getUrl())
+                .menuImgUrl(articleMenu.getImgUrl())
                 .menuAddress(articleMenu.getAddress())
                 .build();
     }
