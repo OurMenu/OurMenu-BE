@@ -386,7 +386,7 @@ public class MenuService {
             String[] integers = {tag};
              int tagCount = integers.length;
             Pageable pageable = PageRequest.of(1, 5);
-            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, 1,  userId, 0, 100000000, tagCount, pageable);
+            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, null,  userId, 0, 100000000, tagCount, pageable);
 //        List<Menu> menus = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId);
             //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
             List<Menu> menuList = menuPage.getContent();
