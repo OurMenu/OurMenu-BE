@@ -24,7 +24,8 @@ public class Tag {
     @OneToMany(mappedBy = "tag")
     private List<MenuTag> menuTags = new ArrayList<>();
 
-    private Boolean isCustom = true;
+
+    private Boolean isCustom;
 
 
     // 중간 테이블 추가
