@@ -57,7 +57,7 @@ public enum DefaultTag {
         Random random = new Random();
         Set<DefaultTag> set = new HashSet<>();
 
-        while(set.size() <= size){
+        while(set.size() < size){
             int randomValue = random.nextInt(25);
             if(set.contains(tags[randomValue]))
                 continue;
