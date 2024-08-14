@@ -63,27 +63,29 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
         // 메뉴와 메뉴 이미지 조인)           // 특정 메뉴 ID로 필터링
     List<Menu> findMenuWithPlaceAndImages();
 
-    @Query("SELECT m FROM Menu m " +
-            "JOIN m.tags mt " +
+    @Query("SELECT m FROM Menu m WHERE m.id IN (" +
+            "SELECT MIN(m2.id) FROM Menu m2 " +
+            "JOIN m2.place p " +
+            "LEFT JOIN m2.images mi " +
+            "JOIN m2.tags mt " +
             "JOIN mt.tag t " +
-            "WHERE m.user.id = :userId " +
-            "AND (:title IS NULL OR m.title LIKE %:title%) " +
-            "AND (:menuFolderId IS NULL OR m.menuList.id = :menuFolderId) " +
-            "AND (:minPrice IS NULL OR m.price >= :minPrice) " + // 최소 가격 조건
-            "AND (:maxPrice IS NULL OR m.price <= :maxPrice) " + // 최대 가격 조건
-            "AND (:tags IS NULL OR t.name IN :tags) " + // 태그 조건
-            "GROUP BY m.id " +
-            "HAVING (:tagCount IS NULL OR COUNT(DISTINCT t.name) = :tagCount) " + // tagCount가 null인 경우 조건 무시
-            "ORDER BY m.groupId ASC")
-        // groupId를 기준으로 오름차순 정렬
-    Page<Menu> findingMenusByCriteria2(@Param("title") String title,
-                                       @Param("tags") String[] tags, // 태그 배열
-                                       @Param("tagCount") Integer tagCount, // 태그 개수
+            "WHERE m2.user.id = :userId " +
+            // "AND (:title IS NULL OR m2.title LIKE %:title%) " +
+            "AND (:tags IS NULL OR (t.name IN :tags AND SIZE(m2.tags) = :tagCount)) " + // 태그 배열 조건
+            "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
+            "AND (:minPrice IS NULL OR m2.price >= :minPrice) " + // 최소 가격 조건
+            "AND (:maxPrice IS NULL OR m2.price <= :maxPrice) " + // 최대 가격 조건
+            "GROUP BY m2.groupId)")
+    Page<Menu> findingMenusByCriteria2(
+                                       @Param("tags") String[] tags, // 태그 배열로 변경
                                        @Param("menuFolderId") Integer menuFolderId,
                                        @Param("userId") Long userId,
-                                       @Param("minPrice") int minPrice,
-                                       @Param("maxPrice") int maxPrice,
+                                       @Param("minPrice") Integer minPrice,
+                                       @Param("maxPrice") Integer maxPrice,
+                                       @Param("tagCount") int tagCount, // 태그 개수 추가
                                        Pageable pageable);
+
+
 
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
