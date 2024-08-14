@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -44,10 +45,16 @@ public class OnBoardingController {
     }
 
     @GetMapping("/recommend/tag")
-    public ApiResponse<GetTagRecommends> getQuestionRecommend(@UserId Long userId) {
-        DefaultTag randomTag = DefaultTag.getRandomTag();
-        List<Menu> menuDtoList = onBoardService.findStoreByRandomTag(userId, randomTag);
-        return ApiUtils.success(GetTagRecommends.toDto(menuDtoList, randomTag));
+    public ApiResponse<List<GetTagRecommends>> getQuestionRecommend(@UserId Long userId) {
+        List<DefaultTag> defaultTagList = DefaultTag.getRandomTag(2);
+
+        List<GetTagRecommends> getTagRecommendsList = new ArrayList<>();
+        for (DefaultTag defaultTag : defaultTagList) {
+            List<Menu> menuList = onBoardService.findStoreByRandomTag(userId, defaultTag);
+            getTagRecommendsList.add(GetTagRecommends.toDto(menuList,defaultTag));
+        }
+
+        return ApiUtils.success(getTagRecommendsList);
 
     }
 }
