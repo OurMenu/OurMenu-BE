@@ -70,20 +70,25 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "JOIN m2.tags mt " +
             "JOIN mt.tag t " +
             "WHERE m2.user.id = :userId " +
-            // "AND (:title IS NULL OR m2.title LIKE %:title%) " +
-            "AND (:tags IS NULL OR (t.name IN :tags AND SIZE(m2.tags) = :tagCount)) " + // 태그 배열 조건
+            "AND (:tags IS NULL OR (t.name IN :tags)) " +
             "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
-            "AND (:minPrice IS NULL OR m2.price >= :minPrice) " + // 최소 가격 조건
-            "AND (:maxPrice IS NULL OR m2.price <= :maxPrice) " + // 최대 가격 조건
-            "GROUP BY m2.groupId)")
+            "AND (:minPrice IS NULL OR m2.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR m2.price <= :maxPrice) " +
+            "GROUP BY m2.groupId " +
+            "HAVING COUNT(DISTINCT t.name) >= :tagCount" +
+            ")")
+
     Page<Menu> findingMenusByCriteria2(
-                                       @Param("tags") String[] tags, // 태그 배열로 변경
-                                       @Param("menuFolderId") Integer menuFolderId,
-                                       @Param("userId") Long userId,
-                                       @Param("minPrice") Integer minPrice,
-                                       @Param("maxPrice") Integer maxPrice,
-                                       @Param("tagCount") int tagCount, // 태그 개수 추가
-                                       Pageable pageable);
+            @Param("tags") String[] tags, // 태그 배열로 변경
+            @Param("menuFolderId") Integer menuFolderId,
+            @Param("userId") Long userId,
+            @Param("minPrice") Integer minPrice,
+            @Param("maxPrice") Integer maxPrice,
+            @Param("tagCount") int tagCount, // 태그 개수 추가
+            Pageable pageable);
+
+
+
 
 
 
