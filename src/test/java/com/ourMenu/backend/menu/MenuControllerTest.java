@@ -513,5 +513,94 @@ public class MenuControllerTest {
         assertThat(findMenu2.getContent().size()).isEqualTo(1);
         // assertThat(findMenu.getContent().get(0).getMenuTitle()).isEqualTo("메뉴1");
     }
+
+    @Test
+    @DisplayName("태그가 빈 경우 모든 메뉴가 조회 되어야한다.")
+    public void findMenuWithNoTags() {
+        //when
+        String menuListTitle1 = "테스트 폴더1";
+        String menuListTitle2 = "테스트 폴더2";
+        long userId = initTest3(menuListTitle1, menuListTitle2);
+        MenuList menuList1 = menuListService.getMenuListByName(menuListTitle1, userId);
+        MenuList menuList2 = menuListService.getMenuListByName(menuListTitle2, userId);
+
+        //given
+        //가게 정보를 구성한다.
+        StoreRequestDTO storeRequestDTO = StoreRequestDTO.builder()
+                .storeName("가게1")
+                .storeLatitude(111.1D)
+                .storeLongitude(111.1D)
+                .storeMemo("가게메모")
+                .storeAddress("가게주소")
+                .build();
+
+        //가게의 태그 리스트를 저장한다
+        TagRequestDto tagRequestDto1 = TagRequestDto.builder()
+                .tagTitle("태그1")
+                .isCustom(true)
+                .build();
+        TagRequestDto tagRequestDto2 = TagRequestDto.builder()
+                .tagTitle("태그2")
+                .isCustom(false)
+                .build();
+        TagRequestDto tagRequestDto3 = TagRequestDto.builder()
+                .tagTitle("태그3")
+                .isCustom(false)
+                .build();
+        TagRequestDto tagRequestDto4 = TagRequestDto.builder()
+                .tagTitle("태그4")
+                .isCustom(false)
+                .build();
+
+        // 메뉴 저장 request 구성
+        PostMenuRequest postMenuRequest1 = PostMenuRequest.builder()
+                .menuTitle("메뉴1")
+                .menuPrice(1000)
+                .menuMemo("메모")
+                .menuIconType("1")
+                .menuFolderIds(List.of(menuList1.getId(), menuList2.getId()))
+                .storeInfo(storeRequestDTO)
+                .tagInfo(List.of(tagRequestDto1, tagRequestDto2)) // 태그 2개
+                .build();
+
+        // 1,2
+
+        // 1,2,3
+
+        // 1, 3, 4
+        PostMenuRequest postMenuRequest2 = PostMenuRequest.builder()
+                .menuTitle("메뉴2")
+                .menuPrice(1000)
+                .menuMemo("메모")
+                .menuIconType("1")
+                .menuFolderIds(List.of(menuList1.getId(), menuList2.getId()))
+                .storeInfo(storeRequestDTO)
+                .tagInfo(List.of(tagRequestDto1, tagRequestDto2, tagRequestDto3)) // 태그 3개
+                .build();
+
+        PostMenuRequest postMenuRequest3 = PostMenuRequest.builder()
+                .menuTitle("메뉴3")
+                .menuPrice(1000)
+                .menuMemo("메모")
+                .menuIconType("1")
+                .menuFolderIds(List.of(menuList1.getId(), menuList2.getId()))
+                .storeInfo(storeRequestDTO)
+                .tagInfo(List.of(tagRequestDto1, tagRequestDto3, tagRequestDto4)) // 태그 2개
+                .build();
+
+        // 메뉴 저장
+        menuService.createMenu(postMenuRequest1, userId);
+        menuService.createMenu(postMenuRequest2, userId);
+        menuService.createMenu(postMenuRequest3, userId);
+
+        // 다양한 태그 조합으로 조회
+
+        String[] tags = new String[]{};
+
+        Pageable pageable = PageRequest.of(0, 100);
+
+        Page<MenuDto> findMenu = menuService.getAllMenusByCriteria2(null, null, userId, 0, Integer.MAX_VALUE, pageable);
+        assertThat(findMenu.getContent().size()).isEqualTo(3);
+    }
 }
 
