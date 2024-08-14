@@ -16,11 +16,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MenuDto {
     private Long groupId;
+    private Long menuId;
     private String menuTitle;        // menuId 필드 제거
     private String placeTitle;
     private String placeAddress;
     private int menuPrice;
     private String menuImgUrl;
+
 
 
     public static List<MenuDto> toDto(List<Menu> menus) {
@@ -49,6 +51,7 @@ public class MenuDto {
     private static MenuDto fromMenu(Menu menu) {
         return MenuDto.builder()
                 .menuTitle(menu.getTitle())
+                .menuId(menu.getId())
                 .placeTitle(menu.getPlace().getTitle())
                 .placeAddress(menu.getPlace().getAddress())
                 .menuPrice(menu.getPrice())
