@@ -26,7 +26,7 @@ public enum AnswerImg {
 
     public String getRandomImgUrl() {
         Random random = new Random();
-        int randomValue = random.nextInt(imgUrlList.size() - 1);
+        int randomValue = random.nextInt(imgUrlList.size());
         return S3Util.S3Path + imgUrlList.get(randomValue) + ".svg";
     }
 }

@@ -32,8 +32,8 @@ public enum Question {
     public static String getImgUrlByIdAndAnswerType(int id, AnswerType answerType) {
         Question question = getQuestionByIdAndAnswerType(id, answerType);
         if(answerType.equals(AnswerType.YES))
-            return question.getAnswer().getYesAnswerImg();
-        return question.getAnswer().getNoAnswerImg();
+            return question.getAnswer().getYesAnswerImg().getRandomImgUrl();
+        return question.getAnswer().getNoAnswerImg().getRandomImgUrl();
 
     }
 
