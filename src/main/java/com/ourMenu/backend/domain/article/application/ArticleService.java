@@ -13,6 +13,7 @@ import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +31,8 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleMenuRepository articleMenuRepository;
     private final UserService userService;
-    private final MenuService menuService;
     private final ArticleMenuService articleMenuService;
+    private final EntityManager em;
 
     /**
      * 게시글을 저장한다.
@@ -113,19 +114,34 @@ public class ArticleService {
     public Article saveArticleWithMenu(Article article, Long userId) {
         User user = userService.getUserById(userId).get();
         article.confirmUser(user);
-        Article saveArticle = save(article);
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
+            articleMenu.confirmArticle(article);
             articleMenuService.save(articleMenu);
         }
-        return saveArticle;
+        return save(article);
     }
 
     @Transactional
     public Article updateArticleWithMenu(Long articleId, Article article, Long userId) {
 
-        User user = userService.getUserById(userId).get();
         Article findArticle = findOne(articleId);
+        User user = findArticle.getUser();
+        if (!user.getId().equals(userId)) {
+            throw new RuntimeException("권한이 없습니다");
+        }
+
+        // 기존 ArticleMenu 삭제
+        findArticle.getArticleMenuList().forEach(articleMenu -> {
+            articleMenu.deleteArticle();  // Article과의 관계 끊기
+            articleMenuRepository.delete(articleMenu);  // ArticleMenu 삭제
+        });
+
+        em.flush();  // 삭제된 내용을 즉시 반영
+
+        // findArticle의 ArticleMenu 리스트 비우기
         findArticle.deleteAllArticleMenus();
+
+
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
             ArticleMenu saveArticleMenu = articleMenuService.save(articleMenu);
             findArticle.addArticleMenu(saveArticleMenu);
