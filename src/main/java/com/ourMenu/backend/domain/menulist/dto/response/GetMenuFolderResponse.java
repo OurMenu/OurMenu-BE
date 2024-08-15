@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class GetMenuListResponse {
+public class GetMenuFolderResponse {
     private Long menuFolderId;
     private String menuFolderTitle;
     private Long menuCount;
