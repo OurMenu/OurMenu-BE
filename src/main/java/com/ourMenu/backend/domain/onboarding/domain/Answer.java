@@ -7,16 +7,16 @@ import java.util.List;
 
 @Getter
 public enum Answer {
-    FEELING("좋아!", S3Util.S3Path + "좋아.svg", AnswerImg.LIKE, AnswerFood.LIKE,
-            "별로야..", S3Util.S3Path + "별로야.svg", AnswerImg.DISLIKE, AnswerFood.DISLIKE),
-    WEATHER("맑아", S3Util.S3Path + "맑아.svg", AnswerImg.SUNNY, AnswerFood.SUNNY,
-            "비가 오네", S3Util.S3Path + "비가와.svg", AnswerImg.RAINY, AnswerFood.RAINY),
-    STRESS("달달한 음식을 먹어", S3Util.S3Path + "달달한음식.svg", AnswerImg.SWEET, AnswerFood.SWEET,
-            "매운 음식이지!", S3Util.S3Path + "매운음식.svg", AnswerImg.SPICY, AnswerFood.SPICY),
-    TRAVEL("바다", S3Util.S3Path + "바다.svg", AnswerImg.SEA, AnswerFood.SEA,
-            "산", S3Util.S3Path + "산.svg", AnswerImg.MOUNTAIN, AnswerFood.MOUNTAIN),
-    SEASON("여름", S3Util.S3Path + "여름.svg", AnswerImg.SUMMER, AnswerFood.SUMMER,
-            "겨울", S3Util.S3Path + "겨울.svg", AnswerImg.WINTER, AnswerFood.WINTER),
+    FEELING("좋아!", "좋아", AnswerImg.LIKE, AnswerFood.LIKE,
+            "별로야..", "별로야", AnswerImg.DISLIKE, AnswerFood.DISLIKE),
+    WEATHER("맑아", "맑아", AnswerImg.SUNNY, AnswerFood.SUNNY,
+            "비가 오네", "비가와", AnswerImg.RAINY, AnswerFood.RAINY),
+    STRESS("달달한 음식을 먹어", "달달한음식", AnswerImg.SWEET, AnswerFood.SWEET,
+            "매운 음식이지!", "매운음식", AnswerImg.SPICY, AnswerFood.SPICY),
+    TRAVEL("바다", "바다", AnswerImg.SEA, AnswerFood.SEA,
+            "산", "산", AnswerImg.MOUNTAIN, AnswerFood.MOUNTAIN),
+    SEASON("여름", "여름", AnswerImg.SUMMER, AnswerFood.SUMMER,
+            "겨울", "겨울", AnswerImg.WINTER, AnswerFood.WINTER),
     ;
 
     private final String yes;
@@ -47,5 +47,12 @@ public enum Answer {
         return noAnswerFood.getStringList();
     }
 
+    public String getYesImg() {
+        return S3Util.getS3SvgPath(yesImg);
+    }
+
+    public String getNoImg() {
+        return S3Util.getS3SvgPath(noImg);
+    }
 
 }
