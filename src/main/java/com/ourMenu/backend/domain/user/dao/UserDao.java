@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.user.dao;
 
 import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
+import com.ourMenu.backend.domain.user.api.response.UserArticleResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -78,6 +80,41 @@ public class UserDao {
                 .addValue("userId", userId)
                 .addValue("profileImg", imgUrl);
         return jdbcTemplate.update(sql, param);
+    }
+
+    public List<UserArticleResponse> getUserArticles(Long userId, Long startId, int size) {
+        String sql = "SELECT " +
+                "a.article_id AS id, " +
+                "a.title, " +
+                "a.content, " +
+                "u.nickname AS creator, " +
+                "u.img_url AS profileImgUrl, " +
+                "DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt, " +
+                "a.menu_count AS menusCount, " +
+                "a.views, " +
+                "a.content AS thumbnail " +
+                "FROM article a " +
+                "JOIN user u ON a.user_id = u.user_id " +
+                "WHERE a.user_id = :userId " +
+                "AND a.article_id < :startId " +
+                "LIMIT :size";
+
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("size", size)
+                .addValue("startId", startId);
+
+        return jdbcTemplate.query(sql, namedParameters, (rs, rowNum) -> new UserArticleResponse(
+                rs.getInt("id"),
+                rs.getString("title"),
+                rs.getString("content"),
+                rs.getString("creator"),
+                rs.getString("profileImgUrl"),
+                rs.getString("createdAt"),
+                rs.getInt("menusCount"),
+                rs.getInt("views"),
+                rs.getString("thumbnail")
+        ));
     }
 
 }

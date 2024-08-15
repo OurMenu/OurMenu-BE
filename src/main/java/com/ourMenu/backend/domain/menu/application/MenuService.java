@@ -338,10 +338,10 @@ public class MenuService {
 //    }
 
     @Transactional
-    public Page<MenuDto> getAllMenusByCriteria2(String title, String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
+    public Page<MenuDto> getAllMenusByCriteria2(String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
         // 메뉴를 페이징 처리하여 조회
 
-        Integer tagCount = (tags != null && tags.length > 0) ? tags.length : null; // 태그가 없으면 null로 설정
+        Integer tagCount = (tags != null && tags.length > 0) ? Integer.valueOf(tags.length) : Integer.valueOf(0); // 태그가 없으면 0으로 설정
 
         if (minPrice == 5000) {
             minPrice = 0; // 기본값: 5,000원 (최소)
@@ -350,12 +350,8 @@ public class MenuService {
             maxPrice = 999999; // 기본값: 무한대 (최대)
         }
 
-        log.info("가격은 " +minPrice);
-        log.info("가격은 " +maxPrice);
-        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(title, tags, tagCount, menuFolderId, userId, minPrice, maxPrice, pageable);
+        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(tags, menuFolderId, userId, minPrice, maxPrice, tagCount, pageable);
 
-
-        log.info("Retrieved menuPage: {}", menuPage.getContent());
         // Menu 엔티티를 MenuDto로 변환
         List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
 
@@ -383,10 +379,9 @@ public class MenuService {
     @Transactional
     public List<Menu> getAllMenusByTagName(String tag, Long userId){
             String[] integers = {tag};
-            Pageable pageable = PageRequest.of(1, 5);
-            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId, 0, 100000000, pageable);
-//        List<Menu> menus = menuRepository.findingMenusByCriteria2(null, integers, 1, null, userId);
-            //List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+            int tagCount = integers.length;
+            Pageable pageable = PageRequest.of(0, 5);
+            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, null,  userId, 0, 999999, tagCount, pageable);
             List<Menu> menuList = menuPage.getContent();
             return menuList; // List<MenuDto> 반환
         }

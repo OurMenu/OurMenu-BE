@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.user.application;
 
 import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
+import com.ourMenu.backend.domain.user.api.response.UserArticleResponse;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.dao.UserDao;
 import com.ourMenu.backend.domain.user.dao.UserRepository;
@@ -27,10 +28,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -111,6 +109,10 @@ public class UserService {
         }
 
         userDao.updateProfileImg(userId, fileName);
+    }
+
+    public List<UserArticleResponse> getUserArticles(Long userId, Long startId, int size) {
+        return userDao.getUserArticles(userId, startId, size);
     }
 
     @Transactional

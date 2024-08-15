@@ -20,6 +20,7 @@ public class MenuDetailDto {
     private String menuMemoTitle;
     private String menuMemo;
     private String menuIconType;
+    private PlaceInfoDTO menuPlaceInfo;
     private List<TagDTO> menuTags;
     private List<MenuImageDto> menuImages; // 이미지 리스트
     private List<PlaceMenuFolderDTO> menuFolders; // 메뉴 폴더 리스트
@@ -45,8 +46,6 @@ public class MenuDetailDto {
         return menuDetailDto;
     }
 
-
-
     private static MenuDetailDto fromMenu(Menu menu, List<PlaceMenuFolderDTO> menuFolders) {
         log.info("e" + menu.getMemoTitle());
         List<TagDTO> tagDTOs = menu.getTags().stream() // MenuTag 리스트로부터 스트림 생성
@@ -57,6 +56,8 @@ public class MenuDetailDto {
                 .map(img -> new MenuImageDto(img.getUrl())) // 이미지 DTO 변환
                 .collect(Collectors.toList());
 
+        // Place 정보 생성
+        PlaceInfoDTO placeInfoDTO = PlaceInfoDTO.toDto(menu.getPlace());
 
 
         return MenuDetailDto.builder()
@@ -69,6 +70,7 @@ public class MenuDetailDto {
                 .menuTags(tagDTOs) // 태그 리스트 추가
                 .menuImages(imageDTOs) // 이미지 리스트 추가
                 .menuFolders(menuFolders)
+                .menuPlaceInfo(placeInfoDTO)
                 .build();
     }
 }
