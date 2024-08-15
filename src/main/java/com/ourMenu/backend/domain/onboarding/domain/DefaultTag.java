@@ -34,8 +34,8 @@ public enum DefaultTag {
     BUY_FOOD("밥약", "밥약하기 좋은 곳,"),
     ORGANIZATION("단체", "단체로 방문한다면,");
 
-    private String TagName;
-    private String TagMemo;
+    private final String TagName;
+    private final String TagMemo;
 
     DefaultTag(String tagName, String tagMemo) {
         TagName = tagName;
