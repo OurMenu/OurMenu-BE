@@ -37,6 +37,10 @@ public class ArticleMenu {
 
     public void confirmArticle(Article article){
         this.article = article;
-        article.addArticleMenu(this);
+        article.upMenuCount();
+    }
+
+    public void deleteArticle(){
+        this.article = null;
     }
 }
