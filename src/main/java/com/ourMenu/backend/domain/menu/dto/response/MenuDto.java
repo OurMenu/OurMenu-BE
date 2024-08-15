@@ -1,10 +1,12 @@
 package com.ourMenu.backend.domain.menu.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +25,8 @@ public class MenuDto {
     private int menuPrice;
     private String menuImgUrl;
 
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
 
     public static List<MenuDto> toDto(List<Menu> menus) {
         List<MenuDto> dtoList = new ArrayList<>();
@@ -56,6 +59,7 @@ public class MenuDto {
                 .placeAddress(menu.getPlace().getAddress())
                 .menuPrice(menu.getPrice())
                 .groupId(menu.getGroupId())
+                .createdAt(menu.getCreatedAt())
                 .menuImgUrl(menu.getImages().isEmpty() ? null : menu.getImages().get(0).getUrl())
                 .build();
     }
