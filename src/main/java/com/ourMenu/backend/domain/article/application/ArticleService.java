@@ -130,22 +130,17 @@ public class ArticleService {
             throw new RuntimeException("권한이 없습니다");
         }
 
-        // 기존 ArticleMenu 삭제
         findArticle.getArticleMenuList().forEach(articleMenu -> {
-            articleMenu.deleteArticle();  // Article과의 관계 끊기
-            articleMenuRepository.delete(articleMenu);  // ArticleMenu 삭제
+            articleMenu.deleteArticle();
+            articleMenuRepository.delete(articleMenu);
         });
 
-        em.flush();  // 삭제된 내용을 즉시 반영
-
-        // findArticle의 ArticleMenu 리스트 비우기
         findArticle.deleteAllArticleMenus();
 
-
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
-            ArticleMenu saveArticleMenu = articleMenuService.save(articleMenu);
-            findArticle.addArticleMenu(saveArticleMenu);
-            saveArticleMenu.confirmArticle(findArticle);
+            findArticle.addArticleMenu(articleMenu);
+            articleMenu.confirmArticle(findArticle);
+            articleMenuService.save(articleMenu);
         }
         findArticle.update(article);
         return findArticle;
