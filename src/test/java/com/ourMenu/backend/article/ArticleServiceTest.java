@@ -20,6 +20,7 @@ import com.ourMenu.backend.domain.user.api.request.SignUpRequest;
 import com.ourMenu.backend.domain.user.application.AccountService;
 import com.ourMenu.backend.domain.user.dao.UserDao;
 import com.ourMenu.backend.global.common.Status;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,8 @@ public class ArticleServiceTest {
     MenuService menuService;
     @Autowired
     MenuListService menuListService;
+    @Autowired
+    EntityManager em;
 
     ArticleMenu articleMenu1 = ArticleMenu.builder()
             .title("제목1")
@@ -125,6 +128,7 @@ public class ArticleServiceTest {
 
         //when
         articleService.hardDelete(saveArticle.getId());
+
         RuntimeException exception = org.junit.jupiter.api.Assertions.assertThrows(NoSuchArticleException.class, () -> {
             Article softDeleteArticle = articleService.softDelete(1L);
             Assertions.assertThat(softDeleteArticle.getStatus()).isEqualTo(Status.DELETED);
