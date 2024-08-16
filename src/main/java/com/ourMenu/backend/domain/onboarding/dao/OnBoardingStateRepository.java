@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface OnBoardingStateRepository extends JpaRepository<OnBoardingState, Long> {
 
-    Optional<OnBoardingState> findByOnBoardingState(Long userId);
+    Optional<OnBoardingState> findByUserId(Long userId);
 }

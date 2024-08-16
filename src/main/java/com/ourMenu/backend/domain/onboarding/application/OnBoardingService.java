@@ -62,7 +62,7 @@ public class OnBoardingService {
 
     @Transactional
     public OnBoardingState findOneById(Long userId) {
-        Optional<OnBoardingState> onBoardingStateOptional = onBoardingStateRepository.findByOnBoardingState(userId);
+        Optional<OnBoardingState> onBoardingStateOptional = onBoardingStateRepository.findByUserId(userId);
         if (onBoardingStateOptional.isEmpty())
             throw new SearchResultNotFoundException();
         return onBoardingStateOptional.get();
