@@ -95,6 +95,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
 
+    List<Menu> findMenusByTitleContainingAndUserIdNot(@Param("title") String title, @Param("userId") Long userId);
+
     @Query("SELECT m FROM Menu m WHERE m.id = :menuId AND m.user.id = :userId")
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
 
