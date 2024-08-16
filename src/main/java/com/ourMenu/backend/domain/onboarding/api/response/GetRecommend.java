@@ -19,7 +19,7 @@ public class GetRecommend {
         return GetRecommend.builder()
                 .menuImgUrl(menu.getImages() != null && !menu.getImages().isEmpty() ? menu.getImages().get(0).getUrl() : null)
                 .menuTitle(menu.getTitle())
-                .placeName(menu.getPlace().getAddress())
+                .placeName(menu.getPlace().getTitle())
                 .groupId(menu.getGroupId())
                 .build();
     }

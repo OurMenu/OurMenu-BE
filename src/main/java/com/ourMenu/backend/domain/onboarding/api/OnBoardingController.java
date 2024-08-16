@@ -41,7 +41,7 @@ public class OnBoardingController {
                                                                    @RequestParam("answer") AnswerType answerType,
                                                                    @UserId Long userId) {
         List<Menu> menus = onBoardService.saveAndFindStoreByQuestionAnswer(userId, questionId, answerType);
-        menus.addAll(onBoardService.findOtherUserMenusByQuestionAnswer(userId,questionId,answerType));
+        //menus.addAll(onBoardService.findOtherUserMenusByQuestionAnswer(userId,questionId,answerType));
         return ApiUtils.success(GetQuestionRecommands.toDto(menus, questionId, answerType));
 
     }
