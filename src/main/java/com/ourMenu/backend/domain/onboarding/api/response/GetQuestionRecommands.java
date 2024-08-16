@@ -8,21 +8,20 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
 @Builder
 public class GetQuestionRecommands {
 
-    private String recommandImgUrl;
-    private List<GetRecommand> menus;
+    private String recommendImgUrl;
+    private List<GetRecommend> menus;
 
     public static GetQuestionRecommands toDto(List<Menu> menus, int questionId, AnswerType answerType) {
-        List<GetRecommand> recommandList = menus.stream().map(GetRecommand::toDto).toList();
+        List<GetRecommend> recommandList = menus.stream().map(GetRecommend::toDto).toList();
         String recommandImgUrl = Question.getImgUrlByIdAndAnswerType(questionId, answerType);
         return GetQuestionRecommands.builder()
-                .recommandImgUrl(recommandImgUrl)
+                .recommendImgUrl(recommandImgUrl)
                 .menus(recommandList)
                 .build();
 

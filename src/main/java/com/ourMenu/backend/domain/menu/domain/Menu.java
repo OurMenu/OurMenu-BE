@@ -36,8 +36,12 @@ public class Menu {
     @Column(name = "modified_at")
     private LocalDateTime modifiedAt;
 
+
+    private String memoTitle;
+
     private String memo;
-    private String icon;
+
+    private String menuIconType;
 
     @Builder.Default
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -68,10 +72,10 @@ public class Menu {
 //        this.status = (this.status == null) ? MenuStatus.CREATED : this.status;
 //    }
 
-    @PreUpdate
-    public void preUpdate() {
-        this.modifiedAt = LocalDateTime.now();
-    }
+//    @PreUpdate
+//    public void preUpdate() {
+//        this.modifiedAt = LocalDateTime.now();
+//    }
 
     public void addMenuImage(MenuImage menuImage) {
         //System.out.println("menuImage = " + menuImage);
@@ -140,6 +144,10 @@ public class Menu {
     }
 
     public void changeIcon(String icon) {
-        this.icon = icon;
+        this.menuIconType = icon;
+    }
+
+    public void updateModifiedAt(){
+        this.modifiedAt = LocalDateTime.now();
     }
 }

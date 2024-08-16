@@ -3,7 +3,9 @@ package com.ourMenu.backend.domain.menu.application;
 import com.ourMenu.backend.domain.menu.domain.*;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.dto.request.*;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
+import com.ourMenu.backend.domain.menu.dto.response.MenuIdDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menu.exception.MenuNotFoundException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
@@ -15,6 +17,10 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,7 +78,6 @@ public class MenuService {
     }
 
 
-
     @Transactional
     // 메뉴 등록 * (이미지 제외)
     public PostMenuResponse createMenu(PostMenuRequest postMenuRequest, Long userId) {
@@ -108,8 +113,6 @@ public class MenuService {
         }
 
 
-
-
         // 식당, 메뉴판 연관관계 설정
 
         for (Long menuFolderId : menuFolderIds) {
@@ -120,6 +123,8 @@ public class MenuService {
                     .price(postMenuRequest.getMenuPrice())
                     .user(finduser)
                     .memo(postMenuRequest.getMenuMemo())
+                    .menuIconType(postMenuRequest.getMenuIconType())
+                    .memoTitle(postMenuRequest.getMenuMemoTitle())
                     .createdAt(LocalDateTime.now())
                     .modifiedAt(LocalDateTime.now())
                     .groupId(maxGroupId)
@@ -136,7 +141,6 @@ public class MenuService {
 
         return new PostMenuResponse(maxGroupId);
     }
-
 
 
     // 메뉴 태그 등록
@@ -164,10 +168,10 @@ public class MenuService {
 
 
     @Transactional
-    public void createMenuImage(PostPhotoRequest request, long userId) {
+    public void createMenuImage(PostPhotoRequest request, long userId, long groupId) {
 
         List<MultipartFile> imgs = request.getMenuImgs();
-        long groupId = request.getMenuGroupId();
+
 
 
         List<Menu> findGroupMenu = menuRepository.findByUserIdAndGroupId(userId, groupId);
@@ -301,8 +305,8 @@ public class MenuService {
     }
 
     @Transactional
-    public List<Menu> findMenuByPlace(Long placeId){
-        List<Menu> menuList = menuRepository.findMenuByPlaceId(placeId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
+    public List<Menu> findMenuByPlace(Long placeId, Long userId){
+        List<Menu> menuList = menuRepository.findMenuByPlaceIdAndUserId(placeId, userId, Arrays.asList(MenuStatus.CREATED, MenuStatus.UPDATED))
                 .orElseThrow(() -> new MenuNotFoundException());
 
         if(menuList.isEmpty()){
@@ -319,16 +323,40 @@ public class MenuService {
 
     
     @Transactional
-    public List<MenuDto> getCertainMenu(Long userId, Long groupId) {
+    public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
         List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
-
-        return MenuDto.toDto(certainMenu);
+        if (certainMenu.isEmpty()) {
+            throw new RuntimeException("해당하는 메뉴가 없습니다");
+        }
+        return MenuDetailDto.toDto(certainMenu);
     }
 
+//    @Transactional
+//    public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
+//        List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
+//        return MenuDto.toDto(menus); // List<MenuDto> 반환
+//    }
+
     @Transactional
-    public List<MenuDto> getAllMenusByCriteria(String title, String tag, Integer menuFolderId, Long userId) {
-        List<Menu> menus = menuRepository.findingMenusByCriteria(title, tag, menuFolderId, userId);
-        return MenuDto.toDto(menus); // List<MenuDto> 반환
+    public Page<MenuDto> getAllMenusByCriteria2(String[] tags, Integer menuFolderId, Long userId, int minPrice, int maxPrice, Pageable pageable){
+        // 메뉴를 페이징 처리하여 조회
+
+        Integer tagCount = (tags != null && tags.length > 0) ? Integer.valueOf(tags.length) : Integer.valueOf(0); // 태그가 없으면 0으로 설정
+
+        if (minPrice == 5000) {
+            minPrice = 0; // 기본값: 5,000원 (최소)
+        }
+        if (maxPrice == 50000) {
+            maxPrice = 999999; // 기본값: 무한대 (최대)
+        }
+
+        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(tags, menuFolderId, userId, minPrice, maxPrice, tagCount, pageable);
+
+        // Menu 엔티티를 MenuDto로 변환
+        List<MenuDto> menuDtos = MenuDto.toDto(menuPage.getContent());
+
+        // Page<MenuDto> 객체로 변환하여 반환
+        return new PageImpl<>(menuDtos, pageable, menuPage.getTotalElements());
     }
 
     @Transactional
@@ -345,5 +373,36 @@ public class MenuService {
         for (Menu menu : byUserIdAndGroupId) {
             removeMenu(menu);
         }
+    }
+
+
+    @Transactional
+    public List<Menu> getAllMenusByTagName(String tag, Long userId){
+            String[] integers = {tag};
+            int tagCount = integers.length;
+            Pageable pageable = PageRequest.of(0, 5);
+            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, null,  userId, 0, 999999, tagCount, pageable);
+            List<Menu> menuList = menuPage.getContent();
+            return menuList; // List<MenuDto> 반환
+        }
+    @Transactional
+    public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
+        List<Menu> menuList = menuRepository.findByUserIdAndGroupId(userId, groupId);
+        for (Menu menu : menuList) {
+            menu.updateModifiedAt();
+            menuRepository.save(menu);
+        }
+        return menuList;
+
+    }
+
+    public MenuIdDto getCertainMenuId(Long userId, Long menuFolderId, Long groupId) {
+        Menu menu = menuRepository.findByUserIdAndMenuListIdAndGroupId(userId, menuFolderId, groupId)
+                .orElseThrow(() -> new MenuNotFoundException("해당하는 메뉴가 없습니다"));
+        return MenuIdDto.toDto(menu);
+    }
+
+    public void updateModifiedAt(Menu menu){
+        menu.updateModifiedAt();
     }
 }

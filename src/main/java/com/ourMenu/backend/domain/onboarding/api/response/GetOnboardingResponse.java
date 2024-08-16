@@ -25,10 +25,10 @@ public class GetOnboardingResponse {
                 .question(data.getQuestion())
                 .yes(data.getAnswer().getYes())
                 .yesImg(data.getAnswer().getYesImg())
-                .yesAnswerUrl(data.getAnswer().getYesAnswerImg())
+                .yesAnswerUrl(data.getAnswer().getYesAnswerImg().getRandomImgUrl())
                 .no(data.getAnswer().getNo())
                 .noImg(data.getAnswer().getNoImg())
-                .noAnswerUrl(data.getAnswer().getNoAnswerImg())
+                .noAnswerUrl(data.getAnswer().getNoAnswerImg().getRandomImgUrl())
                 .build();
     }
 }

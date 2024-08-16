@@ -1,23 +1,26 @@
 use users_db
 
 create table article (
+                         menu_count integer not null,
+                         views integer not null,
                          article_id bigint not null auto_increment,
                          created_at datetime(6),
                          modified_at datetime(6),
                          user_id bigint,
-                         views bigint,
                          content varchar(255),
-                         thumbnail varchar(255),
                          title varchar(255),
                          status enum ('CREATED','DELETED','UPDATED'),
                          primary key (article_id)
-) engine=InnoDB;
+) engine=InnoDB
 
 create table article_menu (
+                              price integer not null,
                               article_id bigint,
                               article_menu_id bigint not null auto_increment,
-                              price bigint,
-                              image varchar(255),
+                              group_id bigint,
+                              address varchar(255),
+                              img_url varchar(255),
+                              place_title varchar(255),
                               title varchar(255),
                               primary key (article_menu_id)
 ) engine=InnoDB;
@@ -37,12 +40,13 @@ create table menu (
                       modified_at datetime(6),
                       place_id bigint,
                       user_id bigint,
-                      icon varchar(255),
                       memo varchar(255),
+                      memo_title varchar(255),
+                      menu_icon_type varchar(255),
                       title varchar(255),
                       status enum ('CREATED','DELETED','UPDATED'),
                       primary key (menu_id)
-) engine=InnoDB;
+) engine=InnoDB
 
 create table menu_image (
                             menu_id bigint,
