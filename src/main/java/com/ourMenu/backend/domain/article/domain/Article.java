@@ -56,8 +56,12 @@ public class Article {
 
     public void addArticleMenu(ArticleMenu articleMenu) {
         this.articleMenuList.add(articleMenu);
-        menuCount++;
     }
+
+    public void upMenuCount(){
+        this.menuCount++;
+    }
+
 
     public void setStatus(Status status) {
         this.status = status;
@@ -75,7 +79,7 @@ public class Article {
     }
 
     public void deleteAllArticleMenus() {
-        this.articleMenuList = new ArrayList<>();
+        articleMenuList.clear();
         menuCount = 0;
     }
 }
