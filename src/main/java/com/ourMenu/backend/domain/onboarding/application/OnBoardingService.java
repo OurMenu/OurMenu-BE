@@ -86,6 +86,10 @@ public class OnBoardingService {
         return menuService.getAllMenusByTagName(randomTag.getTagName(), userId);
     }
 
+    public List<Menu> findOtherUserStoreByRandomTag(Long userId, DefaultTag randomTag){
+        return menuService.getAllMenusByTagNameAndUserIdNot(randomTag.getTagName(), userId);
+    }
+
     @Transactional(readOnly = true)
     public String findOnboardingStateByUserId(Long userId) {
         OnBoardingState onBoardingState = findOneById(userId);

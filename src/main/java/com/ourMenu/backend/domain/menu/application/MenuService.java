@@ -385,6 +385,11 @@ public class MenuService {
             List<Menu> menuList = menuPage.getContent();
             return menuList; // List<MenuDto> 반환
         }
+
+    public List<Menu> getAllMenusByTagNameAndUserIdNot(String tagName, Long userId) {
+        return menuRepository.findMenusByTagNameAndUserIdNot(tagName, userId);
+    }
+
     @Transactional
     public List<Menu> getAllMenusByGroupIdAndUserId(Long groupId, Long userId){
         List<Menu> menuList = menuRepository.findByUserIdAndGroupId(userId, groupId);
@@ -405,4 +410,5 @@ public class MenuService {
     public void updateModifiedAt(Menu menu){
         menu.updateModifiedAt();
     }
+
 }
