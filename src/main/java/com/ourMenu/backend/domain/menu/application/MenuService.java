@@ -387,7 +387,8 @@ public class MenuService {
         }
 
     public List<Menu> getAllMenusByTagNameAndUserIdNot(String tagName, Long userId) {
-        return menuRepository.findMenusByTagNameAndUserIdNot(tagName, userId);
+        return null;
+        //return menuRepository.findMenusByTagNameAndUserIdNot(tagName, userId);
     }
 
     @Transactional
