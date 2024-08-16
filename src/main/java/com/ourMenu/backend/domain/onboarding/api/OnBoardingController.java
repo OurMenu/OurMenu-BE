@@ -1,7 +1,6 @@
 package com.ourMenu.backend.domain.onboarding.api;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.onboarding.api.response.GetOnboardingResponse;
 import com.ourMenu.backend.domain.onboarding.api.response.GetQuestionRecommands;
 import com.ourMenu.backend.domain.onboarding.api.response.GetTagRecommends;
@@ -39,7 +38,7 @@ public class OnBoardingController {
     public ApiResponse<GetQuestionRecommands> getQuestionRecommend(@RequestParam("questionId") int questionId,
                                                                    @RequestParam("answer") AnswerType answerType,
                                                                    @UserId Long userId) {
-        List<Menu> menus = onBoardService.findStoreByQuestionAnswer(userId, questionId, answerType);
+        List<Menu> menus = onBoardService.saveAndFindStoreByQuestionAnswer(userId, questionId, answerType);
         return ApiUtils.success(GetQuestionRecommands.toDto(menus, questionId, answerType));
 
     }
@@ -51,10 +50,15 @@ public class OnBoardingController {
         List<GetTagRecommends> getTagRecommendsList = new ArrayList<>();
         for (DefaultTag defaultTag : defaultTagList) {
             List<Menu> menuList = onBoardService.findStoreByRandomTag(userId, defaultTag);
-            getTagRecommendsList.add(GetTagRecommends.toDto(menuList,defaultTag));
+            getTagRecommendsList.add(GetTagRecommends.toDto(menuList, defaultTag));
         }
 
         return ApiUtils.success(getTagRecommendsList);
+    }
 
+    @GetMapping("/state")
+    public String getOnboardingState(@UserId Long userId) {
+        onBoardService.findOneById(userId);
+        return "success";
     }
 }
