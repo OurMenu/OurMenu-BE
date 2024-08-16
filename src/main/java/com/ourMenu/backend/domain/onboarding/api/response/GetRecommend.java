@@ -18,7 +18,7 @@ public class GetRecommend {
     public static GetRecommend toDto(Menu menu){
         return GetRecommend.builder()
                 .menuImgUrl(menu.getImages() != null && !menu.getImages().isEmpty() ? menu.getImages().get(0).getUrl() : null)
-                .menuImgUrl(menu.getTitle())
+                .menuTitle(menu.getTitle())
                 .placeName(menu.getPlace().getAddress())
                 .groupId(menu.getGroupId())
                 .build();
