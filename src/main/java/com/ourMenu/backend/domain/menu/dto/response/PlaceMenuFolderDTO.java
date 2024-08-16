@@ -10,4 +10,5 @@ import lombok.Data;
 public class PlaceMenuFolderDTO {
     private String menuFolderTitle;
     private String menuFolderIcon;
+    private Long menuFolderId;
 }

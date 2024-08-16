@@ -35,15 +35,14 @@ public class MenuDetailDto {
         }
 
         List<PlaceMenuFolderDTO> folderDTOs = menuLists.stream() // 메뉴의 폴더 리스트
-                .map(menuList -> new PlaceMenuFolderDTO(menuList.getTitle(), menuList.getIconType())) // 폴더 DTO 변환
-                .distinct() // 중복 제거
+                .map(menuList -> new PlaceMenuFolderDTO(menuList.getTitle(), menuList.getIconType(), menuList.getId())) // 폴더 DTO 변환
                 .collect(Collectors.toList());
 
 
-        MenuDetailDto menuDetailDto = fromMenu(menus.get(0), folderDTOs);
+        return fromMenu(menus.get(0), folderDTOs);
 
 
-        return menuDetailDto;
+
     }
 
     private static MenuDetailDto fromMenu(Menu menu, List<PlaceMenuFolderDTO> menuFolders) {
