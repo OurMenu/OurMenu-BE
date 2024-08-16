@@ -28,4 +28,9 @@ public class OnBoardingState {
                 .answerType(answerType)
                 .build();
     }
+
+    public void update(int questionId, AnswerType answerType) {
+        this.questionId = questionId;
+        this.answerType = answerType;
+    }
 }

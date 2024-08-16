@@ -29,9 +29,20 @@ public class OnBoardingService {
 
     @Transactional
     public List<Menu> saveAndFindStoreByQuestionAnswer(Long userId, int questionId, AnswerType answerType) {
-        OnBoardingState onBoardingState = OnBoardingState.toEntity(userId, questionId, answerType);
-        OnBoardingState saveOnBoardingState = this.save(onBoardingState);
+        OnBoardingState onBoardingState = saveAndUpdateOnBoardingState(userId, questionId, answerType);
         return findStoreByQuestionAnswer(userId, questionId, answerType);
+    }
+
+    @Transactional
+    public OnBoardingState saveAndUpdateOnBoardingState(Long userId, int questionId, AnswerType answerType){
+        Optional<OnBoardingState> onBoardingStateOptional = onBoardingStateRepository.findByUserId(userId);
+        if(onBoardingStateOptional.isEmpty()){
+            OnBoardingState onBoardingState = OnBoardingState.toEntity(userId, questionId, answerType);
+            return save(onBoardingState);
+        }
+        OnBoardingState onBoardingState = onBoardingStateOptional.get();
+        onBoardingState.update(questionId,answerType);
+        return onBoardingState;
     }
 
     @Transactional
