@@ -75,6 +75,14 @@ create table menu_tag (
                           primary key (menu_tag_id)
 ) engine=InnoDB;
 
+create table on_boarding_state (
+                                   answer_type tinyint check (answer_type between 0 and 1),
+                                   question_id integer not null,
+                                   id bigint not null auto_increment,
+                                   user_id bigint,
+                                   primary key (id)
+) engine=InnoDB;
+
 create table place (
                        latitude float(53),
                        longitude float(53),
