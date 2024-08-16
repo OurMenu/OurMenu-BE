@@ -1,16 +1,14 @@
 package com.ourMenu.backend.domain.menulist.api;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.menulist.dto.request.PatchMenuListRequestDTO;
-import com.ourMenu.backend.domain.menulist.dto.response.GetMenuFolderDTO;
-import com.ourMenu.backend.domain.menulist.dto.response.MenuGroupIdDTO;
+import com.ourMenu.backend.domain.menulist.dto.response.*;
 import com.ourMenu.backend.domain.menulist.exception.ImageLoadException;
 import com.ourMenu.backend.domain.menulist.exception.MenuListException;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.menulist.dto.request.MenuListRequestDTO;
-import com.ourMenu.backend.domain.menulist.dto.response.GetMenuFolderResponse;
-import com.ourMenu.backend.domain.menulist.dto.response.MenuListResponseDTO;
 import com.ourMenu.backend.domain.menulist.exception.PriorityException;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.exception.UserException;
@@ -179,6 +177,27 @@ public class MenuListApiController {
     @PatchMapping("/priority/{menuFolderId}")
     public ApiResponse<String> changePriority(@PathVariable Long menuFolderId, @RequestParam Long newPriority, @UserId Long userId){
         String response = menuListService.setPriority(menuFolderId, newPriority ,userId);
+        return ApiUtils.success(response);
+    }
+
+    @GetMapping("/{menuFolderId}")
+    public ApiResponse<GetMenuFolder> getMenuFolder(@PathVariable Long menuFolderId, @UserId Long userId){
+        MenuList menuList = menuListService.findMenuListById(menuFolderId, userId);
+
+        List<MenuDto> menus = MenuDto.toDto(menuList.getMenus());
+
+        int menuCount = menuList.getMenus().size();
+
+
+        GetMenuFolder response = GetMenuFolder.builder()
+                .menuFolderId(menuList.getId())
+                .menuFolderTitle(menuList.getTitle())
+                .menuFolderIcon(menuList.getIconType())
+                .menuFolderImg(menuList.getImgUrl())
+                .menuCount(menuCount)
+                .menus(menus)
+                .build();
+
         return ApiUtils.success(response);
     }
 
