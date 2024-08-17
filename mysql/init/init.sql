@@ -14,12 +14,18 @@ create table article (
 ) engine=InnoDB
 
 create table article_menu (
+                              place_latitude float(53) not null,
+                              place_longitude float(53) not null,
                               price integer not null,
+                              shared_count integer not null,
                               article_id bigint,
                               article_menu_id bigint not null auto_increment,
                               group_id bigint,
                               address varchar(255),
                               img_url varchar(255),
+                              menu_icon_type varchar(255),
+                              menu_memo_title varchar(255),
+                              place_memo varchar(255),
                               place_title varchar(255),
                               title varchar(255),
                               shared_count bigint,
