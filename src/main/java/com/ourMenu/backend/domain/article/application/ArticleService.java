@@ -7,10 +7,6 @@ import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import com.ourMenu.backend.domain.article.domain.ORDER_CRITERIA;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
-import com.ourMenu.backend.domain.menu.application.MenuService;
-import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
-import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
@@ -92,7 +88,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article visitArticleById(Long id){
+    public Article visitArticleById(Long id) {
         Article article = findOne(id);
         article.visit();
         return article;
@@ -154,16 +150,24 @@ public class ArticleService {
 
     /**
      * 조건에 맞는 게시글을 조회한다
-     * @param title 검색어
-     * @param page 페이지
-     * @param size 페이지 크기
+     *
+     * @param title         검색어
+     * @param page          페이지
+     * @param size          페이지 크기
      * @param orderCriteria 정렬 기준
+     * @param isMyArticle   본인의 게시물만 가져올 것인지
      * @return 조회된 게시글들
      */
     @Transactional
-    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria){
+    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria, Boolean isMyArticle, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
-        Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable);
+        Page<Article> menuPage;
+        if (isMyArticle) {
+            menuPage = articleRepository.findAllByUserAndTitleContaining(title,pageable,userId);
+            return menuPage.getContent();
+        }
+
+        menuPage = articleRepository.findAllByTitleContaining(title, pageable);
         return menuPage.getContent();
     }
 
@@ -174,7 +178,7 @@ public class ArticleService {
 
     public String getUserImgUrl(String img_url) {
         String fileUrl = "";
-        if(fileUrl != null && !img_url.isBlank()) {
+        if (fileUrl != null && !img_url.isBlank()) {
             fileUrl = s3Client.utilities()
                     .getUrl(builder -> builder.bucket(bucketName).key(img_url))
                     .toExternalForm();
