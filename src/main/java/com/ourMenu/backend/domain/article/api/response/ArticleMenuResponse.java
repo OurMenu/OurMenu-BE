@@ -19,6 +19,12 @@ public class ArticleMenuResponse {
     private String menuImgUrl;
     private String menuAddress;
     private int sharedCount;
+
+    private String menuMemoTitle;
+    private String menuIconType;
+    private String placeMemo;
+    private double placeLatitude;
+    private double placeLongitude;
     public static ArticleMenuResponse toDto(ArticleMenu articleMenu){
         return ArticleMenuResponse.builder()
                 .articleMenuId(articleMenu.getId())
@@ -28,6 +34,11 @@ public class ArticleMenuResponse {
                 .menuImgUrl(articleMenu.getImgUrl())
                 .menuAddress(articleMenu.getAddress())
                 .sharedCount(articleMenu.getSharedCount())
+                .menuMemoTitle(articleMenu.getMenuMemoTitle())
+                .menuIconType(articleMenu.getMenuIconType())
+                .placeMemo(articleMenu.getPlaceMemo())
+                .placeLatitude(articleMenu.getPlaceLatitude())
+                .placeLongitude(articleMenu.getPlaceLongitude())
                 .build();
     }
 }
