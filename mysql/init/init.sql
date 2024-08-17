@@ -11,13 +11,12 @@ create table article (
                          title varchar(255),
                          status enum ('CREATED','DELETED','UPDATED'),
                          primary key (article_id)
-) engine=InnoDB
+) engine=InnoDB;
 
 create table article_menu (
                               place_latitude float(53) not null,
                               place_longitude float(53) not null,
                               price integer not null,
-                              shared_count integer not null,
                               article_id bigint,
                               article_menu_id bigint not null auto_increment,
                               group_id bigint,
@@ -53,7 +52,7 @@ create table menu (
                       title varchar(255),
                       status enum ('CREATED','DELETED','UPDATED'),
                       primary key (menu_id)
-) engine=InnoDB
+) engine=InnoDB;
 
 create table menu_image (
                             menu_id bigint,
