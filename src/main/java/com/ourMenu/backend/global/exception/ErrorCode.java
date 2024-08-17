@@ -39,8 +39,10 @@ public enum ErrorCode {
     IMAGE_NOT_LOADED_ERROR(HttpStatus.BAD_REQUEST, "I400", "이미지 업로드에 실패하였습니다."),
 
     //place
-    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "P401", "식당을 찾을 수 없습니다.");
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "P401", "식당을 찾을 수 없습니다."),
 
+    //onboarding
+    ON_BOARDING_STATE_NOT_FOUND(HttpStatus.NOT_FOUND,"O401","저장된 온보딩 상태가 없습니다.")
     ;
 
     private final HttpStatus status;

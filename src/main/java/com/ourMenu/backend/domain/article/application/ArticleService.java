@@ -68,8 +68,11 @@ public class ArticleService {
     @Transactional
     public void hardDelete(Long id) {
         Article article = findOne(id);
+        article.getArticleMenuList().forEach(articleMenu -> {
+            articleMenu.deleteArticle();
+            articleMenuRepository.delete(articleMenu);
+        });
         articleRepository.delete(article);
-        articleMenuRepository.deleteAll(article.getArticleMenuList());
     }
 
     /**

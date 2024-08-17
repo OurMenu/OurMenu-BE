@@ -92,11 +92,13 @@ public class PlaceService {
         log.info(places.toString());
 
         for (Place place : places) {
-            Menu menu = menuRepository.findDistinctByUserIdOrderByCreatedAtDesc(
-                    place.getId(),
-                    userId
-            ).orElseThrow(() -> new MenuNotFoundException());
-            menuList.add(menu);
+            if(place.getMenus() != null && !place.getMenus().isEmpty()) {
+                Menu menu = menuRepository.findDistinctByUserIdOrderByCreatedAtDesc(
+                        place.getId(),
+                        userId
+                ).orElseThrow(() -> new MenuNotFoundException());
+                menuList.add(menu);
+            }
         }
 
         log.info(menuList.toString());

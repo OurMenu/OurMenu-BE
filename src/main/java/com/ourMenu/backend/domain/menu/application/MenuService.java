@@ -414,7 +414,4 @@ public class MenuService {
         menu.updateModifiedAt();
     }
 
-    public void findAllMenu() {
-        List<Menu> allMenu = menuRepository.findAll();
-    }
 }

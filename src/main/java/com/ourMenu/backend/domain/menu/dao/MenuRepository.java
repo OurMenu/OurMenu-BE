@@ -95,6 +95,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
 
+    List<Menu> findMenusByTitleContainingAndUserIdNot(@Param("title") String title, @Param("userId") Long userId);
+
     @Query("SELECT m FROM Menu m WHERE m.id = :menuId AND m.user.id = :userId")
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
 
@@ -115,5 +117,18 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "SELECT MAX(subM.modifiedAt) FROM Menu subM WHERE subM.groupId = m.groupId AND subM.user.id = :userId" +
             ") ORDER BY m.modifiedAt DESC")
     List<Menu> findDistinctByUserIdOrderByModifiedAtDesc(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT m FROM Menu m WHERE m.user.id != :userId " +
+            "AND m.id IN (" +
+            "    SELECT MIN(m2.id) FROM Menu m2 " +  // 그룹 내에서 최소 ID를 선택
+            "    JOIN m2.tags mt " +
+            "    WHERE mt.tag.name IN :tagNames " +
+            "    GROUP BY m2.groupId " +  // groupId로 그룹화
+            "    HAVING COUNT(DISTINCT mt.tag.name) >= :tagCount" +
+            ")")
+    List<Menu> findMenusByTagNamesInAndUserIdNotAndTagCountGreaterThanEqual(
+            @Param("tagNames") List<String> tagNames,
+            @Param("userId") Long userId,
+            @Param("tagCount") int tagCount);
 
 }
