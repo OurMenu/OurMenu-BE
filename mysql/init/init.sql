@@ -91,7 +91,7 @@ create table place (
                        place_id bigint not null auto_increment,
                        user_id bigint,
                        address varchar(255),
-                       info varchar(255),
+                       info varchar(500),
                        title varchar(255),
                        status enum ('CREATED','DELETED','UPDATED'),
                        primary key (place_id)

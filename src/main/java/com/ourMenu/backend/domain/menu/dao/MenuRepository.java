@@ -35,14 +35,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     Optional<Menu> findByIdAndUserId(Long menuId, Long userId);
 
-    @Query("SELECT DISTINCT m FROM Menu m " +
-            "JOIN FETCH m.place p " +
-            "LEFT JOIN FETCH m.images mi " +
-            "JOIN m.tags mt " +
-            "JOIN mt.tag t " +
-            "WHERE m.user.id = :userId " +
-            "AND m.groupId = :groupId")
-    List<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
+    @Query("SELECT m FROM Menu m WHERE m.id IN (" +
+            "(SELECT MIN(m2.id) FROM Menu m2 WHERE m2.user.id = :userId " +
+            "AND m2.groupId = :groupId " + // groupId를 조건에 추가
+            "GROUP BY m2.groupId))")
+    Optional<List<Menu>> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
                                                  @Param("groupId") Long groupId);
 
 
@@ -67,8 +64,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "SELECT MIN(m2.id) FROM Menu m2 " +
             "JOIN m2.place p " +
             "LEFT JOIN m2.images mi " +
-            "JOIN m2.tags mt " +
-            "JOIN mt.tag t " +
+            "LEFT JOIN m2.tags mt " +
+            "LEFT JOIN mt.tag t " +
             "WHERE m2.user.id = :userId " +
             "AND (:tags IS NULL OR (t.name IN :tags)) " +
             "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
