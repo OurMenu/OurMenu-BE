@@ -2,10 +2,12 @@ package com.ourMenu.backend.domain.article.api;
 
 import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
 import com.ourMenu.backend.domain.article.api.request.PutArticleRequest;
+import com.ourMenu.backend.domain.article.api.response.ArticleMenuResponse;
 import com.ourMenu.backend.domain.article.api.response.ArticleResponse;
 import com.ourMenu.backend.domain.article.api.response.CommunityArticle;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.domain.Article;
+import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import com.ourMenu.backend.domain.article.domain.ORDER_CRITERIA;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
@@ -72,4 +74,10 @@ public class ArticleController {
         return ApiUtils.success(communityArticleList);
     }
 
+    @GetMapping("/article/menu/{articleMenuId}")
+    public ApiResponse<ArticleMenuResponse> getSharedArticleMenu(@PathVariable Long articleMenuId){
+        ArticleMenu articleMenu = articleService.addSharedCount(articleMenuId);
+
+        return ApiUtils.success(ArticleMenuResponse.toDto(articleMenu));
+    }
 }

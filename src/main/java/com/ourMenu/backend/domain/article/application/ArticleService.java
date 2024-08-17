@@ -185,4 +185,11 @@ public class ArticleService {
         }
         return fileUrl;
     }
+
+    @Transactional
+    public ArticleMenu addSharedCount(Long articleMenuId) {
+        ArticleMenu articleMenu = findArticleMenu(articleMenuId);
+        articleMenu.addSharedCount();
+        return articleMenu;
+    }
 }

@@ -46,4 +46,5 @@ public class ArticleMenu {
     public void deleteArticle(){
         this.article = null;
     }
+    public void addSharedCount(){ this.sharedCount++; }
 }
