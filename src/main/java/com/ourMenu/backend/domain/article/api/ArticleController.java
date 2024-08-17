@@ -6,6 +6,7 @@ import com.ourMenu.backend.domain.article.api.request.PutArticleRequest;
 import com.ourMenu.backend.domain.article.api.response.ArticleMenuResponse;
 import com.ourMenu.backend.domain.article.api.response.ArticleResponse;
 import com.ourMenu.backend.domain.article.api.response.CommunityArticle;
+import com.ourMenu.backend.domain.article.api.response.DownloadArticleMenuResponse;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.article.domain.ArticleMenu;
@@ -83,11 +84,11 @@ public class ArticleController {
     }
 
     @PostMapping("/article/menu/{articleMenuId}")
-    public ApiResponse<String> downloadArticleMenu(@PathVariable Long articleMenuId,
+    public ApiResponse<DownloadArticleMenuResponse> downloadArticleMenu(@PathVariable Long articleMenuId,
                                                                 @RequestBody DownloadArticleMenu downloadArticleMenu,
                                                                 @UserId Long userId){
-        articleService.downloadMenus(articleMenuId, downloadArticleMenu, userId);
+        Long groupId = articleService.downloadMenus(articleMenuId, downloadArticleMenu, userId);
 
-        return ApiUtils.success("success");
+        return ApiUtils.success(DownloadArticleMenuResponse.toDto(groupId));
     }
 }

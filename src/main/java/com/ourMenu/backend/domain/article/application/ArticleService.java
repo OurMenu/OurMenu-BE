@@ -10,7 +10,11 @@ import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
+import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
+import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.argument_resolver.UserId;
@@ -202,10 +206,28 @@ public class ArticleService {
     }
 
     @Transactional
-    public List<Menu> downloadMenus(Long articleMenuId, DownloadArticleMenu downloadArticleMenu, Long userId) {
-        //menuListService.findMenuListById()
-        return null;
-        //PostMenuRequest
-        //menuService.createMenu()
+    public Long downloadMenus(Long articleMenuId, DownloadArticleMenu downloadArticleMenu, Long userId) {
+        ArticleMenu articleMenu = findArticleMenu(articleMenuId);
+        articleMenu.addSharedCount();
+        List<Long> menuFolderIds = downloadArticleMenu.getArticleMenuIds();
+        StoreRequestDTO storeRequestDTO = StoreRequestDTO.builder()
+                .storeName(articleMenu.getPlaceTitle())
+                .storeMemo(articleMenu.getPlaceMemo())
+                .storeAddress(articleMenu.getAddress())
+                .storeLatitude(articleMenu.getPlaceLatitude())
+                .storeLongitude(articleMenu.getPlaceLongitude())
+                .build();
+
+        PostMenuRequest postMenuRequest = PostMenuRequest.builder()
+                .menuTitle(articleMenu.getMenuMemoTitle())
+                .menuPrice(articleMenu.getPrice())
+                .menuMemo(articleMenu.getPlaceMemo())
+                .menuMemoTitle(articleMenu.getMenuMemoTitle())
+                .menuIconType(articleMenu.getMenuIconType())
+                .storeInfo(storeRequestDTO)
+                .tagInfo(Collections.emptyList())
+                .menuFolderIds(menuFolderIds)
+                .build();
+        return menuService.createMenu(postMenuRequest, userId).getMenuGroupId();
     }
 }
