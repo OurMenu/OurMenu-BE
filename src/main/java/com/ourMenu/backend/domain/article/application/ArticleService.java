@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.article.application;
 
+import com.ourMenu.backend.domain.article.api.request.DownloadArticleMenu;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
@@ -7,8 +8,12 @@ import com.ourMenu.backend.domain.article.domain.ArticleMenu;
 import com.ourMenu.backend.domain.article.domain.ORDER_CRITERIA;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
+import com.ourMenu.backend.domain.menu.application.MenuService;
+import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.*;
@@ -31,7 +38,8 @@ public class ArticleService {
     private final ArticleMenuRepository articleMenuRepository;
     private final UserService userService;
     private final ArticleMenuService articleMenuService;
-    private final EntityManager em;
+    private final MenuService menuService;
+    private final MenuListService menuListService;
 
     /**
      * 게시글을 저장한다.
@@ -163,7 +171,7 @@ public class ArticleService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
         Page<Article> menuPage;
         if (isMyArticle) {
-            menuPage = articleRepository.findAllByUserAndTitleContaining(title,pageable,userId);
+            menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable, userId);
             return menuPage.getContent();
         }
 
@@ -191,5 +199,13 @@ public class ArticleService {
         ArticleMenu articleMenu = findArticleMenu(articleMenuId);
         articleMenu.addSharedCount();
         return articleMenu;
+    }
+
+    @Transactional
+    public List<Menu> downloadMenus(Long articleMenuId, DownloadArticleMenu downloadArticleMenu, Long userId) {
+        //menuListService.findMenuListById()
+        return null;
+        //PostMenuRequest
+        //menuService.createMenu()
     }
 }

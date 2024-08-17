@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.article.api;
 
+import com.ourMenu.backend.domain.article.api.request.DownloadArticleMenu;
 import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
 import com.ourMenu.backend.domain.article.api.request.PutArticleRequest;
 import com.ourMenu.backend.domain.article.api.response.ArticleMenuResponse;
@@ -79,5 +80,14 @@ public class ArticleController {
         ArticleMenu articleMenu = articleService.addSharedCount(articleMenuId);
 
         return ApiUtils.success(ArticleMenuResponse.toDto(articleMenu));
+    }
+
+    @PostMapping("/article/menu/{articleMenuId}")
+    public ApiResponse<String> downloadArticleMenu(@PathVariable Long articleMenuId,
+                                                                @RequestBody DownloadArticleMenu downloadArticleMenu,
+                                                                @UserId Long userId){
+        articleService.downloadMenus(articleMenuId, downloadArticleMenu, userId);
+
+        return ApiUtils.success("success");
     }
 }
