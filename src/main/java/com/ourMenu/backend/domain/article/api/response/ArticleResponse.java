@@ -18,6 +18,7 @@ public class ArticleResponse {
 
     private Long articleId;
     private String articleTitle;
+    private String userEmail;
     private String userNickname;
     private String userImgUrl;
     private LocalDateTime createdBy;
@@ -37,6 +38,7 @@ public class ArticleResponse {
         return ArticleResponse.builder()
                 .articleId(article.getId())
                 .articleTitle(article.getTitle())
+                .userEmail(article.getUser().getEmail())
                 .userNickname(article.getUser().getNickname())
                 .userImgUrl(userImgUrl)
                 .createdBy(article.getCreatedAt())
@@ -58,6 +60,7 @@ public class ArticleResponse {
         return ArticleResponse.builder()
                 .articleId(article.getId())
                 .articleTitle(article.getTitle())
+                .userEmail(article.getUser().getEmail())
                 .userNickname(article.getUser().getNickname())
                 .createdBy(article.getCreatedAt())
                 .articleContent(article.getContent())
