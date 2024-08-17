@@ -26,20 +26,20 @@ public class ArticleController {
     public ApiResponse<ArticleResponse> postArticle(@RequestBody PostArticleRequest postArticleRequest, @UserId Long userId) {
         Article article = PostArticleRequest.toEntity(postArticleRequest);
         Article saveArticle = articleService.saveArticleWithMenu(article,userId);
-        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
         if(saveArticle.getUser().getImgUrl() == null){
             return ApiUtils.success(ArticleResponse.toDto(article));
         }
+        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
         return ApiUtils.success(ArticleResponse.toDto(saveArticle,userImgUrl));
     }
 
     @GetMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> getArticle(@PathVariable Long articleId) {
         Article article = articleService.visitArticleById(articleId);
-        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
         if(article.getUser().getImgUrl() == null){
             return ApiUtils.success(ArticleResponse.toDto(article));
         }
+        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
         return ApiUtils.success(ArticleResponse.toDto(article,userImgUrl));
     }
 
