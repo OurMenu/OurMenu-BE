@@ -58,6 +58,14 @@ public class MenuService {
     }
 
 
+    public List<Long> getMenuIdsByUserId(Long userId) {
+        List<Menu> menus = menuRepository.findByUserId(userId); // 유저 ID로 메뉴 조회
+        return menus.stream()
+                .map(Menu::getId) // 메뉴 ID를 추출
+                .collect(Collectors.toList()); // 리스트로 변환
+    }
+
+
     @Transactional(readOnly = true)
     public Long findMaxGroupId(Long userId){
         List<Menu> menus = menuRepository.findByUserId(userId);
@@ -321,7 +329,7 @@ public class MenuService {
         return menuRepository.findById(menuId).orElseThrow(() -> new MenuNotFoundException());
     }
 
-    
+
     @Transactional
     public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
         List<Menu> certainMenu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
@@ -378,13 +386,13 @@ public class MenuService {
 
     @Transactional
     public List<Menu> getAllMenusByTagName(String tag, Long userId){
-            String[] integers = {tag};
-            int tagCount = integers.length;
-            Pageable pageable = PageRequest.of(0, 5);
-            Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, null,  userId, 0, 999999, tagCount, pageable);
-            List<Menu> menuList = menuPage.getContent();
-            return menuList; // List<MenuDto> 반환
-        }
+        String[] integers = {tag};
+        int tagCount = integers.length;
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Menu> menuPage = menuRepository.findingMenusByCriteria2(integers, null,  userId, 0, 999999, tagCount, pageable);
+        List<Menu> menuList = menuPage.getContent();
+        return menuList; // List<MenuDto> 반환
+    }
 
     public List<Menu> getAllMenusByTagNameAndUserIdNot(String tagName, Long userId) {
         return null;

@@ -84,6 +84,12 @@ public class MenuApiController {
         return ApiUtils.success(menuIdDto);
     }
 
+    @GetMapping("/test")
+    public ApiResponse<List<Long>> getAllMenu(@UserId Long id) {
+        List<Long> menuIds = menuService.getMenuIdsByUserId(id); // Service 호출
+        return ApiUtils.success(menuIds); // 메뉴 ID 리스트 반환
+    }
+
 
     // 메뉴 생성
     @PostMapping("")
