@@ -19,6 +19,12 @@ public class ArticleMenuRequest {
     private String menuImgUrl;
     private String menuAddress;
 
+    private String menuMemoTitle;
+    private String menuIconType;
+    private String placeMemo;
+    private double placeLatitude;
+    private double placeLongitude;
+
 
     public static ArticleMenu toEntity(ArticleMenuRequest articleMenuRequest){
         return ArticleMenu.builder()
@@ -27,6 +33,11 @@ public class ArticleMenuRequest {
                 .price(articleMenuRequest.getMenuPrice())
                 .imgUrl(articleMenuRequest.getMenuImgUrl())
                 .address(articleMenuRequest.getMenuAddress())
+                .menuMemoTitle(articleMenuRequest.getMenuMemoTitle())
+                .menuIconType(articleMenuRequest.getMenuIconType())
+                .placeMemo(articleMenuRequest.getPlaceMemo())
+                .placeLatitude(articleMenuRequest.getPlaceLatitude())
+                .placeLongitude(articleMenuRequest.getPlaceLongitude())
                 .build();
     }
 

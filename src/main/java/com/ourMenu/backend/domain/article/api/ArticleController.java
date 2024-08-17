@@ -1,10 +1,12 @@
 package com.ourMenu.backend.domain.article.api;
 
+import com.ourMenu.backend.domain.article.api.request.DownloadArticleMenu;
 import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
 import com.ourMenu.backend.domain.article.api.request.PutArticleRequest;
 import com.ourMenu.backend.domain.article.api.response.ArticleMenuResponse;
 import com.ourMenu.backend.domain.article.api.response.ArticleResponse;
 import com.ourMenu.backend.domain.article.api.response.CommunityArticle;
+import com.ourMenu.backend.domain.article.api.response.DownloadArticleMenuResponse;
 import com.ourMenu.backend.domain.article.application.ArticleService;
 import com.ourMenu.backend.domain.article.domain.Article;
 import com.ourMenu.backend.domain.article.domain.ArticleMenu;
@@ -79,5 +81,14 @@ public class ArticleController {
         ArticleMenu articleMenu = articleService.addSharedCount(articleMenuId);
 
         return ApiUtils.success(ArticleMenuResponse.toDto(articleMenu));
+    }
+
+    @PostMapping("/article/menu/{articleMenuId}")
+    public ApiResponse<DownloadArticleMenuResponse> downloadArticleMenu(@PathVariable Long articleMenuId,
+                                                                @RequestBody DownloadArticleMenu downloadArticleMenu,
+                                                                @UserId Long userId){
+        Long groupId = articleService.downloadMenus(articleMenuId, downloadArticleMenu, userId);
+
+        return ApiUtils.success(DownloadArticleMenuResponse.toDto(groupId));
     }
 }
