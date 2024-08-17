@@ -116,7 +116,7 @@ public class MenuApiController {
 
     @DeleteMapping("/group/{groupId}")
     public ApiResponse<String> removeAllMenu(@PathVariable Long groupId, @UserId Long userId){
-        menuService.findAllMenu();
+        menuService.removeAllMenus(groupId, userId);
         return ApiUtils.success("OK");  //OK 반환
     }
 
