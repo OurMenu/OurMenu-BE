@@ -10,17 +10,20 @@ import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
+import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.*;
 
@@ -162,5 +165,20 @@ public class ArticleService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
         Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable);
         return menuPage.getContent();
+    }
+
+
+    private final S3Client s3Client;
+    @Value("${spring.aws.s3.bucket-name}")
+    private String bucketName;
+
+    public String getUserImgUrl(String img_url) {
+        String fileUrl = "";
+        if(fileUrl != null && !img_url.isBlank()) {
+            fileUrl = s3Client.utilities()
+                    .getUrl(builder -> builder.bucket(bucketName).key(img_url))
+                    .toExternalForm();
+        }
+        return fileUrl;
     }
 }

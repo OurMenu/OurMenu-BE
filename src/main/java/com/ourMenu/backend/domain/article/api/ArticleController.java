@@ -26,20 +26,32 @@ public class ArticleController {
     public ApiResponse<ArticleResponse> postArticle(@RequestBody PostArticleRequest postArticleRequest, @UserId Long userId) {
         Article article = PostArticleRequest.toEntity(postArticleRequest);
         Article saveArticle = articleService.saveArticleWithMenu(article,userId);
-        return ApiUtils.success(ArticleResponse.toDto(saveArticle));
+        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
+        if(saveArticle.getUser().getImgUrl() == null){
+            return ApiUtils.success(ArticleResponse.toDto(article));
+        }
+        return ApiUtils.success(ArticleResponse.toDto(saveArticle,userImgUrl));
     }
 
     @GetMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> getArticle(@PathVariable Long articleId) {
         Article article = articleService.visitArticleById(articleId);
-        return ApiUtils.success(ArticleResponse.toDto(article));
+        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
+        if(article.getUser().getImgUrl() == null){
+            return ApiUtils.success(ArticleResponse.toDto(article));
+        }
+        return ApiUtils.success(ArticleResponse.toDto(article,userImgUrl));
     }
 
     @PutMapping("/article/{articleId}")
     public ApiResponse<ArticleResponse> putArticle(@PathVariable Long articleId, @RequestBody PutArticleRequest putArticleRequest, @UserId Long userId) {
         Article article = PutArticleRequest.toEntity(putArticleRequest);
         Article saveArticle = articleService.updateArticleWithMenu(articleId, article, userId);
-        return ApiUtils.success(ArticleResponse.toDto(saveArticle));
+        if(saveArticle.getUser().getImgUrl() == null){
+            return ApiUtils.success(ArticleResponse.toDto(saveArticle));
+        }
+        String userImgUrl = articleService.getUserImgUrl(saveArticle.getUser().getImgUrl());
+        return ApiUtils.success(ArticleResponse.toDto(saveArticle,userImgUrl));
     }
 
     @GetMapping("/community")
@@ -48,7 +60,13 @@ public class ArticleController {
                                  @RequestParam(defaultValue = "5") int size, // 페이지 크기, 기본값은 5
                                  @RequestParam(value = "orderCriteria", defaultValue = "CREATED_AT_DESC") ORDER_CRITERIA orderCriteria){
         List<Article> articleList = articleService.findArticleByUserIdAndOrderAndPage(title, page, size, orderCriteria);
-        List<CommunityArticle> communityArticleList = articleList.stream().map(CommunityArticle::toDto).toList();
+        List<CommunityArticle> communityArticleList = articleList.stream().map(article->{
+            if(article.getUser().getImgUrl() == null){
+                return CommunityArticle.toDto(article);
+            }
+            String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
+            return CommunityArticle.toDto(article,userImgUrl);
+        }).toList();
         return ApiUtils.success(communityArticleList);
     }
 
