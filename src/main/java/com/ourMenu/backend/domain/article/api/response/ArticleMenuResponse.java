@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ArticleMenuResponse {
 
+    private Long articleMenuId;
     private String placeTitle;
     private String menuTitle;
     private int menuPrice;
@@ -20,6 +21,7 @@ public class ArticleMenuResponse {
     private int sharedCount;
     public static ArticleMenuResponse toDto(ArticleMenu articleMenu){
         return ArticleMenuResponse.builder()
+                .articleMenuId(articleMenu.getId())
                 .placeTitle(articleMenu.getPlaceTitle())
                 .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
