@@ -35,6 +35,9 @@ public class ArticleMenu {
 
     private Long groupId;
 
+    @Builder.Default
+    private int sharedCount = 0;
+
     public void confirmArticle(Article article){
         this.article = article;
         article.upMenuCount();
