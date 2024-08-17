@@ -25,6 +25,27 @@ public class CommunityArticle {
     private int articleViews;
     private String articleThumbnail;
 
+    public static CommunityArticle toDto(Article article, String userImgUrl){
+        String menuImg = null;
+        for (ArticleMenu articleMenu : article.getArticleMenuList()) {
+            if (articleMenu.getImgUrl() != null) {
+                menuImg = articleMenu.getImgUrl();
+                break;
+            }
+        }
+        return CommunityArticle.builder()
+                .articleId(article.getId())
+                .articleTitle(article.getTitle())
+                .articleContent(article.getContent())
+                .userNickname(article.getUser().getNickname())
+                .userImgUrl(userImgUrl)
+                .createdBy(article.getCreatedAt())
+                .menusCount(article.getMenuCount())
+                .articleViews(article.getViews())
+                .articleThumbnail(menuImg)
+                .build();
+    }
+
     public static CommunityArticle toDto(Article article){
         String menuImg = null;
         for (ArticleMenu articleMenu : article.getArticleMenuList()) {
@@ -38,7 +59,6 @@ public class CommunityArticle {
                 .articleTitle(article.getTitle())
                 .articleContent(article.getContent())
                 .userNickname(article.getUser().getNickname())
-                .userImgUrl(article.getUser().getImgUrl())
                 .createdBy(article.getCreatedAt())
                 .menusCount(article.getMenuCount())
                 .articleViews(article.getViews())

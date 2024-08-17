@@ -52,7 +52,7 @@ public class OnBoardingService {
         for (String s : foodStringList) {
             List<Menu> menus = menuRepository.findMenusByTitleContainingAndUserId(s, userId);
             for (Menu menu : menus) {
-                map.put(menu.getId(), menu);
+                map.put(menu.getGroupId(), menu);
             }
         }
 

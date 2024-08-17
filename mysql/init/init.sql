@@ -22,6 +22,7 @@ create table article_menu (
                               img_url varchar(255),
                               place_title varchar(255),
                               title varchar(255),
+                              shared_count bigint,
                               primary key (article_menu_id)
 ) engine=InnoDB;
 

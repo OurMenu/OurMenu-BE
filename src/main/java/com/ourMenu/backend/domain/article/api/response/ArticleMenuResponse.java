@@ -12,17 +12,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ArticleMenuResponse {
 
+    private Long articleMenuId;
+    private String placeTitle;
     private String menuTitle;
     private int menuPrice;
     private String menuImgUrl;
     private String menuAddress;
-
+    private int sharedCount;
     public static ArticleMenuResponse toDto(ArticleMenu articleMenu){
         return ArticleMenuResponse.builder()
+                .articleMenuId(articleMenu.getId())
+                .placeTitle(articleMenu.getPlaceTitle())
                 .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
                 .menuImgUrl(articleMenu.getImgUrl())
                 .menuAddress(articleMenu.getAddress())
+                .sharedCount(articleMenu.getSharedCount())
                 .build();
     }
 }
