@@ -58,6 +58,14 @@ public class MenuService {
     }
 
 
+    public List<Long> getMenuIdsByUserId(Long userId) {
+        List<Menu> menus = menuRepository.findByUserId(userId); // 유저 ID로 메뉴 조회
+        return menus.stream()
+                .map(Menu::getId) // 메뉴 ID를 추출
+                .collect(Collectors.toList()); // 리스트로 변환
+    }
+
+
     @Transactional(readOnly = true)
     public Long findMaxGroupId(Long userId){
         List<Menu> menus = menuRepository.findByUserId(userId);
@@ -404,5 +412,9 @@ public class MenuService {
 
     public void updateModifiedAt(Menu menu){
         menu.updateModifiedAt();
+    }
+
+    public void findAllMenu() {
+        List<Menu> allMenu = menuRepository.findAll();
     }
 }
