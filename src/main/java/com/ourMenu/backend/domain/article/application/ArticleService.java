@@ -86,6 +86,19 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
+    @Transactional
+    public void hardDeleteByUserId(Long id, Long userId) {
+        Article article = findOne(id);
+        if(!article.getUser().getId().equals(userId)){
+            throw new RuntimeException("권한이 없습니다");
+        }
+        article.getArticleMenuList().forEach(articleMenu -> {
+            articleMenu.deleteArticle();
+            articleMenuRepository.delete(articleMenu);
+        });
+        articleRepository.delete(article);
+    }
+
     /**
      * 게시글 조회
      *

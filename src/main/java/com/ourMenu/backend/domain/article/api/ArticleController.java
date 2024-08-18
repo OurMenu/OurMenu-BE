@@ -58,6 +58,12 @@ public class ArticleController {
         return ApiUtils.success(ArticleResponse.toDto(saveArticle, userImgUrl));
     }
 
+    @DeleteMapping("/article/{articleId}")
+    public ApiResponse<String> deleteArticle(@PathVariable Long articleId, @UserId Long userId){
+        articleService.hardDeleteByUserId(articleId, userId);
+        return ApiUtils.success("OK");
+    }
+
     @GetMapping("")
     public ApiResponse<List<CommunityArticle>> getArticleList(@RequestParam(required = false) String title,//검색어
                                                               @RequestParam(defaultValue = "0") int page, // 페이지 번호, 기본값은 0
