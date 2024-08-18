@@ -71,10 +71,12 @@ public class OnBoardingService {
         List<String> foodStringList = Question.getAnswerFoodByIdAndAnswerType(questionId, answerType);
         Map<Long, Menu> map = new HashMap<>();
 
-        for (String s : foodStringList) {
-            List<Menu> menus = menuRepository.findMenusByTitleContainingAndUserIdNot(s, userId);
+        for (String foodString : foodStringList) {
+            List<Menu> menus = menuRepository.findMenusByTitleContaining(foodString);
             for (Menu menu : menus) {
-                map.put(menu.getId(), menu);
+                if(menu.getUser().getId().equals(userId))
+                    continue;
+                map.put(menu.getGroupId(), menu);
             }
         }
 
@@ -84,6 +86,10 @@ public class OnBoardingService {
 
     public List<Menu> findStoreByRandomTag(Long userId, DefaultTag randomTag) {
         return menuService.getAllMenusByTagName(randomTag.getTagName(), userId);
+    }
+
+    public List<Menu> findOtherStoreByRandomTag(Long userId, DefaultTag randomTag) {
+        return menuService.getAllOtherMenusByTagName(randomTag.getTagName(), userId);
     }
 
     public List<Menu> findOtherUserStoreByRandomTag(Long userId, DefaultTag randomTag){
@@ -109,4 +115,6 @@ public class OnBoardingService {
     public OnBoardingState save(OnBoardingState onBoardingState) {
         return onBoardingStateRepository.save(onBoardingState);
     }
+
+
 }

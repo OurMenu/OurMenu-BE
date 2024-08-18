@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -19,12 +20,20 @@ public class GetTagRecommends {
     private List<GetRecommend> menus;
 
 
-    public static GetTagRecommends toDto(List<Menu> menus, DefaultTag tag) {
-        List<GetRecommend> recommandList = menus.stream().map(GetRecommend::toDto).toList();
+    public static GetTagRecommends toDto(List<Menu> menuList, DefaultTag tag) {
+        List<GetRecommend> recommandList = menuList.stream().map(GetRecommend::toDto).toList();
         return GetTagRecommends.builder()
                 .tagName(tag.getTagMemo())
-                .menus(recommandList)
+                .menus(new ArrayList<>(recommandList))
                 .build();
 
+    }
+
+    public void addAll(List<Menu> menuList) {
+        List<GetRecommend> recommandList = menuList.stream().map(GetRecommend::toDto).toList();
+        if (menus == null) {
+            menus = new ArrayList<>();  // 가변 리스트로 초기화
+        }
+        menus.addAll(recommandList);
     }
 }
