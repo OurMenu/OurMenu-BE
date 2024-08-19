@@ -3,6 +3,7 @@ package com.ourMenu.backend.domain.onboarding.application;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.dao.MenuRepository;
 import com.ourMenu.backend.domain.menu.domain.Menu;
+import com.ourMenu.backend.domain.menu.dto.MenuIdentifier;
 import com.ourMenu.backend.domain.onboarding.dao.OnBoardingStateRepository;
 import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
 import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
@@ -69,15 +70,20 @@ public class OnBoardingService {
     @Transactional
     public List<Menu> findOtherUserMenusByQuestionAnswer(Long userId, int questionId, AnswerType answerType) {
         List<String> foodStringList = Question.getAnswerFoodByIdAndAnswerType(questionId, answerType);
-        Map<Long, Menu> map = new HashMap<>();
+        List<Menu> menuList = new ArrayList<>();
 
         for (String foodString : foodStringList) {
             List<Menu> menus = menuRepository.findMenusByTitleContaining(foodString);
-            for (Menu menu : menus) {
-                if(menu.getUser().getId().equals(userId))
-                    continue;
-                map.put(menu.getGroupId(), menu);
-            }
+            menuList.addAll(menus);
+        }
+
+        Map<MenuIdentifier,Menu> map = new HashMap<>();
+
+        for (Menu menu : menuList) {
+            if(menu.getUser().getId() == userId)
+                continue;
+            MenuIdentifier menuIdentifier = new MenuIdentifier(menu.getGroupId(),menu.getUser().getId());
+            map.put(menuIdentifier,menu);
         }
 
         return map.values().stream().toList();
@@ -89,7 +95,15 @@ public class OnBoardingService {
     }
 
     public List<Menu> findOtherStoreByRandomTag(Long userId, DefaultTag randomTag) {
-        return menuService.getAllOtherMenusByTagName(randomTag.getTagName(), userId);
+        List<Menu> menuList = menuService.getAllOtherMenusByTagName(randomTag.getTagName(), userId);
+        Map<MenuIdentifier,Menu> map = new HashMap<>();
+        for (Menu menu : menuList) {
+            if(menu.getUser().getId() == userId)
+                continue;
+            MenuIdentifier menuIdentifier = new MenuIdentifier(menu.getGroupId(),menu.getUser().getId());
+            map.put(menuIdentifier,menu);
+        }
+        return map.values().stream().toList();
     }
 
     public List<Menu> findOtherUserStoreByRandomTag(Long userId, DefaultTag randomTag){
