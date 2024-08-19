@@ -1,7 +1,6 @@
 package com.ourMenu.backend.domain.onboarding.api.response;
 
 import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDto;
 import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +19,17 @@ public class GetTagRecommends {
     private List<GetRecommend> menus;
 
 
-    public static GetTagRecommends toDto(List<Menu> menuList, DefaultTag tag) {
-        List<GetRecommend> recommandList = menuList.stream().map(GetRecommend::toDto).toList();
+    public static GetTagRecommends toDtoOwn(List<Menu> menuList, DefaultTag tag) {
+        List<GetRecommend> recommandList = menuList.stream().map(menu->GetRecommend.toDto(menu,true)).toList();
+        return GetTagRecommends.builder()
+                .tagName(tag.getTagMemo())
+                .menus(new ArrayList<>(recommandList))
+                .build();
+
+    }
+
+    public static GetTagRecommends toDtoOther(List<Menu> menuList, DefaultTag tag) {
+        List<GetRecommend> recommandList = menuList.stream().map(menu->GetRecommend.toDto(menu,false)).toList();
         return GetTagRecommends.builder()
                 .tagName(tag.getTagMemo())
                 .menus(new ArrayList<>(recommandList))
@@ -30,7 +38,7 @@ public class GetTagRecommends {
     }
 
     public void addAll(List<Menu> menuList) {
-        List<GetRecommend> recommandList = menuList.stream().map(GetRecommend::toDto).toList();
+        List<GetRecommend> recommandList = menuList.stream().map(menu->GetRecommend.toDto(menu,false)).toList();
         if (menus == null) {
             menus = new ArrayList<>();  // 가변 리스트로 초기화
         }

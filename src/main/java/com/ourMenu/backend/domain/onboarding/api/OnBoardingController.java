@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import static java.lang.Math.min;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,13 +51,16 @@ public class OnBoardingController {
         }
         List<Menu> menuList = new ArrayList<>();
         menuList.addAll(onBoardService.saveAndFindStoreByQuestionAnswer(userId, questionId, answerType));
+        int boundary = menuList.size() - 1;
+
         menuList.addAll(onBoardService.findOtherUserMenusByQuestionAnswer(userId, questionId, answerType));
 
+        boundary = min(boundary, 14);
         if (menuList.size() > 15) {
             menuList = menuList.subList(0, 15);
         }
 
-        return ApiUtils.success(GetQuestionRecommands.toDto(menuList, questionId, answerType));
+        return ApiUtils.success(GetQuestionRecommands.toDto(menuList, questionId, answerType, boundary));
 
     }
 
@@ -67,7 +71,7 @@ public class OnBoardingController {
         List<GetTagRecommends> getTagRecommendsList = new ArrayList<>();
         for (DefaultTag defaultTag : defaultTagList) {
             List<Menu> menuList1 = onBoardService.findStoreByRandomTag(userId, defaultTag);
-            getTagRecommendsList.add(GetTagRecommends.toDto(menuList1, defaultTag));
+            getTagRecommendsList.add(GetTagRecommends.toDtoOwn(menuList1, defaultTag));
 
             List<Menu> menuList2 = onBoardService.findOtherStoreByRandomTag(userId, defaultTag);
             getTagRecommendsList.get(getTagRecommendsList.size()-1).addAll(menuList2);
