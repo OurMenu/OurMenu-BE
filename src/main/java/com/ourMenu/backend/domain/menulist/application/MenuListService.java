@@ -125,6 +125,10 @@ public class MenuListService {
 
         if (!menus.isEmpty()) {
             for (Menu menu : menus) {
+                // 먼저 빈 리스트를 생성해놓습니다.
+                List<MenuImage> copiedImages = new ArrayList<>();
+                List<MenuTag> copiedTags = new ArrayList<>();
+
                 // 복사된 메뉴 생성
                 Menu copiedMenu = Menu.builder()
                         .title(menu.getTitle())
@@ -135,26 +139,29 @@ public class MenuListService {
                         .memo(menu.getMemo())
                         .menuIconType(menu.getMenuIconType())
                         .user(user)
-                        .images(new ArrayList<>(menu.getImages().stream()
-                                .map(image -> MenuImage.builder()
-                                        .url(image.getUrl())
-                                        .menu(menu) // 기존 메뉴가 아니라 새 메뉴로 설정
-                                        .build())
-                                .collect(Collectors.toList())))
-                        .tags(new ArrayList<>(menu.getTags().stream()
-                                .map(tag -> MenuTag.builder()
-                                        .tag(tag.getTag())
-                                        .menu(menu) // 기존 메뉴가 아니라 새 메뉴로 설정
-                                        .build())
-                                .collect(Collectors.toList())))
+                        .images(copiedImages)
+                        .tags(copiedTags)
                         .place(menu.getPlace())
                         .groupId(menu.getGroupId())
                         .build();
+
+                copiedImages.addAll(menu.getImages().stream().map(image ->
+                        MenuImage.builder()
+                                .url(image.getUrl())
+                                .menu(copiedMenu) // 새 메뉴로 설정
+                                .build()).collect(Collectors.toList()));
+
+                copiedTags.addAll(menu.getTags().stream()
+                        .map(tag -> MenuTag.builder()
+                                .tag(tag.getTag())
+                                .menu(copiedMenu) // 새 메뉴로 설정
+                                .build())
+                        .collect(Collectors.toList()));
+
                 menuRepository.save(copiedMenu);
 
-                // 복사된 메뉴와 메뉴판 연결
+
                 copiedMenu.confirmMenuList(menuList);
-//                menuList.addMenu(copiedMenu); // 메뉴판에 복사된 메뉴 추가
             }
         }
 
