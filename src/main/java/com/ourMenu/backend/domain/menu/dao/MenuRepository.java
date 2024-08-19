@@ -144,34 +144,17 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     /**
      * 온보딩에 사용되는 쿼리
-     * @param tags
-     * @param menuFolderId
-     * @param userId
-     * @param minPrice
-     * @param maxPrice
-     * @param tagCount
-     * @param pageable
+     * @param tag
      * @return
      */
     @Query("SELECT m FROM Menu m WHERE m.id IN (" +
-            "SELECT MIN(m2.id) FROM Menu m2 " +
+            "SELECT m2.id FROM Menu m2 " +
             "JOIN m2.place p " +
             "LEFT JOIN m2.images mi " +
             "LEFT JOIN m2.tags mt " +
             "LEFT JOIN mt.tag t " +
-            "WHERE (:tags IS NULL OR (t.name IN :tags)) " +
-            "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
-            "AND (:minPrice IS NULL OR m2.price >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR m2.price <= :maxPrice) " +
-            "GROUP BY m2.groupId " +
-            "HAVING COUNT(DISTINCT t.name) >= :tagCount" +
-            ")")
+            "WHERE t.name IN :tag)")
 
-    Page<Menu> findingMenusByCriteria3(
-            @Param("tags") String[] tags, // 태그 배열로 변경
-            @Param("menuFolderId") Integer menuFolderId,
-            @Param("minPrice") Integer minPrice,
-            @Param("maxPrice") Integer maxPrice,
-            @Param("tagCount") Integer tagCount, // 태그 개수 추가
-            Pageable pageable);
+    List<Menu> findingMenusByCriteria3(
+            @Param("tag") String tag);
 }

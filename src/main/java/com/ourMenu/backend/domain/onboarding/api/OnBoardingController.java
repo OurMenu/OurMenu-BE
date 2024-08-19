@@ -55,6 +55,7 @@ public class OnBoardingController {
 
         menuList.addAll(onBoardService.findOtherUserMenusByQuestionAnswer(userId, questionId, answerType));
 
+
         boundary = min(boundary, 14);
         if (menuList.size() > 15) {
             menuList = menuList.subList(0, 15);
