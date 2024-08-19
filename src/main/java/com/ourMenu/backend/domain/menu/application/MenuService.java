@@ -332,9 +332,7 @@ public class MenuService {
 
     @Transactional
     public MenuDetailDto getCertainMenu(Long userId, Long groupId) {
-        List<Menu> menu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new RuntimeException("해당하는 메뉴가 없습니다."));
-
+        List<Menu> menu = menuRepository.findCertainMenuByUserIdAndGroupId(userId, groupId);
         return MenuDetailDto.toDto(menu);
     }
 
