@@ -157,14 +157,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findingMenusByCriteria3(
             @Param("tag") String tag);
 
-    Page<Menu> findingMenusByCriteria3(
-            @Param("tags") String[] tags, // 태그 배열로 변경
-            @Param("menuFolderId") Integer menuFolderId,
-            @Param("minPrice") Integer minPrice,
-            @Param("maxPrice") Integer maxPrice,
-            @Param("tagCount") Integer tagCount, // 태그 개수 추가
-            Pageable pageable);
-
 
     List<Menu> findOneByGroupIdAndUserId(Long groupId, Long userId);
 
