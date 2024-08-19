@@ -15,12 +15,14 @@ public class GetRecommend {
     private String menuTitle;
     private String placeName;
     private Long groupId;
-    public static GetRecommend toDto(Menu menu){
+    private boolean isUserOwned;
+    public static GetRecommend toDto(Menu menu, boolean isUserOwned){
         return GetRecommend.builder()
                 .menuImgUrl(menu.getImages() != null && !menu.getImages().isEmpty() ? menu.getImages().get(0).getUrl() : null)
                 .menuTitle(menu.getTitle())
                 .placeName(menu.getPlace().getTitle())
                 .groupId(menu.getGroupId())
+                .isUserOwned(isUserOwned)
                 .build();
     }
 

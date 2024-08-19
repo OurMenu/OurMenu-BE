@@ -1,4 +1,4 @@
-use users_db
+use users_db;
 
 create table article (
                          menu_count integer not null,
