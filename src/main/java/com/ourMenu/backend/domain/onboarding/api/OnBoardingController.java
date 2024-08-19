@@ -10,6 +10,7 @@ import com.ourMenu.backend.domain.onboarding.domain.AnswerType;
 import com.ourMenu.backend.domain.onboarding.domain.DefaultTag;
 import com.ourMenu.backend.domain.onboarding.domain.OnBoardingState;
 import com.ourMenu.backend.domain.onboarding.domain.Question;
+import com.ourMenu.backend.domain.onboarding.util.S3Util;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
 import com.ourMenu.backend.global.util.ApiUtils;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,11 +39,24 @@ public class OnBoardingController {
     }
 
     @GetMapping("/recommend")
-    public ApiResponse<GetQuestionRecommands> getQuestionRecommend(@RequestParam("questionId") int questionId,
-                                                                   @RequestParam("answer") AnswerType answerType,
+    public ApiResponse<GetQuestionRecommands> getQuestionRecommend(@RequestParam(value = "questionId", required = false) Integer questionId,
+                                                                   @RequestParam(value = "answer", required = false) AnswerType answerType,
                                                                    @UserId Long userId) {
-        List<Menu> menus = onBoardService.saveAndFindStoreByQuestionAnswer(userId, questionId, answerType);
-        return ApiUtils.success(GetQuestionRecommands.toDto(menus, questionId, answerType));
+        if(questionId == null) {
+            questionId = S3Util.getRandomQuestionId();
+        }
+        if(answerType == null){
+            answerType = S3Util.getRandomAnswerType();
+        }
+        List<Menu> menuList = new ArrayList<>();
+        menuList.addAll(onBoardService.saveAndFindStoreByQuestionAnswer(userId, questionId, answerType));
+        menuList.addAll(onBoardService.findOtherUserMenusByQuestionAnswer(userId, questionId, answerType));
+
+        if (menuList.size() > 15) {
+            menuList = menuList.subList(0, 15);
+        }
+
+        return ApiUtils.success(GetQuestionRecommands.toDto(menuList, questionId, answerType));
 
     }
 
@@ -51,10 +66,16 @@ public class OnBoardingController {
 
         List<GetTagRecommends> getTagRecommendsList = new ArrayList<>();
         for (DefaultTag defaultTag : defaultTagList) {
-            List<Menu> menuList = onBoardService.findStoreByRandomTag(userId, defaultTag);
-            getTagRecommendsList.add(GetTagRecommends.toDto(menuList, defaultTag));
+            List<Menu> menuList1 = onBoardService.findStoreByRandomTag(userId, defaultTag);
+            getTagRecommendsList.add(GetTagRecommends.toDto(menuList1, defaultTag));
+
+            List<Menu> menuList2 = onBoardService.findOtherStoreByRandomTag(userId, defaultTag);
+            getTagRecommendsList.get(getTagRecommendsList.size()-1).addAll(menuList2);
         }
 
+        if (getTagRecommendsList.size() > 15) {
+            getTagRecommendsList = getTagRecommendsList.subList(0, 15);
+        }
         return ApiUtils.success(getTagRecommendsList);
     }
 

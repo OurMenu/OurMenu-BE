@@ -52,7 +52,31 @@ public class OnBoardingService {
         for (String s : foodStringList) {
             List<Menu> menus = menuRepository.findMenusByTitleContainingAndUserId(s, userId);
             for (Menu menu : menus) {
-                map.put(menu.getId(), menu);
+                map.put(menu.getGroupId(), menu);
+            }
+        }
+
+        return map.values().stream().toList();
+    }
+
+    /**
+     * questionId와 answerType에 해당하는 메뉴를 가진 다른사람(본인의 것은 제외한다)의 유저의 메뉴를 가져온다
+     * @param userId
+     * @param questionId
+     * @param answerType
+     * @return
+     */
+    @Transactional
+    public List<Menu> findOtherUserMenusByQuestionAnswer(Long userId, int questionId, AnswerType answerType) {
+        List<String> foodStringList = Question.getAnswerFoodByIdAndAnswerType(questionId, answerType);
+        Map<Long, Menu> map = new HashMap<>();
+
+        for (String foodString : foodStringList) {
+            List<Menu> menus = menuRepository.findMenusByTitleContaining(foodString);
+            for (Menu menu : menus) {
+                if(menu.getUser().getId().equals(userId))
+                    continue;
+                map.put(menu.getGroupId(), menu);
             }
         }
 
@@ -62,6 +86,14 @@ public class OnBoardingService {
 
     public List<Menu> findStoreByRandomTag(Long userId, DefaultTag randomTag) {
         return menuService.getAllMenusByTagName(randomTag.getTagName(), userId);
+    }
+
+    public List<Menu> findOtherStoreByRandomTag(Long userId, DefaultTag randomTag) {
+        return menuService.getAllOtherMenusByTagName(randomTag.getTagName(), userId);
+    }
+
+    public List<Menu> findOtherUserStoreByRandomTag(Long userId, DefaultTag randomTag){
+        return menuService.getAllMenusByTagNameAndUserIdNot(randomTag.getTagName(), userId);
     }
 
     @Transactional(readOnly = true)
@@ -83,4 +115,6 @@ public class OnBoardingService {
     public OnBoardingState save(OnBoardingState onBoardingState) {
         return onBoardingStateRepository.save(onBoardingState);
     }
+
+
 }

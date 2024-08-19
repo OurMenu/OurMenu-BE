@@ -1,5 +1,6 @@
 package com.ourMenu.backend.domain.article.application;
 
+import com.ourMenu.backend.domain.article.api.request.DownloadArticleMenu;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
@@ -9,18 +10,27 @@ import com.ourMenu.backend.domain.article.exception.NoSuchArticleException;
 import com.ourMenu.backend.domain.article.exception.NoSuchArticleMenuException;
 import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
+import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
+import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
+import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
+import com.ourMenu.backend.domain.menulist.application.MenuListService;
+import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
+import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.Status;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.*;
 
@@ -32,7 +42,8 @@ public class ArticleService {
     private final ArticleMenuRepository articleMenuRepository;
     private final UserService userService;
     private final ArticleMenuService articleMenuService;
-    private final EntityManager em;
+    private final MenuService menuService;
+    private final MenuListService menuListService;
 
     /**
      * 게시글을 저장한다.
@@ -68,8 +79,24 @@ public class ArticleService {
     @Transactional
     public void hardDelete(Long id) {
         Article article = findOne(id);
+        article.getArticleMenuList().forEach(articleMenu -> {
+            articleMenu.deleteArticle();
+            articleMenuRepository.delete(articleMenu);
+        });
         articleRepository.delete(article);
-        articleMenuRepository.deleteAll(article.getArticleMenuList());
+    }
+
+    @Transactional
+    public void hardDeleteByUserId(Long id, Long userId) {
+        Article article = findOne(id);
+        if(!article.getUser().getId().equals(userId)){
+            throw new RuntimeException("권한이 없습니다");
+        }
+        article.getArticleMenuList().forEach(articleMenu -> {
+            articleMenu.deleteArticle();
+            articleMenuRepository.delete(articleMenu);
+        });
+        articleRepository.delete(article);
     }
 
     /**
@@ -86,7 +113,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article visitArticleById(Long id){
+    public Article visitArticleById(Long id) {
         Article article = findOne(id);
         article.visit();
         return article;
@@ -148,16 +175,72 @@ public class ArticleService {
 
     /**
      * 조건에 맞는 게시글을 조회한다
-     * @param title 검색어
-     * @param page 페이지
-     * @param size 페이지 크기
+     *
+     * @param title         검색어
+     * @param page          페이지
+     * @param size          페이지 크기
      * @param orderCriteria 정렬 기준
+     * @param isMyArticle   본인의 게시물만 가져올 것인지
      * @return 조회된 게시글들
      */
     @Transactional
-    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria){
+    public List<Article> findArticleByUserIdAndOrderAndPage(String title, int page, int size, ORDER_CRITERIA orderCriteria, Boolean isMyArticle, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(orderCriteria.getDirection(), orderCriteria.getProperty()));
-        Page<Article> menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable);
+        Page<Article> menuPage;
+        if (isMyArticle) {
+            menuPage = articleRepository.findAllByUserAndTitleContaining(title, pageable, userId);
+            return menuPage.getContent();
+        }
+
+        menuPage = articleRepository.findAllByTitleContaining(title, pageable);
         return menuPage.getContent();
+    }
+
+
+    private final S3Client s3Client;
+    @Value("${spring.aws.s3.bucket-name}")
+    private String bucketName;
+
+    public String getUserImgUrl(String img_url) {
+        String fileUrl = "";
+        if (fileUrl != null && !img_url.isBlank()) {
+            fileUrl = s3Client.utilities()
+                    .getUrl(builder -> builder.bucket(bucketName).key(img_url))
+                    .toExternalForm();
+        }
+        return fileUrl;
+    }
+
+    @Transactional
+    public ArticleMenu addSharedCount(Long articleMenuId) {
+        ArticleMenu articleMenu = findArticleMenu(articleMenuId);
+        articleMenu.addSharedCount();
+        return articleMenu;
+    }
+
+    @Transactional
+    public Long downloadMenus(Long articleMenuId, DownloadArticleMenu downloadArticleMenu, Long userId) {
+        ArticleMenu articleMenu = findArticleMenu(articleMenuId);
+        articleMenu.addSharedCount();
+        List<Long> menuFolderIds = downloadArticleMenu.getArticleMenuIds();
+        StoreRequestDTO storeRequestDTO = StoreRequestDTO.builder()
+                .storeName(articleMenu.getPlaceTitle())
+                .storeMemo(articleMenu.getPlaceMemo())
+                .storeAddress(articleMenu.getAddress())
+                .storeLatitude(articleMenu.getPlaceLatitude())
+                .storeLongitude(articleMenu.getPlaceLongitude())
+                .build();
+
+        PostMenuRequest postMenuRequest = PostMenuRequest.builder()
+                .menuTitle(articleMenu.getMenuMemoTitle())
+                .menuPrice(articleMenu.getPrice())
+                .menuMemo(articleMenu.getPlaceMemo())
+                .menuMemoTitle(articleMenu.getMenuMemoTitle())
+                .menuIconType(articleMenu.getMenuIconType())
+                .storeInfo(storeRequestDTO)
+                .tagInfo(Collections.emptyList())
+                .menuFolderIds(menuFolderIds)
+                .build();
+        return menuService.createMenu(postMenuRequest, userId).getMenuGroupId();
     }
 }

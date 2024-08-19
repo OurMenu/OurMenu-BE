@@ -35,15 +35,22 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     Optional<Menu> findByIdAndUserId(Long menuId, Long userId);
 
+//    @Query("SELECT m FROM Menu m WHERE m.id IN (" +
+//            "(SELECT MIN(m2.id) FROM Menu m2 WHERE m2.user.id = :userId " +
+//            "AND m2.groupId = :groupId " + // groupId를 조건에 추가
+//            "GROUP BY m2.groupId))")
+//    Optional<List<Menu>> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
+//                                                 @Param("groupId") Long groupId);
+
+
     @Query("SELECT DISTINCT m FROM Menu m " +
             "JOIN FETCH m.place p " +
             "LEFT JOIN FETCH m.images mi " +
-            "JOIN m.tags mt " +
-            "JOIN mt.tag t " +
+            "LEFT JOIN m.tags mt " +
+            "LEFT JOIN mt.tag t " +
             "WHERE m.user.id = :userId " +
             "AND m.groupId = :groupId")
-    List<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,
-                                                 @Param("groupId") Long groupId);
+    List<Menu> findCertainMenuByUserIdAndGroupId(@Param("userId") Long userId,@Param("groupId") Long groupId);
 
 
     @Query("SELECT m FROM Menu m " +
@@ -67,8 +74,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             "SELECT MIN(m2.id) FROM Menu m2 " +
             "JOIN m2.place p " +
             "LEFT JOIN m2.images mi " +
-            "JOIN m2.tags mt " +
-            "JOIN mt.tag t " +
+            "LEFT JOIN m2.tags mt " +
+            "LEFT JOIN mt.tag t " +
             "WHERE m2.user.id = :userId " +
             "AND (:tags IS NULL OR (t.name IN :tags)) " +
             "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
@@ -84,7 +91,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             @Param("userId") Long userId,
             @Param("minPrice") Integer minPrice,
             @Param("maxPrice") Integer maxPrice,
-            @Param("tagCount") int tagCount, // 태그 개수 추가
+            @Param("tagCount") Integer tagCount, // 태그 개수 추가
             Pageable pageable);
 
 
@@ -94,6 +101,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title% AND m.user.id = :userId")
     List<Menu> findMenusByTitleContainingAndUserId(@Param("title") String title, @Param("userId") Long userId);
+
+    @Query("SELECT m FROM Menu m WHERE m.title LIKE %:title%")
+    List<Menu> findMenusByTitleContaining(@Param("title") String title);
+
+    List<Menu> findMenusByTitleContainingAndUserIdNot(@Param("title") String title, @Param("userId") Long userId);
 
     @Query("SELECT m FROM Menu m WHERE m.id = :menuId AND m.user.id = :userId")
     Optional<Menu> findMenuByUserId(@Param("menuId") Long menuId, @Param("userId") Long userId);
@@ -116,4 +128,50 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             ") ORDER BY m.modifiedAt DESC")
     List<Menu> findDistinctByUserIdOrderByModifiedAtDesc(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT m FROM Menu m WHERE m.user.id != :userId " +
+            "AND m.id IN (" +
+            "    SELECT MIN(m2.id) FROM Menu m2 " +  // 그룹 내에서 최소 ID를 선택
+            "    JOIN m2.tags mt " +
+            "    WHERE mt.tag.name IN :tagNames " +
+            "    GROUP BY m2.groupId " +  // groupId로 그룹화
+            "    HAVING COUNT(DISTINCT mt.tag.name) >= :tagCount" +
+            ")")
+    List<Menu> findMenusByTagNamesInAndUserIdNotAndTagCountGreaterThanEqual(
+            @Param("tagNames") List<String> tagNames,
+            @Param("userId") Long userId,
+            @Param("tagCount") int tagCount);
+
+
+    /**
+     * 온보딩에 사용되는 쿼리
+     * @param tags
+     * @param menuFolderId
+     * @param userId
+     * @param minPrice
+     * @param maxPrice
+     * @param tagCount
+     * @param pageable
+     * @return
+     */
+    @Query("SELECT m FROM Menu m WHERE m.id IN (" +
+            "SELECT MIN(m2.id) FROM Menu m2 " +
+            "JOIN m2.place p " +
+            "LEFT JOIN m2.images mi " +
+            "LEFT JOIN m2.tags mt " +
+            "LEFT JOIN mt.tag t " +
+            "WHERE (:tags IS NULL OR (t.name IN :tags)) " +
+            "AND (:menuFolderId IS NULL OR m2.menuList.id = :menuFolderId) " +
+            "AND (:minPrice IS NULL OR m2.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR m2.price <= :maxPrice) " +
+            "GROUP BY m2.groupId " +
+            "HAVING COUNT(DISTINCT t.name) >= :tagCount" +
+            ")")
+
+    Page<Menu> findingMenusByCriteria3(
+            @Param("tags") String[] tags, // 태그 배열로 변경
+            @Param("menuFolderId") Integer menuFolderId,
+            @Param("minPrice") Integer minPrice,
+            @Param("maxPrice") Integer maxPrice,
+            @Param("tagCount") Integer tagCount, // 태그 개수 추가
+            Pageable pageable);
 }
