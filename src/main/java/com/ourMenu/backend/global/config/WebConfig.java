@@ -28,6 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/account/signup",
                         "/account/login",
                         "/account/reissueToken",
+                        "/user/temporaryPassword",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",

@@ -37,7 +37,7 @@ public class UserController {
         return ApiUtils.success(null);
     }
 
-    @PostMapping("/password")
+    @PostMapping("/temporaryPassword")
     public ApiResponse<TempPasswordResponse> getTemporaryPassword(@Valid @RequestBody TempPasswordRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(getErrorMessages(bindingResult));
