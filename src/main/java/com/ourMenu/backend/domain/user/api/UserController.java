@@ -2,6 +2,8 @@ package com.ourMenu.backend.domain.user.api;
 
 import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
+import com.ourMenu.backend.domain.user.api.request.TempPasswordRequest;
+import com.ourMenu.backend.domain.user.api.response.TempPasswordResponse;
 import com.ourMenu.backend.domain.user.api.response.UserArticleResponse;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.application.UserService;
@@ -33,6 +35,15 @@ public class UserController {
         }
         userService.changePassword(userId, request);
         return ApiUtils.success(null);
+    }
+
+    @PostMapping("/temporaryPassword")
+    public ApiResponse<TempPasswordResponse> getTemporaryPassword(@Valid @RequestBody TempPasswordRequest request, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new ValidationException(getErrorMessages(bindingResult));
+        }
+        String tempPwd = userService.getTemporaryPassword(request);
+        return ApiUtils.success(new TempPasswordResponse(tempPwd));
     }
 
     @PatchMapping("/nickname")

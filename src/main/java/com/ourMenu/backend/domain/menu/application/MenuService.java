@@ -423,4 +423,15 @@ public class MenuService {
         menu.updateModifiedAt();
     }
 
+    public List<Menu> getMenuByGroupId(List<Long>groupIdList, Long userId) {
+        Map<Long,Menu> map = new HashMap<>();
+        for (Long groupId : groupIdList) {
+            List<Menu> menuList = menuRepository.findOneByGroupIdAndUserId(groupId, userId);
+            if(menuList.size()==0)
+                throw new RuntimeException("해당하는 메뉴가 없습니다");
+            map.put(menuList.get(0).getGroupId(),menuList.get(0));
+        }
+        return map.values().stream().toList();
+    }
+
 }

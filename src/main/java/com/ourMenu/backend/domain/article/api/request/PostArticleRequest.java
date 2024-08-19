@@ -19,14 +19,14 @@ public class PostArticleRequest {
 
     private String articleContent;
 
-    private List<ArticleMenuRequest> articleMenus;
+    private List<Long> groupIds;
 
-    public static Article toEntity(PostArticleRequest postArticleRequest){
+    /*public static Article toEntity(PostArticleRequest postArticleRequest){
         List<ArticleMenu> articleMenuList = postArticleRequest.getArticleMenus().stream().map(ArticleMenuRequest::toEntity).toList();
         return Article.builder()
                 .title(postArticleRequest.articleTitle)
                 .content(postArticleRequest.articleContent)
                 .articleMenuList(articleMenuList)
                 .build();
-    }
+    }*/
 }

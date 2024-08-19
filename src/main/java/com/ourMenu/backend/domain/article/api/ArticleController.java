@@ -17,6 +17,7 @@ import com.ourMenu.backend.global.util.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,12 +29,11 @@ public class ArticleController {
 
     @PostMapping("/article")
     public ApiResponse<ArticleResponse> postArticle(@RequestBody PostArticleRequest postArticleRequest, @UserId Long userId) {
-        Article article = PostArticleRequest.toEntity(postArticleRequest);
-        Article saveArticle = articleService.saveArticleWithMenu(article, userId);
+        Article saveArticle = articleService.getArticleByGroupId(postArticleRequest,userId);
         if (saveArticle.getUser().getImgUrl() == null) {
-            return ApiUtils.success(ArticleResponse.toDto(article));
+            return ApiUtils.success(ArticleResponse.toDto(saveArticle));
         }
-        String userImgUrl = articleService.getUserImgUrl(article.getUser().getImgUrl());
+        String userImgUrl = articleService.getUserImgUrl(saveArticle.getUser().getImgUrl());
         return ApiUtils.success(ArticleResponse.toDto(saveArticle, userImgUrl));
     }
 
@@ -59,7 +59,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/article/{articleId}")
-    public ApiResponse<String> deleteArticle(@PathVariable Long articleId, @UserId Long userId){
+    public ApiResponse<String> deleteArticle(@PathVariable Long articleId, @UserId Long userId) {
         articleService.hardDeleteByUserId(articleId, userId);
         return ApiUtils.success("OK");
     }
@@ -83,7 +83,7 @@ public class ArticleController {
     }
 
     @GetMapping("/article/menu/{articleMenuId}")
-    public ApiResponse<ArticleMenuResponse> getSharedArticleMenu(@PathVariable Long articleMenuId){
+    public ApiResponse<ArticleMenuResponse> getSharedArticleMenu(@PathVariable Long articleMenuId) {
         ArticleMenu articleMenu = articleService.addSharedCount(articleMenuId);
 
         return ApiUtils.success(ArticleMenuResponse.toDto(articleMenu));
@@ -91,8 +91,8 @@ public class ArticleController {
 
     @PostMapping("/article/menu/{articleMenuId}")
     public ApiResponse<DownloadArticleMenuResponse> downloadArticleMenu(@PathVariable Long articleMenuId,
-                                                                @RequestBody DownloadArticleMenu downloadArticleMenu,
-                                                                @UserId Long userId){
+                                                                        @RequestBody DownloadArticleMenu downloadArticleMenu,
+                                                                        @UserId Long userId) {
         Long groupId = articleService.downloadMenus(articleMenuId, downloadArticleMenu, userId);
 
         return ApiUtils.success(DownloadArticleMenuResponse.toDto(groupId));

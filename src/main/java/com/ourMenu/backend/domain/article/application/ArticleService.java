@@ -1,6 +1,7 @@
 package com.ourMenu.backend.domain.article.application;
 
 import com.ourMenu.backend.domain.article.api.request.DownloadArticleMenu;
+import com.ourMenu.backend.domain.article.api.request.PostArticleRequest;
 import com.ourMenu.backend.domain.article.dao.ArticleMenuRepository;
 import com.ourMenu.backend.domain.article.dao.ArticleRepository;
 import com.ourMenu.backend.domain.article.domain.Article;
@@ -12,6 +13,7 @@ import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
+import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
 import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
 import com.ourMenu.backend.domain.menulist.domain.MenuList;
@@ -243,4 +245,36 @@ public class ArticleService {
                 .build();
         return menuService.createMenu(postMenuRequest, userId).getMenuGroupId();
     }
+
+    @Transactional
+    public Article getArticleByGroupId(PostArticleRequest postArticleRequest, Long userId) {
+        List<Menu> menuList = menuService.getMenuByGroupId(postArticleRequest.getGroupIds(),userId);
+        Article article = Article.builder()
+                .user(userService.getUserById(userId).get())
+                .title(postArticleRequest.getArticleTitle())
+                .content(postArticleRequest.getArticleContent())
+                .build();
+        Article saveArticle = save(article);
+
+        for (Menu menu : menuList) {
+            ArticleMenu articleMenu = ArticleMenu.builder()
+                    .article(saveArticle)
+                    .title(menu.getTitle())
+                    .price(menu.getPrice())
+                    .placeTitle(menu.getPlace().getTitle())
+                    .address(menu.getPlace().getAddress())
+                    .imgUrl(menu.getImages().size() == 0  ? null:menu.getImages().get(0).getUrl())
+                    .groupId(menu.getGroupId())
+                    .menuMemoTitle(menu.getMemoTitle())
+                    .menuIconType(menu.getMenuIconType())
+                    .placeMemo(menu.getPlace().getInfo())
+                    .placeLatitude(menu.getPlace().getLatitude())
+                    .placeLongitude(menu.getPlace().getLongitude())
+                    .build();
+            ArticleMenu saveArticleMenu = articleMenuService.save(articleMenu);
+            saveArticle.addArticleMenu(saveArticleMenu);
+        }
+        return saveArticle;
+    }
+
 }

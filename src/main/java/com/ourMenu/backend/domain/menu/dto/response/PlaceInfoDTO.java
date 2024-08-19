@@ -8,11 +8,14 @@ import lombok.Data;
 @Data
 @Builder
 public class PlaceInfoDTO {
+    private String placeTitle;
     private String placeAddress;
     private String placeInfo;
 
+
     public static PlaceInfoDTO toDto(Place place){
         return PlaceInfoDTO.builder()
+                .placeTitle(place.getTitle())
                 .placeAddress(place.getAddress())
                 .placeInfo(place.getInfo())
                 .build();

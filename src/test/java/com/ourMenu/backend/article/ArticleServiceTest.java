@@ -188,7 +188,7 @@ public class ArticleServiceTest {
 
     }
 
-    @DisplayName("saveArticleWithMenu 메서드에서 발생하는 쿼리수릃 확인한다.")
+ /*   @DisplayName("saveArticleWithMenu 메서드에서 발생하는 쿼리수릃 확인한다.")
     @Test
     @Transactional
     public void test7() {
@@ -268,5 +268,5 @@ public class ArticleServiceTest {
         //then
         System.out.println("saveArticle.toString() = " + saveArticle.toString());
 
-    }
+    }*/
 }
