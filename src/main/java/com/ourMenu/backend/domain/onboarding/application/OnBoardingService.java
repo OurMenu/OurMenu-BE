@@ -97,8 +97,6 @@ public class OnBoardingService {
     public List<Menu> findOtherStoreByRandomTag(Long userId, DefaultTag randomTag) {
         List<Menu> menuList = menuService.getAllOtherMenusByTagName(randomTag.getTagName(), userId);
         Map<MenuIdentifier,Menu> map = new HashMap<>();
-        if(Objects.equals(randomTag.getTagName(), "양식"))
-            System.out.println("map = " + map);
         for (Menu menu : menuList) {
             if(menu.getUser().getId() == userId)
                 continue;
