@@ -2,6 +2,7 @@ package com.ourMenu.backend.domain.user.application;
 
 import com.ourMenu.backend.domain.user.api.request.ChangeNicknameRequest;
 import com.ourMenu.backend.domain.user.api.request.ChangePasswordRequest;
+import com.ourMenu.backend.domain.user.api.request.TempPasswordRequest;
 import com.ourMenu.backend.domain.user.api.response.UserArticleResponse;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
 import com.ourMenu.backend.domain.user.dao.UserDao;
@@ -59,6 +60,28 @@ public class UserService {
 
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         userDao.updatePassword(userId, encodedNewPassword);
+    }
+
+    public String getTemporaryPassword(TempPasswordRequest request) {
+        // get user by email
+        Map<String, Object> user = userDao.getUserByEmail(request.getEmail());
+        Long userId = (Long) user.get("user_id");
+
+        // make random password
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(characters.length());
+            sb.append(characters.charAt(index));
+        }
+        String tempPwd = sb.toString();
+
+        // update password
+        String encodedNewPassword = passwordEncoder.encode(tempPwd);
+        userDao.updatePassword(userId, encodedNewPassword);
+
+        return tempPwd;
     }
 
     public void changeNickname(Long userId, ChangeNicknameRequest request) {
