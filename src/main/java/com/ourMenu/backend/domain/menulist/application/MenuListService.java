@@ -201,7 +201,7 @@ public class MenuListService {
         MenuList.MenuListBuilder updateMenuListBuilder = menuList.toBuilder();
 
         //제목 수정
-        if (request.getMenuFolderTitle() != null) {
+        if (request.getMenuFolderTitle() != null && !request.getMenuFolderTitle().isEmpty()) {
             updateMenuListBuilder.title(request.getMenuFolderTitle());
         }
 
@@ -233,7 +233,7 @@ public class MenuListService {
         }
 
 
-        if (request.getMenuFolderIcon() != null) {
+        if (request.getMenuFolderIcon() != null && !request.getMenuFolderIcon().isEmpty()) {
             updateMenuListBuilder.iconType(request.getMenuFolderIcon());
         }
 
