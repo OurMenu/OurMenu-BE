@@ -13,15 +13,10 @@ import com.ourMenu.backend.domain.menu.application.MenuService;
 import com.ourMenu.backend.domain.menu.domain.Menu;
 import com.ourMenu.backend.domain.menu.dto.request.PostMenuRequest;
 import com.ourMenu.backend.domain.menu.dto.request.StoreRequestDTO;
-import com.ourMenu.backend.domain.menu.dto.response.MenuDetailDto;
-import com.ourMenu.backend.domain.menu.dto.response.PostMenuResponse;
 import com.ourMenu.backend.domain.menulist.application.MenuListService;
-import com.ourMenu.backend.domain.menulist.domain.MenuList;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.domain.user.domain.User;
-import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.Status;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -30,8 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.*;
@@ -151,7 +144,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article updateArticleWithMenu(Long articleId, Article article, Long userId) {
+    public Article updateArticleWithMenu(Long articleId, Article article, Long userId, List<Long> groupIds) {
 
         Article findArticle = findOne(articleId);
         User user = findArticle.getUser();
@@ -166,10 +159,24 @@ public class ArticleService {
 
         findArticle.deleteAllArticleMenus();
 
-        for (ArticleMenu articleMenu : article.getArticleMenuList()) {
-            findArticle.addArticleMenu(articleMenu);
-            articleMenu.confirmArticle(findArticle);
-            articleMenuService.save(articleMenu);
+        List<Menu> menuList = menuService.getMenuByGroupId(groupIds, userId);
+        for (Menu menu : menuList) {
+            ArticleMenu articleMenu = ArticleMenu.builder()
+                    .article(findArticle)
+                    .title(menu.getTitle())
+                    .price(menu.getPrice())
+                    .placeTitle(menu.getPlace().getTitle())
+                    .address(menu.getPlace().getAddress())
+                    .imgUrl(menu.getImages().size() == 0 ? null : menu.getImages().get(0).getUrl())
+                    .groupId(menu.getGroupId())
+                    .menuMemoTitle(menu.getMemoTitle())
+                    .menuIconType(menu.getMenuIconType())
+                    .placeMemo(menu.getPlace().getInfo())
+                    .placeLatitude(menu.getPlace().getLatitude())
+                    .placeLongitude(menu.getPlace().getLongitude())
+                    .build();
+            ArticleMenu saveArticleMenu = articleMenuService.save(articleMenu);
+            findArticle.addArticleMenu(saveArticleMenu);
         }
         findArticle.update(article);
         return findArticle;
@@ -276,5 +283,6 @@ public class ArticleService {
         }
         return saveArticle;
     }
+
 
 }
