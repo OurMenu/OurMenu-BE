@@ -174,4 +174,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             @Param("maxPrice") Integer maxPrice,
             @Param("tagCount") Integer tagCount, // 태그 개수 추가
             Pageable pageable);
+
+
+    List<Menu> findOneByGroupIdAndUserId(Long groupId, Long userId);
 }
