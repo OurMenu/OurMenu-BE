@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChangeNicknameRequest {
 
-    @Size(min = 1, max = 6, message = "닉네임은 1글자 이상, 최대 6글자까지 가능합니다")
+    @Size(min = 1, max = 10, message = "닉네임은 1글자 이상, 최대 6글자까지 가능합니다")
     private String nickname;
 
 }
