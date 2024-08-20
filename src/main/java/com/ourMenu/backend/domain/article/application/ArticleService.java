@@ -241,15 +241,16 @@ public class ArticleService {
                 .build();
 
         PostMenuRequest postMenuRequest = PostMenuRequest.builder()
-                .menuTitle(articleMenu.getMenuMemoTitle())
+                .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
-                .menuMemo(articleMenu.getPlaceMemo())
+                .menuMemo("공유된 메뉴입니다")
                 .menuMemoTitle(articleMenu.getMenuMemoTitle())
                 .menuIconType(articleMenu.getMenuIconType())
                 .storeInfo(storeRequestDTO)
                 .tagInfo(Collections.emptyList())
                 .menuFolderIds(menuFolderIds)
                 .build();
+        menuService.createMenu(postMenuRequest, userId);
         return menuService.createMenu(postMenuRequest, userId).getMenuGroupId();
     }
 
