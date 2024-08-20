@@ -234,7 +234,7 @@ public class ArticleService {
                 .build();
 
         PostMenuRequest postMenuRequest = PostMenuRequest.builder()
-                .menuTitle(articleMenu.getMenuMemoTitle())
+                .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
                 .menuMemo(articleMenu.getPlaceMemo())
                 .menuMemoTitle(articleMenu.getMenuMemoTitle())
@@ -243,6 +243,7 @@ public class ArticleService {
                 .tagInfo(Collections.emptyList())
                 .menuFolderIds(menuFolderIds)
                 .build();
+        menuService.createMenu(postMenuRequest, userId);
         return menuService.createMenu(postMenuRequest, userId).getMenuGroupId();
     }
 
