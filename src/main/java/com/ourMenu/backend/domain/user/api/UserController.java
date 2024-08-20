@@ -6,6 +6,7 @@ import com.ourMenu.backend.domain.user.api.request.TempPasswordRequest;
 import com.ourMenu.backend.domain.user.api.response.TempPasswordResponse;
 import com.ourMenu.backend.domain.user.api.response.UserArticleResponse;
 import com.ourMenu.backend.domain.user.api.response.UserInfoResponse;
+import com.ourMenu.backend.domain.user.application.EmailService;
 import com.ourMenu.backend.domain.user.application.UserService;
 import com.ourMenu.backend.global.argument_resolver.UserId;
 import com.ourMenu.backend.global.common.ApiResponse;
@@ -27,6 +28,7 @@ import static com.ourMenu.backend.global.util.BindingResultUtils.getErrorMessage
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
     @PatchMapping("/password")
     public ApiResponse<Object> changePassword(@UserId Long userId, @Valid @RequestBody ChangePasswordRequest request, BindingResult bindingResult) {
@@ -43,6 +45,7 @@ public class UserController {
             throw new ValidationException(getErrorMessages(bindingResult));
         }
         String tempPwd = userService.getTemporaryPassword(request);
+        emailService.sendPasswordEmail(request.getEmail(), tempPwd);
         return ApiUtils.success(new TempPasswordResponse(tempPwd));
     }
 

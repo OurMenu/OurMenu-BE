@@ -56,6 +56,24 @@ public class EmailService {
         return message;
     }
 
+    public void sendPasswordEmail(String address, String password) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(senderEmail);
+            message.setRecipients(MimeMessage.RecipientType.TO, address);
+            message.setSubject("[Ourmenu]임시 비밀번호");
+            String body = "";
+            body += "<h3>" + "임시 비밀번호" + "</h3>";
+            body += "<h1>" + password + "</h1>";
+            message.setText(body,"UTF-8", "html");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        javaMailSender.send(message);
+    }
+
     private void saveCode(String address, String code) {
         AuthEmailEntity emailEntity = new AuthEmailEntity(address, code);
         emailRepository.save(emailEntity);
