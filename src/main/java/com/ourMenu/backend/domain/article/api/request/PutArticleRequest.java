@@ -19,14 +19,12 @@ public class PutArticleRequest {
 
     private String articleContent;
 
-    private List<ArticleMenuRequest> articleMenus;
+    private List<Long> groupIds;
 
     public static Article toEntity(PutArticleRequest putArticleRequest){
-        List<ArticleMenu> articleMenuList = putArticleRequest.getArticleMenus().stream().map(ArticleMenuRequest::toEntity).toList();
         return Article.builder()
                 .title(putArticleRequest.articleTitle)
                 .content(putArticleRequest.articleContent)
-                .articleMenuList(articleMenuList)
                 .build();
     }
 }
