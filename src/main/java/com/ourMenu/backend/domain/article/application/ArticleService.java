@@ -236,7 +236,7 @@ public class ArticleService {
         PostMenuRequest postMenuRequest = PostMenuRequest.builder()
                 .menuTitle(articleMenu.getTitle())
                 .menuPrice(articleMenu.getPrice())
-                .menuMemo(articleMenu.getPlaceMemo())
+                .menuMemo("공유된 메뉴입니다")
                 .menuMemoTitle(articleMenu.getMenuMemoTitle())
                 .menuIconType(articleMenu.getMenuIconType())
                 .storeInfo(storeRequestDTO)
