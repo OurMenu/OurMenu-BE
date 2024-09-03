@@ -1,22 +1,43 @@
-## OurMenu backend 
-### git convention
-| 태그이름       | 내용                                          |
-|------------|---------------------------------------------|
-| `feat`     | 새로운 기능을 추가할 경우                              |
-| `fix `     | 버그를 고친 경우                                   |
-| `style`    | 코드 포맷 변경, 세미 콜론 누락, 코드 수정이 없는 경우            |
-| `refactor` | 코드 리팩토링                                     |
-| `comment`  | 필요한 주석 추가 및 변경                              |
-| `docs`	    | 문서, Swagger 를 수정한 경우                        |
-| `test`     | 테스트 추가, 테스트 리팩토링(프로덕션 코드 변경 X)              |
-| `chore`	   | 빌드 태스트 업데이트, 패키지 매니저를 설정하는 경우(프로덕션 코드 변경 X) |
-| `rename`   | 파일 혹은 폴더명을 수정하거나 옮기는 작업만인 경우                |
-| `remove`   | 파일을 삭제하는 작업만 수행한 경우                         |
-### 
+# 5초만에 메뉴를 추천해주는, OURMENU
 
-### review
-- PR은 코드 변경이 없는 경우를 제외하고 리뷰와 승인을 필요로 합니다
-- PR는 build가 성공되는 경우에 merge 할 수 있도록 합니다.
-- main는 최종, develop은 개발 branch이고, 브랜치명으로 해당 작업을 명세합니다 ex) feat/deploy
-- [패키지를 도메인별로 분리하는 작업합니다](https://velog.io/@jsb100800/Spring-boot-directory-package)
-- 
+ <img width=800px src=https://github.com/user-attachments/assets/17aefb5c-4bb7-4174-83a3-66176e904c94/>
+
+오늘도 뭘 먹을지 고민된다면? <br>
+내가 아카이빙해 두었던 내 취향의 메뉴들을 바탕으로 메뉴를 추천받아보세요! <br>
+나만의 메뉴판, **아워메뉴** <br>
+
+⏰ 개발기간
+
+- `2024. 07. 03` ~ `2024. 08. 20` (Ver 1.0)
+
+<br>
+
+## 팀원 소개
+
+**🧑🏻‍💻 Back-End**
+<table>
+  <tbody>
+    <tr>
+      <td align="center"><a href="https://github.com/david-parkk">
+      <img width=140px src="https://avatars.githubusercontent.com/u/57484954?v=4" alt=""/><br />
+      <sub><b>[BE Leader] 박지원</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/isoo127">
+      <img width=140px src="https://avatars.githubusercontent.com/u/81908212?v=4" alt=""/><br />
+      <sub><b>[BE] 강상민</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/You-Hyuk">
+      <img width=140px src="https://avatars.githubusercontent.com/u/145669610?v=4" alt=""/><br />
+      <sub><b>[BE] 정유혁</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/csh-scl">
+      <img width=140px src="https://avatars.githubusercontent.com/u/140063021?v=4" alt=""/><br />
+      <sub><b>[BE] 조성현</b></sub></a><br /></td>
+    </tr>
+  </tbody>
+</table>
+
+
+## 기술 스택
+![My Skills](https://go-skill-icons.vercel.app/api/icons?i=spring,hibernate,mysql,redis,mongodb,aws,githubactions,nginx,docker&perline=5)
+
+## 아키텍쳐
+![image](https://github.com/user-attachments/assets/575fe410-f54b-4ec2-b427-8fc3fee7e9b7)
+
